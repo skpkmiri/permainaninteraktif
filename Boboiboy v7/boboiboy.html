@@ -1,0 +1,2175 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pertandingan Kuiz Kata Adjektif MBK - BoBoiBoy & Papa Zola</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Cartoonish Look -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght=500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: radial-gradient(circle, #f8fafc 0%, #e2e8f0 100%);
+            transition: background 0.5s ease;
+            position: relative;
+            overflow-x: hidden;
+        }
+        .theme-p1 { background: radial-gradient(circle, #ffedd5 0%, #fed7aa 100%); }
+        .theme-p2 { background: radial-gradient(circle, #dcfce7 0%, #bbf7d0 100%); }
+        .theme-autism { background: radial-gradient(circle, #e0f2fe 0%, #bae6fd 100%); }
+        .theme-flashcard { background: radial-gradient(circle, #faf5ff 0%, #e9d5ff 100%); }
+        .theme-superhero { background: radial-gradient(circle, #fdf2f8 0%, #fbcfe8 100%); }
+        
+        .font-cartoon {
+            font-family: 'Fredoka One', cursive;
+        }
+        .pop-shadow {
+            box-shadow: 0 8px 0px 0px rgba(0,0,0,0.15);
+        }
+        .btn-pop:active {
+            transform: translateY(4px);
+            box-shadow: 0 4px 0px 0px rgba(0,0,0,0.15);
+        }
+        
+        /* Animasi Kartun */
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg); }
+        }
+        @keyframes float-up {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+        @keyframes pulse-fun {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .bounce-element { animation: bounce-slow 3s ease-in-out infinite; }
+        .wiggle-element { animation: wiggle 2s ease-in-out infinite; }
+        .pulse-element { animation: pulse-fun 1.5s ease-in-out infinite; }
+        
+        /* Dekorasi Latar Belakang Kartun */
+        .bg-shape {
+            position: absolute;
+            z-index: -1;
+            opacity: 0.4;
+            animation: float-up 15s linear infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-4 overflow-x-hidden theme-p1" id="main-body">
+
+    <!-- ELEMEN DEKORASI LATAR BELAKANG (KARTUN) -->
+    <div class="bg-shape text-4xl" style="left: 10%; animation-duration: 18s; animation-delay: 0s;">⚡</div>
+    <div class="bg-shape text-3xl" style="left: 30%; animation-duration: 22s; animation-delay: 5s;">⭐</div>
+    <div class="bg-shape text-5xl" style="left: 60%; animation-duration: 20s; animation-delay: 2s;">🌀</div>
+    <div class="bg-shape text-3xl" style="left: 80%; animation-duration: 25s; animation-delay: 8s;">🍃</div>
+    <div class="bg-shape text-4xl" style="left: 45%; animation-duration: 19s; animation-delay: 12s;">🔥</div>
+
+    <!-- ELEMEN AUDIO MUZIK LATAR -->
+    <audio id="bgm-player" loop preload="auto">
+        <source src="starostin-comedy-cartoon-funny-background-music-492540.mp3" type="audio/mpeg">
+        Pelayar anda tidak menyokong elemen audio.
+    </audio>
+
+    <!-- Butang Kamus Poket AI Terapung (Kiri) -->
+    <button onclick="openPocketDictionary()" class="fixed bottom-4 left-4 bg-indigo-500 hover:bg-indigo-600 text-white p-4 rounded-full border-4 border-indigo-700 shadow-xl z-50 transition btn-pop flex items-center justify-center pulse-element" id="btn-dictionary-float" title="Kamus Poket AI Ochobot">
+        <div class="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-indigo-100 shadow-sm shrink-0">
+            <img src="Ochobot%202%20-%20Edited.jpg" alt="Ochobot" class="w-full h-full object-cover" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
+            <span class="text-xl hidden">🤖</span>
+        </div>
+    </button>
+
+    <!-- Butang Toggle Muzik Latar (BGM) Terapung (Kanan) -->
+    <button onclick="toggleBGM()" class="fixed bottom-4 right-4 bg-purple-500 hover:bg-purple-600 text-white p-4 rounded-full border-4 border-purple-700 shadow-xl z-50 transition btn-pop flex items-center justify-center pulse-element" id="btn-bgm-float" title="Buka/Tutup Muzik">
+        <span id="bgm-icon" class="text-2xl">🎵🔇</span>
+    </button>
+
+    <!-- HEADER / SKOR BERGANDA -->
+    <header id="quiz-header" class="w-full max-w-2xl mx-auto flex justify-between items-center bg-white p-3 rounded-2xl shadow-md border-4 border-gray-300 mb-4 z-10 hidden">
+        <div class="flex items-center space-x-2 bg-orange-100 px-3 py-1 rounded-xl border-2 border-orange-400 wiggle-element" id="header-p1-box">
+            <div class="w-8 h-8 rounded-full overflow-hidden border border-orange-500 flex items-center justify-center bg-orange-50 shadow-sm shrink-0">
+                <img src="Boboiboy%20-%20Edited.jpg" alt="BoBoiBoy" class="w-full h-full object-cover" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
+                <span class="text-lg hidden">👦</span>
+            </div>
+            <div>
+                <h1 class="font-cartoon text-orange-600 text-xs leading-none">PASUKAN BOBOIBOY</h1>
+                <p class="text-sm font-bold text-gray-800" id="score-p1">Markah: 0</p>
+            </div>
+        </div>
+
+        <!-- TETAPAN SUARA AI (DIPILIH GURU/MURID) -->
+        <div class="bg-gray-50 border border-gray-200 px-2 py-1 rounded-xl text-center hidden md:block flex-grow mx-4">
+            <label class="text-[10px] font-bold text-gray-500 block uppercase">Suara AI Ochobot 🗣️</label>
+            <select id="tts-voice-select" class="text-xs bg-white border border-gray-300 rounded px-1 py-0.5 outline-none font-bold text-gray-700 w-full text-center">
+                <option value="Kore">Kore (Ceria) 👦</option>
+                <option value="Leda">Leda (Lembut) 👧</option>
+                <option value="Zephyr">Zephyr (Bersemangat) ⚡</option>
+                <option value="Fenrir">Fenrir (Garang) 🐺</option>
+            </select>
+        </div>
+
+        <div class="flex items-center space-x-2 bg-green-100 px-3 py-1 rounded-xl border-2 border-green-500 text-right wiggle-element" style="animation-delay: 1s;" id="header-p2-box">
+            <div>
+                <h1 class="font-cartoon text-green-700 text-xs leading-none">PASUKAN ADU DU</h1>
+                <p class="text-sm font-bold text-gray-800" id="score-p2">Markah: 0</p>
+            </div>
+            <div class="w-8 h-8 rounded-full overflow-hidden border border-green-500 flex items-center justify-center bg-green-50 shadow-sm shrink-0">
+                <img src="Adudu%20-%20Edited.png" alt="Adu Du" class="w-full h-full object-cover" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
+                <span class="text-lg hidden">👽</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow flex items-center justify-center w-full max-w-4xl mx-auto relative z-10 my-4">
+        
+        <div class="flex flex-col lg:flex-row gap-6 w-full items-center justify-center">
+            
+            <!-- Hiasan Sisi Watak BoBoiBoy & Ochobot (Kiri - Skrin Besar sahaja) -->
+            <div class="hidden lg:flex flex-col gap-4 w-48 text-center shrink-0">
+                <div class="bg-white rounded-2xl border-4 border-orange-400 p-3 shadow-md bounce-element">
+                    <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-orange-300 mx-auto mb-2 flex items-center justify-center bg-orange-50 shadow-sm">
+                        <img src="Boboiboy%20-%20Edited.jpg" alt="BoBoiBoy" class="w-full h-full object-cover" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
+                        <span class="text-4xl hidden">👦</span>
+                    </div>
+                    <span class="font-cartoon text-sm text-orange-600">BoBoiBoy</span>
+                    <span class="text-[10px] block font-bold text-gray-500 bg-orange-50 rounded-full py-0.5 mt-1">Hero Bumi!</span>
+                </div>
+                <div class="bg-white rounded-2xl border-4 border-indigo-400 p-3 shadow-md bounce-element" style="animation-delay: 1s;">
+                    <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-indigo-300 mx-auto mb-2 flex items-center justify-center bg-indigo-50 shadow-sm">
+                        <img src="Ochobot%202%20-%20Edited.jpg" alt="Ochobot" class="w-full h-full object-cover" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
+                        <span class="text-4xl hidden">🤖</span>
+                    </div>
+                    <span class="font-cartoon text-sm text-indigo-600">Ochobot</span>
+                    <span class="text-[10px] block font-bold text-gray-500 bg-indigo-50 rounded-full py-0.5 mt-1">Robot Pembantu AI</span>
+                </div>
+            </div>
+
+            <!-- KAD UTAMA PERMAINAN -->
+            <div class="w-full max-w-2xl">
+                
+                <!-- 1. SKRIN PEMILIHAN MOD KATEGORI -->
+                <div id="screen-category" class="w-full bg-white rounded-3xl border-8 border-indigo-500 p-6 md:p-8 text-center pop-shadow">
+                    <div class="flex justify-center items-center gap-4 mb-4">
+                        <div class="w-16 h-16 rounded-full overflow-hidden border-4 border-indigo-200 flex items-center justify-center bg-orange-100 shadow-sm">
+                            <img src="Boboiboy%20-%20Edited.jpg" alt="BoBoiBoy" class="w-full h-full object-cover animate-pulse" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
+                            <span class="text-3xl hidden">👦</span>
+                        </div>
+                        <span class="text-5xl bounce-element">⚡</span>
+                        <div class="w-16 h-16 rounded-full overflow-hidden border-4 border-indigo-200 flex items-center justify-center bg-green-100 shadow-sm">
+                            <img src="Adudu%20-%20Edited.png" alt="Adu Du" class="w-full h-full object-cover animate-pulse" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
+                            <span class="text-3xl hidden">👽</span>
+                        </div>
+                    </div>
+                    
+                    <h2 class="font-cartoon text-2xl md:text-3xl text-indigo-600 mb-1 leading-tight">AKADEMI KEBENARAN MBK</h2>
+                    <p class="text-gray-500 font-bold text-xs md:text-sm mb-6">Sila Pilih Kumpulan Pembelajaran Murid:</p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                        <!-- Butang Kategori A: Slow Learner -->
+                        <button onclick="selectCategory('slow-learner')" class="p-4 bg-gradient-to-br from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 border-4 border-orange-400 rounded-2xl transition btn-pop text-left flex flex-col justify-between h-40 shadow-sm relative overflow-hidden group">
+                            <div class="absolute -right-4 -bottom-4 text-6xl opacity-20 group-hover:scale-110 transition-transform">⚡</div>
+                            <div class="flex justify-between items-center w-full relative z-10">
+                                <span class="text-3xl bounce-element">👦👧</span>
+                                <span class="bg-orange-400 text-white font-cartoon text-[10px] px-2 py-0.5 rounded-full shadow-sm">ASAS 3M</span>
+                            </div>
+                            <div class="relative z-10">
+                                <h3 class="font-cartoon text-base text-orange-600 leading-none mb-1">Pasukan Slow Learner</h3>
+                                <p class="text-[10px] text-gray-600 font-bold">Kuiz 20 Soalan Setiap Kelas (Tahun 1-6).</p>
+                            </div>
+                        </button>
+
+                        <!-- Butang Kategori B: Autisme Non-Verbal -->
+                        <button onclick="selectCategory('autisme')" class="p-4 bg-gradient-to-br from-sky-50 to-indigo-50 hover:from-sky-100 hover:to-indigo-100 border-4 border-indigo-400 rounded-2xl transition btn-pop text-left flex flex-col justify-between h-40 shadow-sm relative overflow-hidden group">
+                            <div class="absolute -right-4 -bottom-4 text-6xl opacity-20 group-hover:scale-110 transition-transform">🧩</div>
+                            <div class="flex justify-between items-center w-full relative z-10">
+                                <span class="text-3xl bounce-element" style="animation-delay: 0.5s;">🧩</span>
+                                <span class="bg-indigo-400 text-white font-cartoon text-[10px] px-2 py-0.5 rounded-full shadow-sm">SENSORI</span>
+                            </div>
+                            <div class="relative z-10">
+                                <h3 class="font-cartoon text-base text-indigo-600 leading-none mb-1">Pasukan Autisme</h3>
+                                <p class="text-[10px] text-gray-600 font-bold">20 Padanan Visual Setiap Kelas (Tahun 1-6).</p>
+                            </div>
+                        </button>
+
+                        <!-- Butang Kategori C: Kad Imbasan Pintar AI Ochobot -->
+                        <button onclick="openAiFlashcards()" class="p-4 bg-gradient-to-br from-purple-50 to-fuchsia-50 hover:from-purple-100 hover:to-fuchsia-100 border-4 border-purple-400 rounded-2xl transition btn-pop text-left flex flex-col justify-between h-40 shadow-sm relative overflow-hidden group">
+                            <div class="absolute -right-4 -bottom-4 text-6xl opacity-20 group-hover:scale-110 transition-transform">📕</div>
+                            <div class="flex justify-between items-center w-full relative z-10">
+                                <div class="w-8 h-8 rounded-full overflow-hidden border border-purple-300 flex items-center justify-center bg-indigo-50 shadow-sm">
+                                    <img src="Ochobot%202%20-%20Edited.jpg" alt="Ochobot" class="w-full h-full object-cover" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
+                                    <span class="text-sm hidden">🤖</span>
+                                </div>
+                                <span class="bg-purple-500 text-white font-cartoon text-[10px] px-2 py-0.5 rounded-full shadow-sm">AI IMAGEN</span>
+                            </div>
+                            <div class="relative z-10">
+                                <h3 class="font-cartoon text-base text-purple-700 leading-none mb-1">Kad Imbasan AI</h3>
+                                <p class="text-[10px] text-gray-600 font-bold">Bina maksud & lukisan BoBoiBoy AI secara langsung!</p>
+                            </div>
+                        </button>
+
+                        <!-- BUTANG KATEGORI D: PENCIPTA SUPERHERO AI -->
+                        <button onclick="openSuperheroCreator()" class="p-4 bg-gradient-to-br from-rose-50 to-pink-50 hover:from-rose-100 hover:to-pink-100 border-4 border-pink-400 rounded-2xl transition btn-pop text-left flex flex-col justify-between h-40 shadow-sm relative overflow-hidden group">
+                            <div class="absolute -right-4 -bottom-4 text-6xl opacity-20 group-hover:scale-110 transition-transform">🦸‍♂️</div>
+                            <div class="flex justify-between items-center w-full relative z-10">
+                                <span class="text-3xl bounce-element">⚡🚀</span>
+                                <span class="bg-pink-500 text-white font-cartoon text-[10px] px-2 py-0.5 rounded-full shadow-sm">✨ REKA HERO AI ✨</span>
+                            </div>
+                            <div class="relative z-10">
+                                <h3 class="font-cartoon text-base text-pink-700 leading-none mb-1">Pencipta Superhero AI</h3>
+                                <p class="text-[10px] text-gray-600 font-bold">Reka watak superhero kustom anda sendiri dengan lukisan AI!</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 1B. SKRIN PEMILIHAN TAHUN -->
+                <div id="screen-year" class="hidden w-full bg-white rounded-3xl border-8 border-indigo-500 p-6 md:p-8 text-center pop-shadow">
+                    <div class="flex justify-center gap-3 mb-2">
+                        <span class="text-4xl bounce-element">🎒</span>
+                        <span class="text-4xl wiggle-element">🏫</span>
+                        <span class="text-4xl bounce-element" style="animation-delay: 0.5s;">🍪</span>
+                    </div>
+                    <h2 class="font-cartoon text-2xl md:text-3xl text-indigo-600 mb-1 leading-tight">PILIH TAHUN PENGAJIAN</h2>
+                    <p id="year-selection-subtitle" class="text-gray-500 font-bold text-xs md:text-sm mb-6">Sila pilih kelas untuk memulakan cabaran:</p>
+
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+                        <button onclick="selectYear(1)" class="p-4 bg-red-50 hover:bg-red-100 border-4 border-red-400 rounded-2xl transition btn-pop font-cartoon text-red-600 text-lg shadow-sm">Tahun 1 🎒</button>
+                        <button onclick="selectYear(2)" class="p-4 bg-orange-50 hover:bg-orange-100 border-4 border-orange-400 rounded-2xl transition btn-pop font-cartoon text-orange-600 text-lg shadow-sm">Tahun 2 ✏️</button>
+                        <button onclick="selectYear(3)" class="p-4 bg-yellow-50 hover:bg-yellow-100 border-4 border-yellow-400 rounded-2xl transition btn-pop font-cartoon text-yellow-700 text-lg shadow-sm">Tahun 3 📖</button>
+                        <button onclick="selectYear(4)" class="p-4 bg-green-50 hover:bg-green-100 border-4 border-green-400 rounded-2xl transition btn-pop font-cartoon text-green-700 text-lg shadow-sm">Tahun 4 🔍</button>
+                        <button onclick="selectYear(5)" class="p-4 bg-blue-50 hover:bg-blue-100 border-4 border-blue-400 rounded-2xl transition btn-pop font-cartoon text-blue-600 text-lg shadow-sm">Tahun 5 🚀</button>
+                        <button onclick="selectYear(6)" class="p-4 bg-purple-50 hover:bg-purple-100 border-4 border-purple-400 rounded-2xl transition btn-pop font-cartoon text-purple-600 text-lg shadow-sm">Tahun 6 👑</button>
+                    </div>
+
+                    <button onclick="backToCategorySelect()" class="text-xs font-bold text-gray-400 hover:text-gray-600 py-1 transition">⬅️ Kembali ke Pemilihan Kategori</button>
+                </div>
+
+                <!-- 2. SKRIN MULA SLOW LEARNER -->
+                <div id="screen-start-slow" class="hidden w-full bg-white rounded-3xl border-8 border-orange-500 p-6 md:p-8 text-center pop-shadow">
+                    <h2 class="font-cartoon text-3xl md:text-4xl text-orange-600 mb-1 leading-tight">PERLAWANAN ADJEKTIF</h2>
+                    <p id="start-slow-subtitle" class="text-gray-700 font-bold text-sm md:text-base mb-6">Kategori: Slow Learner - Tahun X</p>
+                    
+                    <div class="flex justify-center items-center space-x-4 mb-6">
+                        <div class="flex flex-col items-center p-3 bg-orange-100 border-4 border-orange-400 rounded-2xl w-28 bounce-element">
+                            <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-orange-300 flex items-center justify-center bg-orange-50 mb-2 shadow-sm">
+                                <img src="Boboiboy%20-%20Edited.jpg" alt="BoBoiBoy" class="w-full h-full object-cover" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
+                                <span class="text-2xl hidden">👦</span>
+                            </div>
+                            <span class="font-cartoon text-orange-600 text-[10px]">Pemain 1</span>
+                            <span class="font-bold text-[11px] text-orange-800">BoBoiBoy</span>
+                        </div>
+                        <span class="font-cartoon text-2xl text-gray-400 pulse-element">VS</span>
+                        <div class="flex flex-col items-center p-3 bg-green-100 border-4 border-green-500 rounded-2xl w-28 bounce-element" style="animation-delay: 1.5s;">
+                            <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-green-300 flex items-center justify-center bg-green-50 mb-2 shadow-sm">
+                                <img src="Adudu%20-%20Edited.png" alt="Adu Du" class="w-full h-full object-cover" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
+                                <span class="text-2xl hidden">👽</span>
+                            </div>
+                            <span class="font-cartoon text-green-700 text-[10px]">Pemain 2</span>
+                            <span class="font-bold text-[11px] text-green-900">Adu Du</span>
+                        </div>
+                    </div>
+
+                    <!-- INTEGRASI GEMINI AI -->
+                    <div class="bg-indigo-50 border-4 border-dashed border-indigo-300 rounded-2xl p-4 mb-6 text-left">
+                        <span class="bg-indigo-500 text-white font-cartoon text-[10px] px-2 py-0.5 rounded-full inline-block mb-2">⚡ CIRI PINTAR CIKGU ⚡</span>
+                        <h4 class="font-cartoon text-sm text-indigo-900 mb-1">Bina Soalan Kuiz Baru Menggunakan AI Ochobot!</h4>
+                        <p class="text-xs text-gray-600 mb-3">Jana kuiz bertema secara automatik (10 soalan).</p>
+                        
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <select id="ai-quiz-theme" class="bg-white border-2 border-indigo-300 rounded-xl px-3 py-2 text-xs font-bold text-gray-700 outline-none flex-grow shadow-sm">
+                                <option value="Makanan & Kedai Kokotiam Tok Aba">Tema: Makanan & Kedai Tok Aba ☕</option>
+                                <option value="Pertempuran Angkasa Lepas & Kapal Angkasa">Tema: Pertempuran Angkasa Lepas 🚀</option>
+                                <option value="Aktiviti Gotong-Royong di Sekolah Kebenaran">Tema: Gotong-Royong Sekolah 🏫</option>
+                                <option value="Haiwan Jinak dan Liar di Zoo Negara">Tema: Haiwan di Zoo 🐯</option>
+                            </select>
+                            <button onclick="generateCustomAiQuiz()" id="btn-generate-quiz" class="bg-indigo-500 hover:bg-indigo-600 text-white font-cartoon text-xs py-2 px-4 rounded-xl border-b-4 border-indigo-700 transition btn-pop whitespace-nowrap">✨ Jana Kuiz AI! ✨</button>
+                        </div>
+                        <div id="ai-quiz-loading" class="hidden mt-3 text-xs font-bold text-indigo-600 animate-pulse flex items-center gap-2"><span>🔮</span> Ochobot sedang menyusun soalan baru... Sila tunggu...</div>
+                        <div id="ai-quiz-success" class="hidden mt-3 p-2 bg-emerald-100 border border-emerald-300 text-emerald-800 text-xs rounded-xl font-bold flex items-center gap-2"><span>✅</span> Kuiz berjaya dijana! Klik mula bermain di bawah.</div>
+                    </div>
+                    
+                    <div class="flex flex-col gap-3">
+                        <button onclick="startSlowLearnerGame()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-cartoon text-xl py-3.5 rounded-2xl border-b-6 border-orange-700 transition btn-pop shadow-md">MULA PERTANDINGAN! 🎮</button>
+                        <button onclick="backToYearSelect()" class="text-xs font-bold text-gray-400 hover:text-gray-600 py-1 transition">⬅️ Pilih Tahun Lain</button>
+                    </div>
+                </div>
+
+                <!-- 3. SKRIN SOALAN SLOW LEARNER -->
+                <div id="screen-quiz" class="hidden w-full bg-white rounded-3xl border-8 border-orange-500 p-6 md:p-8 pop-shadow">
+                    <div id="turn-banner" class="w-full bg-orange-500 text-white font-cartoon text-lg text-center py-2 rounded-xl mb-4 shadow-sm transition-colors duration-300">⚡ GILIRAN PASUKAN BOBOIBOY (PEMAIN 1)</div>
+                    <div class="mb-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold text-blue-600 text-sm bg-blue-100 px-2 py-0.5 rounded-full border border-blue-300 animate-pulse" id="level-indicator-slow">Tahun X</span>
+                            <span class="font-bold text-gray-600 text-sm" id="question-number">Soalan 1 / 20</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden border-2 border-gray-300">
+                            <div id="progress-bar" class="bg-gradient-to-r from-blue-400 to-blue-600 h-full transition-all duration-300" style="width: 5%;"></div>
+                        </div>
+                    </div>
+
+                    <div id="question-bubble" class="bg-orange-50 rounded-2xl border-4 border-orange-300 p-4 mb-6 relative transition-colors duration-300">
+                        <div id="speaker-badge" class="absolute -top-6 -left-2 bg-orange-400 text-white text-[11px] p-1 px-3 rounded-full border-2 border-orange-600 font-cartoon flex items-center gap-1.5 shadow-md">
+                            <span>🤠 PAPA ZOLA SOAL:</span>
+                            <button onclick="speakCurrentQuestion()" class="bg-white text-orange-600 w-5 h-5 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition" title="Dengar Soalan">
+                                <i class="fas fa-volume-up text-[10px]"></i>
+                            </button>
+                        </div>
+                        <div class="mt-4 text-center">
+                            <p id="quiz-question" class="font-cartoon text-base md:text-lg text-gray-800 leading-relaxed">BoBoiBoy mempunyai pedang yang sangat ________.</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3" id="answers-container">
+                        <button onclick="checkAnswer(0)" class="answer-option w-full bg-blue-50 hover:bg-blue-100 text-left p-3.5 rounded-xl border-4 border-blue-400 flex items-center space-x-3 transition btn-pop group">
+                            <span class="font-cartoon text-lg text-blue-500 bg-white w-8 h-8 rounded-full flex items-center justify-center border-2 border-blue-400 shadow-sm group-hover:scale-110 transition-transform">A</span>
+                            <span class="font-bold text-gray-800 text-base answer-text">Tajam</span>
+                        </button>
+                        <button onclick="checkAnswer(1)" class="answer-option w-full bg-green-50 hover:bg-green-100 text-left p-3.5 rounded-xl border-4 border-green-400 flex items-center space-x-3 transition btn-pop group">
+                            <span class="font-cartoon text-lg text-green-500 bg-white w-8 h-8 rounded-full flex items-center justify-center border-2 border-green-400 shadow-sm group-hover:scale-110 transition-transform">B</span>
+                            <span class="font-bold text-gray-800 text-base answer-text">Tumpul</span>
+                        </button>
+                        <button onclick="checkAnswer(2)" class="answer-option w-full bg-purple-50 hover:bg-purple-100 text-left p-3.5 rounded-xl border-4 border-purple-400 flex items-center space-x-3 transition btn-pop group">
+                            <span class="font-cartoon text-lg text-purple-500 bg-white w-8 h-8 rounded-full flex items-center justify-center border-2 border-purple-400 shadow-sm group-hover:scale-110 transition-transform">C</span>
+                            <span class="font-bold text-gray-800 text-base answer-text">Lembut</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4. SKRIN AUTISME -->
+                <div id="screen-autism" class="hidden w-full bg-white rounded-3xl border-8 border-indigo-400 p-6 md:p-8 pop-shadow relative overflow-hidden">
+                    <div class="w-full bg-indigo-500 text-white font-cartoon text-base md:text-lg text-center py-2.5 rounded-xl mb-4 shadow-sm pulse-element">🧩 PADANAN VISUAL KARTUN</div>
+                    <div class="flex justify-between items-center mb-4 text-xs font-bold">
+                        <span class="text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded-full border border-indigo-300" id="autism-level-lbl">Tahun 1 | Cabaran 1/20</span>
+                        <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full" id="autism-concept-lbl">Kategori: Warna</span>
+                    </div>
+                    <div class="bg-sky-50 rounded-2xl border-4 border-sky-300 p-4 mb-6 text-center min-h-[160px] flex flex-col justify-center items-center relative">
+                        <div id="autism-visual-target" class="text-7xl mb-2 wiggle-element">⚡</div>
+                        <h3 id="autism-visual-instruction" class="font-cartoon text-lg text-gray-700 leading-tight mt-2 flex items-center justify-center gap-2">
+                            <span>Cari warna yang sama!</span>
+                            <!-- BUTANG SUARA GEMINI TTS UNTUK AUTISME -->
+                            <button onclick="speakTextTTS(document.getElementById('autism-visual-instruction').innerText)" class="bg-indigo-500 text-white w-6 h-6 rounded-full flex items-center justify-center hover:scale-115 active:scale-90 transition">
+                                <i class="fas fa-volume-up text-xs"></i>
+                            </button>
+                        </h3>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3" id="autism-options-container"></div>
+                    <div class="text-center mt-4"><p class="text-[10px] font-bold text-indigo-400" id="autism-progress-text">Selesaikan semua cabaran hero!</p></div>
+                </div>
+
+                <!-- 4B. SKRIN KAD IMBASAN AI OCHOBOT -->
+                <div id="screen-flashcard" class="hidden w-full bg-white rounded-3xl border-8 border-purple-500 p-6 md:p-8 pop-shadow text-center">
+                    <div class="w-full bg-purple-600 text-white font-cartoon text-lg text-center py-2.5 rounded-xl mb-4 shadow-sm">
+                        ✨ KAD IMBASAN GAMBAR PINTAR AI ✨
+                    </div>
+                    
+                    <p class="text-xs font-bold text-gray-500 mb-4">Sila pilih kata adjektif atau taip sendiri kosa kata baharu:</p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-2 mb-6">
+                        <select id="flashcard-select" class="bg-purple-50 border-2 border-purple-300 rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 outline-none flex-grow shadow-sm">
+                            <option value="pantas">Pantas ⚡</option>
+                            <option value="marah">Marah 😡</option>
+                            <option value="sejuk">Sejuk ❄️</option>
+                            <option value="besar">Besar 🐘</option>
+                            <option value="wangi">Wangi 🌸</option>
+                            <option value="tinggi">Tinggi 🦒</option>
+                        </select>
+                        <input type="text" id="flashcard-custom-input" placeholder="Atau taip perkataan kustom..." class="bg-gray-100 border-2 border-purple-300 rounded-xl px-4 py-2.5 text-xs font-bold text-gray-700 outline-none shadow-sm text-center flex-grow">
+                        <button onclick="generatePocketFlashcardAi()" class="bg-purple-500 hover:bg-purple-600 text-white font-cartoon text-xs py-2 px-4 rounded-xl border-b-4 border-purple-700 transition btn-pop whitespace-nowrap shadow-md">
+                            ✨ Bina Kad AI! ✨
+                        </button>
+                    </div>
+
+                    <!-- Status Memuatkan AI -->
+                    <div id="flashcard-loading" class="hidden text-xs font-bold text-purple-600 animate-pulse mb-6 flex flex-col items-center gap-2">
+                        <span>🔮</span> Ochobot sedang menjana maksud & melukis gambar ilustrasi menggunakan Imagen 4.0... Sila tunggu sebentar...
+                    </div>
+
+                    <!-- Keputusan Kad Imbasan AI Visual -->
+                    <div id="flashcard-output" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 bg-purple-50/50 p-4 border-4 border-purple-300 rounded-3xl text-left shadow-inner mb-6 transition-all duration-300">
+                        <!-- Gambar Ilustrasi Dijana AI -->
+                        <div class="bg-white p-2 border-2 border-purple-200 rounded-2xl flex flex-col justify-center items-center h-48 shadow-sm overflow-hidden">
+                            <img id="flashcard-ai-img" src="" alt="Ilustrasi AI" class="w-full h-full object-contain rounded-xl">
+                        </div>
+                        
+                        <!-- Penjelasan & Ayat Dijana AI -->
+                        <div class="flex flex-col justify-between">
+                            <div>
+                                <span class="text-[10px] font-cartoon bg-purple-600 text-white px-2 py-0.5 rounded-full shadow-sm" id="flashcard-ai-tag">KOSA KATA AI</span>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <h3 id="flashcard-ai-word" class="font-cartoon text-3xl text-purple-700 capitalize leading-none">Pantas</h3>
+                                    <!-- BUTANG SUARA GEMINI TTS UNTUK KAD IMBASAN -->
+                                    <button onclick="speakFlashcard()" class="bg-purple-200 text-purple-700 w-6 h-6 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition" title="Dengar">
+                                        <i class="fas fa-volume-up text-xs"></i>
+                                    </button>
+                                </div>
+                                <h4 class="font-cartoon text-[11px] text-purple-500 uppercase mt-3">Maksud Mudah Ochobot:</h4>
+                                <p id="flashcard-ai-explanation" class="text-sm font-bold text-gray-800 leading-tight mt-1"></p>
+                            </div>
+                            
+                            <div class="mt-4 pt-3 border-t border-purple-200">
+                                <h4 class="font-cartoon text-[11px] text-orange-500 uppercase">Ayat Contoh BoBoiBoy:</h4>
+                                <p id="flashcard-ai-sentence" class="text-xs font-bold text-gray-700 mt-1 italic leading-relaxed"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="backToCategorySelect()" class="w-full bg-gray-400 hover:bg-gray-500 text-white font-cartoon text-base py-3 rounded-2xl border-b-4 border-gray-600 transition btn-pop">
+                        🚪 Kembali ke Menu Kategori
+                    </button>
+                </div>
+
+                <!-- 4C. SKRIN PENCIPTA SUPERHERO AI (CIRI GEMINI BARU!) -->
+                <div id="screen-superhero-creator" class="hidden w-full bg-white rounded-3xl border-8 border-pink-500 p-6 md:p-8 pop-shadow text-center">
+                    <div class="w-full bg-pink-600 text-white font-cartoon text-lg text-center py-2.5 rounded-xl mb-4 shadow-sm">
+                        ⚡ REKA KREASI SUPERHERO AI OCHOBOT 🦸‍♂️
+                    </div>
+                    <p class="text-xs font-bold text-gray-500 mb-4">Cipta superhero baru bumi menggunakan kata adjektif!</p>
+                    
+                    <div class="space-y-4 mb-6 text-left">
+                        <div>
+                            <label class="text-xs font-cartoon text-pink-700 block mb-1">1. Nama Superhero Anda:</label>
+                            <input type="text" id="superhero-name-input" placeholder="Masukkan nama (Contoh: BoBoiBoy Jaguh)..." class="w-full bg-pink-50/50 border-2 border-pink-300 rounded-xl px-4 py-2.5 text-xs font-bold text-gray-700 outline-none shadow-sm">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-xs font-cartoon text-pink-700 block mb-1">2. Sifat Kekuatan (Adjektif):</label>
+                                <select id="superhero-adj-select" class="w-full bg-pink-50/50 border-2 border-pink-300 rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 outline-none shadow-sm">
+                                    <option value="pantas">Pantas ⚡</option>
+                                    <option value="sasa dan perkasa">Sasa & Kuat 💪</option>
+                                    <option value="bijak">Bijak & Pintar 🧠</option>
+                                    <option value="berani">Sangat Berani 🦁</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs font-cartoon text-pink-700 block mb-1">3. Kuasa Elemen:</label>
+                                <select id="superhero-power-select" class="w-full bg-pink-50/50 border-2 border-pink-300 rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 outline-none shadow-sm">
+                                    <option value="api yang membara">Api 🔥</option>
+                                    <option value="ais yang beku">Ais ❄️</option>
+                                    <option value="daun tumbuhan menjalar">Daun 🍃</option>
+                                    <option value="cahaya yang silau">Cahaya ☀️</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button onclick="generateSuperheroAi()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-cartoon text-sm py-3 rounded-2xl border-b-6 border-pink-700 transition btn-pop shadow-md uppercase">
+                            ✨ Bina Adiwira AI Saya! ⚡
+                        </button>
+                    </div>
+
+                    <!-- Status Memuatkan AI -->
+                    <div id="superhero-loading" class="hidden text-xs font-bold text-pink-600 animate-pulse mb-6 flex flex-col items-center gap-2">
+                        <span>🔮</span> Ochobot sedang menggabungkan kuasa elemen dan melukis adiwira anda... Sila bersabar...
+                    </div>
+
+                    <!-- Keputusan Superhero AI -->
+                    <div id="superhero-output" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 bg-pink-50/50 p-4 border-4 border-pink-300 rounded-3xl text-left shadow-inner mb-6 transition-all duration-300">
+                        <div class="bg-white p-2 border-2 border-pink-200 rounded-2xl flex flex-col justify-center items-center h-48 shadow-sm overflow-hidden">
+                            <img id="superhero-ai-img" src="" alt="Superhero AI Portrait" class="w-full h-full object-contain rounded-xl">
+                        </div>
+                        <div class="flex flex-col justify-between">
+                            <div>
+                                <span class="text-[10px] font-cartoon bg-pink-600 text-white px-2 py-0.5 rounded-full shadow-sm">PROFIL ADIWIRA BARU</span>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <h3 id="superhero-ai-title" class="font-cartoon text-2xl text-pink-700 capitalize leading-none">Hero Jaguh</h3>
+                                    <button onclick="speakSuperheroStory()" class="bg-pink-200 text-pink-700 w-6 h-6 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition" title="Dengar Cerita">
+                                        <i class="fas fa-volume-up text-xs"></i>
+                                    </button>
+                                </div>
+                                <h4 class="font-cartoon text-[11px] text-pink-500 uppercase mt-3">Kisah Kebenaran Hero:</h4>
+                                <p id="superhero-ai-story" class="text-xs font-bold text-gray-800 leading-relaxed mt-1 whitespace-pre-line"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="backToCategorySelect()" class="w-full bg-gray-400 hover:bg-gray-500 text-white font-cartoon text-base py-3 rounded-2xl border-b-4 border-gray-600 transition btn-pop">
+                        🚪 Kembali ke Menu Kategori
+                    </button>
+                </div>
+
+                <!-- 5. DIALOG FEEDBACK MODAL -->
+                <div id="modal-feedback" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
+                    <div class="bg-white rounded-3xl border-8 max-w-md w-full p-6 text-center shadow-2xl transition transform scale-95" id="feedback-card">
+                        <div id="feedback-avatar" class="text-7xl mb-2 bounce-element"></div>
+                        <h3 id="feedback-title" class="font-cartoon text-3xl md:text-4xl mb-2 tracking-wide uppercase"></h3>
+                        <div id="feedback-motivation-box" class="bg-yellow-100 border-4 border-yellow-300 rounded-2xl p-4 mb-4 pulse-element relative">
+                            <p id="feedback-message" class="text-yellow-800 font-cartoon text-xl md:text-2xl leading-tight"></p>
+                            <!-- BUTANG SUARA GEMINI TTS MOTIVASI -->
+                            <button onclick="speakTextTTS(document.getElementById('feedback-message').innerText + '. ' + document.getElementById('feedback-explanation').innerText)" class="absolute top-2 right-2 bg-yellow-400 text-yellow-800 w-6 h-6 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition" title="Dengar Motivasi">
+                                <i class="fas fa-volume-up text-xs"></i>
+                            </button>
+                        </div>
+                        <div id="feedback-explanation-box" class="bg-gray-50 border-2 border-gray-200 rounded-xl p-3 mb-4">
+                            <p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Fakta Adjektif:</p>
+                            <p id="feedback-explanation" class="text-sm font-bold text-gray-800"></p>
+                        </div>
+                        
+                        <!-- INTEGRASI GEMINI AI: BINA AYAT CONTOH -->
+                        <div id="gemini-ai-box" class="border-t-4 border-dashed border-indigo-100 pt-4 mb-6">
+                            <button id="btn-gemini-ai" onclick="generateAiExample()" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-cartoon text-xs py-2.5 px-4 rounded-2xl border-b-4 border-indigo-700 transition btn-pop flex items-center justify-center gap-2 shadow-sm"><span>✨ Bina Ayat Contoh AI! ✨</span></button>
+                            <div id="ai-loading" class="hidden mt-3 text-xs font-bold text-indigo-500 animate-pulse">🔮 Ochobot sedang berfikir...</div>
+                            <div id="ai-output-container" class="hidden mt-3 p-3 bg-indigo-50 border-2 border-indigo-200 rounded-xl relative text-left">
+                                <span class="absolute -top-3 left-4 bg-indigo-500 text-white text-[9px] font-cartoon px-2 py-0.5 rounded-full">🤖 AI OCHOBOT</span>
+                                <p id="ai-output-text" class="text-xs font-bold text-indigo-900 mt-1 leading-relaxed"></p>
+                                <!-- BUTANG GEMINI TTS BINA AYAT -->
+                                <button onclick="speakTextTTS(document.getElementById('ai-output-text').innerText)" class="absolute bottom-2 right-2 bg-indigo-200 text-indigo-700 w-5 h-5 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition" title="Dengar Ayat">
+                                    <i class="fas fa-volume-up text-[10px]"></i>
+                                </button>
+                            </div>
+                            <div id="ai-error-container" class="hidden mt-3 p-2 bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg font-bold">❌ Sistem sibuk! Teruskan perjalanan.</div>
+                        </div>
+                        <button onclick="nextQuestion()" id="btn-next" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-cartoon text-xl py-3.5 rounded-2xl border-b-6 border-orange-700 transition btn-pop shadow-md uppercase">SETERUSNYA! ➡️</button>
+                    </div>
+                </div>
+
+                <!-- 6. SKRIN KEPUTUSAN -->
+                <div id="screen-result" class="hidden w-full bg-white rounded-3xl border-8 border-blue-500 p-6 md:p-8 text-center pop-shadow relative overflow-hidden">
+                    <div class="absolute top-0 left-10 text-4xl animate-bounce" style="animation-duration: 2s;">🎉</div>
+                    <div class="absolute top-0 right-10 text-4xl animate-bounce" style="animation-duration: 2.5s;">🎊</div>
+                    <h2 class="font-cartoon text-2xl md:text-3xl text-blue-600 mb-6 pulse-element" id="result-main-title">KEPUTUSAN PERTANDINGAN!</h2>
+                    
+                    <div id="winner-banner" class="bg-yellow-100 border-4 border-yellow-400 rounded-2xl p-6 mb-6 bounce-element">
+                        <span id="winner-emoji" class="text-7xl block mb-2">🏆</span>
+                        <h3 id="winner-title" class="font-cartoon text-xl md:text-2xl text-yellow-700">PASUKAN BOBOIBOY MENANG!</h3>
+                    </div>
+                    
+                    <div id="score-comparison-box" class="flex justify-around items-center mb-6">
+                        <div class="text-center">
+                            <img src="Boboiboy - Edited.jpg" alt="BoBoiBoy" class="w-16 h-16 rounded-full object-cover mx-auto mb-2 border-4 border-orange-300 shadow-sm">
+                            <p class="font-cartoon text-xs text-gray-500">BoBoiBoy</p>
+                            <p class="font-cartoon text-4xl text-orange-500" id="final-score-p1">100</p>
+                        </div>
+                        <span class="font-cartoon text-2xl text-gray-300">VS</span>
+                        <div class="text-center">
+                            <img src="Adudu - Edited.png" alt="Adu Du" class="w-16 h-16 rounded-full object-cover mx-auto mb-2 border-4 border-green-300 shadow-sm">
+                            <p class="font-cartoon text-xs text-gray-500">Adu Du</p>
+                            <p class="font-cartoon text-4xl text-green-600" id="final-score-p2">80</p>
+                        </div>
+                    </div>
+
+                    <!-- INTEGRASI GEMINI AI: CERITA PENDEK OCHOBOT PADA SKRIN KEPUTUSAN -->
+                    <div id="ai-story-box" class="mb-4 bg-indigo-50 border-4 border-dashed border-indigo-300 rounded-2xl p-4 text-left hidden">
+                        <button onclick="generateAiStory()" id="btn-generate-story" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-cartoon text-sm py-3 px-4 rounded-xl border-b-4 border-indigo-700 transition btn-pop">
+                            ✨ Ochobot, Ceritakan Kisah Kejayaan Saya! ✨
+                        </button>
+                        <div id="ai-story-loading" class="hidden mt-3 text-xs font-bold text-indigo-600 animate-pulse flex items-center gap-2">
+                            <span>🔮</span> Ochobot sedang mengarang cerita yang menarik...
+                        </div>
+                        <div id="ai-story-output-container" class="hidden mt-3 p-3 bg-white border-2 border-indigo-200 rounded-xl relative">
+                            <span class="absolute -top-3 left-4 bg-indigo-500 text-white text-[9px] font-cartoon px-2 py-0.5 rounded-full">🤖 CERITA AI OCHOBOT</span>
+                            <p id="ai-story-text" class="text-sm font-bold text-gray-800 mt-2 leading-relaxed"></p>
+                            <!-- BUTANG GEMINI TTS CERITA SELESAI -->
+                            <button onclick="speakTextTTS(document.getElementById('ai-story-text').innerText)" class="mt-2 text-xs text-indigo-600 font-bold underline flex items-center gap-1 hover:text-indigo-800 transition">
+                                🔊 Dengar Cerita Ochobot AI
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- INTEGRASI GEMINI AI: LAPORAN PRESTASI GURU -->
+                    <div id="ai-teacher-report-box" class="mb-6 bg-teal-50 border-4 border-dashed border-teal-300 rounded-2xl p-4 text-left">
+                        <span class="bg-teal-500 text-white font-cartoon text-[10px] px-2 py-0.5 rounded-full inline-block mb-2">👨‍🏫 KHUSUS UNTUK GURU 👩‍🏫</span>
+                        <h4 class="font-cartoon text-sm text-teal-900 mb-2">Jana Laporan Prestasi AI</h4>
+                        <p class="text-xs text-gray-600 mb-3">Dapatkan analisis ringkas dan cadangan aktiviti susulan berdasarkan markah murid ini.</p>
+                        <button onclick="generateAiTeacherReport()" id="btn-generate-report" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-cartoon text-sm py-2.5 px-4 rounded-xl border-b-4 border-teal-700 transition btn-pop">
+                            📝 Jana Laporan Analisis AI
+                        </button>
+                        
+                        <div id="ai-report-loading" class="hidden mt-3 text-xs font-bold text-teal-600 animate-pulse flex items-center gap-2">
+                            <span>🔮</span> Sedang menjana ulasan pedagogi...
+                        </div>
+                        <div id="ai-report-output-container" class="hidden mt-3 p-3 bg-white border-2 border-teal-200 rounded-xl relative">
+                            <p id="ai-report-text" class="text-xs text-gray-800 mt-1 whitespace-pre-line"></p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        <button onclick="resetGame()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-cartoon text-xl py-4 rounded-2xl border-b-6 border-blue-700 transition btn-pop shadow-md">MAIN SEMULA 🔄</button>
+                        <button onclick="backToYearSelect()" class="text-xs font-bold text-gray-400 hover:text-gray-600 py-1 transition">🚪 Kembali ke Pemilihan Tahun</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hiasan Sisi Watak Pasukan Adu Du (Kanan - Skrin Besar sahaja) -->
+            <div class="hidden lg:flex flex-col gap-4 w-48 text-center shrink-0">
+                <div class="bg-white rounded-2xl border-4 border-green-500 p-3 shadow-md bounce-element" style="animation-delay: 0.5s;">
+                    <img src="Adudu - Edited.png" alt="Adu Du" class="w-16 h-16 rounded-full object-cover mx-auto mb-2 border-2 border-green-300 shadow-sm">
+                    <span class="font-cartoon text-sm text-green-700">Adu Du</span>
+                    <span class="text-[10px] block font-bold text-gray-500 bg-green-50 rounded-full py-0.5 mt-1">Seteru Utama</span>
+                </div>
+                <div class="bg-white rounded-2xl border-4 border-purple-500 p-3 shadow-md bounce-element" style="animation-delay: 1.5s;">
+                    <img src="Probe.webp" alt="Probe" class="w-16 h-16 rounded-full object-cover mx-auto mb-2 border-2 border-purple-300 shadow-sm">
+                    <span class="font-cartoon text-sm text-purple-700">Probe</span>
+                    <span class="text-[10px] block font-bold text-gray-500 bg-purple-50 rounded-full py-0.5 mt-1">Robot Tempur</span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- INTEGRASI GEMINI AI MODAL: KAMUS POKET INTERAKTIF & SEMAK AYAT OCHOBOT -->
+    <div id="modal-dictionary" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50 overflow-y-auto">
+        <div class="bg-white rounded-3xl border-8 border-indigo-500 max-w-md w-full p-6 text-center shadow-2xl pulse-element my-8">
+            <div class="text-6xl mb-2 bounce-element flex justify-center">
+                <div class="w-20 h-20 rounded-full overflow-hidden border-4 border-indigo-400 shadow-md flex items-center justify-center bg-indigo-100">
+                    <img src="Ochobot%202%20-%20Edited.jpg" alt="Ochobot" class="w-full h-full object-cover" id="dict-ochobot-avatar" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
+                    <span class="text-4xl hidden">🤖</span>
+                </div>
+            </div>
+            
+            <!-- Tab Menu di Kamus Poket -->
+            <div class="flex border-b-2 border-indigo-100 mb-4 text-xs font-bold">
+                <button onclick="switchDictTab('maksud')" id="tab-maksud" class="w-1/4 py-2 text-indigo-600 border-b-4 border-indigo-500">Maksud</button>
+                <button onclick="switchDictTab('semak')" id="tab-semak" class="w-1/4 py-2 text-gray-500 border-b-4 border-transparent">Semak</button>
+                <button onclick="switchDictTab('sembang')" id="tab-sembang" class="w-1/4 py-2 text-gray-500 border-b-4 border-transparent">Sembang ✨</button>
+                <button onclick="switchDictTab('gambar')" id="tab-gambar" class="w-1/4 py-2 text-gray-500 border-b-4 border-transparent">Gambar 🎨✨</button>
+            </div>
+
+            <!-- Tab 1: Maksud & Teka-Teki -->
+            <div id="dict-tab-content-maksud">
+                <p class="text-xs font-bold text-gray-500 mb-4">Tanya maksud kata adjektif atau dapatkan teka-teki!</p>
+                <div class="flex flex-col gap-2 mb-2">
+                    <input type="text" id="dict-input" placeholder="Taip kata adjektif... cth: wangi" class="w-full bg-gray-100 border-2 border-indigo-300 rounded-xl px-4 py-2.5 text-sm font-bold text-gray-700 outline-none shadow-sm text-center">
+                    <div class="flex gap-2">
+                        <button onclick="askPocketDictionary()" class="w-1/2 bg-indigo-500 hover:bg-indigo-600 text-white font-cartoon text-xs py-2 px-2 rounded-xl border-b-4 border-indigo-700 transition btn-pop">✨ Cari Maksud ✨</button>
+                        <button onclick="generateAiRiddle()" class="w-1/2 bg-rose-500 hover:bg-rose-600 text-white font-cartoon text-xs py-2 px-2 rounded-xl border-b-4 border-rose-700 transition btn-pop">🧩 Teka-Teki AI! 🧩</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Semak Ayat -->
+            <div id="dict-tab-content-semak" class="hidden">
+                <p class="text-xs font-bold text-gray-500 mb-4">Bina ayat menggunakan kata adjektif anda dan biarkan AI menyemaknya!</p>
+                <div class="border-indigo-100 mb-2">
+                    <input type="text" id="dict-word-focus" placeholder="Kata adjektif... cth: tinggi" class="w-full bg-gray-100 border-2 border-indigo-300 rounded-xl px-4 py-2 text-xs font-bold text-gray-700 outline-none shadow-sm text-center mb-2">
+                    <textarea id="dict-sentence-input" rows="2" placeholder="Cuba bina ayat... Cth: Bangunan itu sangat tinggi." class="w-full bg-indigo-50 border-2 border-indigo-300 rounded-xl px-4 py-2 text-xs font-bold text-gray-700 outline-none shadow-sm text-left mb-2 resize-none"></textarea>
+                    <button onclick="checkMySentenceAi()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-cartoon text-xs py-2 px-2 rounded-xl border-b-4 border-emerald-700 transition btn-pop">✨ Semak Ayat Saya Oleh Ochobot! ✨</button>
+                </div>
+            </div>
+
+            <!-- Tab 3: Sembang Watak -->
+            <div id="dict-tab-content-sembang" class="hidden">
+                <p class="text-xs font-bold text-gray-500 mb-3">Pilih watak kegemaran anda untuk bersembang secara langsung!</p>
+                <div class="flex gap-2 mb-3">
+                    <select id="chat-char-select" onchange="changeChatCharacter()" class="bg-gray-100 border-2 border-indigo-300 rounded-xl px-3 py-2 text-xs font-bold text-gray-700 outline-none flex-grow shadow-sm">
+                        <option value="boboiboy">BoBoiBoy (Sangat Mesra) ⚡</option>
+                        <option value="ochobot">Ochobot (Sabar & Bijak) 🤖</option>
+                        <option value="adudu">Adu Du (Kelakar & Marah) 👽</option>
+                    </select>
+                    <button onclick="clearChatHistory()" class="bg-gray-200 hover:bg-gray-300 text-gray-600 p-2 rounded-xl text-xs font-bold" title="Padam Sembang">🗑️</button>
+                </div>
+
+                <!-- Tetingkap Sembang Mini -->
+                <div id="chat-window" class="h-36 bg-gray-50 border-2 border-indigo-100 rounded-xl p-3 overflow-y-auto text-left text-xs mb-3 flex flex-col gap-2">
+                    <div class="text-indigo-600 font-bold bg-indigo-50 p-2 rounded-lg" id="chat-start-msg">🤖 Ochobot: Hai kawan! Mari mulakan sembang kebenaran kita hari ini! Gunakan kata adjektif ya.</div>
+                </div>
+
+                <!-- Input Sembang -->
+                <div class="flex gap-2">
+                    <input type="text" id="chat-user-input" placeholder="Tulis mesej anda di sini..." class="bg-gray-100 border-2 border-indigo-300 rounded-xl px-3 py-2 text-xs font-bold text-gray-700 outline-none flex-grow shadow-sm">
+                    <button onclick="sendCharacterChatMessage()" class="bg-indigo-500 hover:bg-indigo-600 text-white font-cartoon text-xs py-2 px-3 rounded-xl border-b-4 border-indigo-700 transition btn-pop">✨ Hantar Mesej! ✨</button>
+                </div>
+            </div>
+
+            <!-- Tab 4: Lukisan Gambar AI -->
+            <div id="dict-tab-content-gambar" class="hidden">
+                <p class="text-xs font-bold text-gray-500 mb-4">Lukis visual BoBoiBoy menggunakan kuasa penjana Gambar AI Ochobot!</p>
+                <div class="flex flex-col gap-2 mb-2">
+                    <input type="text" id="dict-image-input" placeholder="Taip perkataan... cth: sejuk" class="w-full bg-gray-100 border-2 border-indigo-300 rounded-xl px-4 py-2.5 text-sm font-bold text-gray-700 outline-none shadow-sm text-center">
+                    <button onclick="generateAiImage()" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-cartoon text-xs py-2.5 px-4 rounded-xl border-b-4 border-rose-700 transition btn-pop">✨ Bina Gambar AI! ✨</button>
+                </div>
+                
+                <!-- Bekas Gambar Hasil AI -->
+                <div id="dict-image-output-container" class="hidden mt-4 p-2 bg-gray-100 border-2 border-gray-300 rounded-2xl relative shadow-inner">
+                    <img id="dict-output-image-el" src="" alt="Ilustrasi AI" class="w-full max-h-48 object-contain rounded-xl">
+                    <p class="text-[10px] text-gray-500 mt-2 font-bold text-center">Generated by Ochobot AI 🎨</p>
+                </div>
+            </div>
+
+            <!-- Status Memuatkan AI -->
+            <div id="dict-loading" class="hidden text-xs font-bold text-indigo-600 animate-pulse mb-4 mt-2">
+                🔮 Ochobot sedang mencari data di galaksi... Sila tunggu...
+            </div>
+
+            <!-- Keputusan Maksud / Semakan AI -->
+            <div id="dict-output-container" class="hidden text-left p-3.5 bg-indigo-50 border-2 border-indigo-200 rounded-xl mb-4 relative max-h-48 overflow-y-auto mt-2">
+                <span class="absolute top-2 right-2 text-xl" id="dict-output-emoji">💡</span>
+                <h4 class="font-cartoon text-xs text-indigo-500 uppercase" id="dict-output-title">Maksud Mudah Ochobot:</h4>
+                <p id="dict-output-explanation" class="text-sm font-bold text-indigo-900 mt-1 mb-2 leading-relaxed whitespace-pre-line"></p>
+                <div id="dict-sentence-section">
+                    <h4 class="font-cartoon text-xs text-orange-500 uppercase flex items-center gap-1.5">
+                        <span>Ayat Contoh BoBoiBoy:</span>
+                        <!-- BUTANG SUARA GEMINI TTS UNTUK HASIL KAMUS -->
+                        <button onclick="speakTextTTS(document.getElementById('dict-output-explanation').innerText + '. ' + document.getElementById('dict-output-sentence').innerText)" class="bg-orange-100 text-orange-600 w-5 h-5 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition">
+                            <i class="fas fa-volume-up text-[10px]"></i>
+                        </button>
+                    </h4>
+                    <p id="dict-output-sentence" class="text-xs font-bold text-gray-700 mt-0.5 italic leading-relaxed"></p>
+                </div>
+            </div>
+
+            <div id="dict-error-container" class="hidden p-2 bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg font-bold mb-4">
+                ❌ Alamak, Ochobot kehabisan kuasa! Cuba lagi nanti.
+            </div>
+
+            <button onclick="closePocketDictionary()" class="w-full bg-gray-400 hover:bg-gray-500 text-white font-cartoon text-base py-2.5 rounded-2xl border-b-4 border-gray-600 transition btn-pop mt-2">
+                TUTUP KAMUS ❌
+            </button>
+        </div>
+    </div>
+
+    <!-- NOTIFIKASI KUSTOM MODAL -->
+    <div id="modal-alert" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl border-4 border-indigo-500 max-w-sm w-full p-6 text-center shadow-2xl pulse-element">
+            <span class="text-6xl block mb-3 bounce-element" id="alert-emoji">💡</span>
+            <h3 class="font-cartoon text-xl text-indigo-900 mb-2" id="alert-title">Sistem</h3>
+            <p class="text-sm font-bold text-gray-700 mb-6" id="alert-message">Mesej pemberitahuan.</p>
+            <button onclick="closeCustomAlert()" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-cartoon text-lg py-3 rounded-2xl border-b-6 border-indigo-700 transition btn-pop">BAIKLAH! 👍</button>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="text-center mt-6 text-[10px] md:text-xs text-gray-500 font-bold relative z-10">Dibina khas untuk Murid Berkeperluan Khas (MBK) • Modul Berperingkat Tahun 1-6 🚀</footer>
+
+    <script>
+        const apiKey = "";
+
+        let activeCategory = ""; 
+        let activeYear = 1;      
+        let currentQuestionIndex = 0;
+        let scoreP1 = 0;
+        let scoreP2 = 0;
+        let scoreAutisme = 0; 
+        let currentPlayer = 1; 
+        let lastGeneratedAiText = "";
+        let isMusicPlaying = false;
+        let isMusicInitialized = false;
+
+        // Memori Sejarah Sembang Watak (Gemini AI)
+        let characterChatHistory = [];
+
+        // Kawalan Audio Teman Musik MP3
+        function toggleBGM() {
+            const bgmPlayer = document.getElementById('bgm-player');
+            bgmPlayer.volume = 0.25; 
+            bgmPlayer.loop = true; 
+
+            if (isMusicPlaying) {
+                bgmPlayer.pause();
+                isMusicPlaying = false;
+                document.getElementById('bgm-icon').innerText = '🎵🔇';
+                document.getElementById('bgm-icon').parentElement.classList.remove('pulse-element');
+            } else {
+                let playPromise = bgmPlayer.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(_ => {
+                        isMusicPlaying = true;
+                        document.getElementById('bgm-icon').innerText = '🎵🔊';
+                        document.getElementById('bgm-icon').parentElement.classList.add('pulse-element');
+                    }).catch(error => {
+                        console.log("Autoplay prevented:", error);
+                    });
+                }
+            }
+        }
+
+        // --- DATABASE SOALAN KUMPULAN A: SLOW LEARNER (OBJEK TAHUN 1 - 6) ---
+        let quizDataSlowAll = {
+            "1": [
+                { "question": "Topi dinosaur BoBoiBoy berwarna ________ yang sangat terang.", "options": ["oren", "kelabu", "hitam"], "answer": 0, "word": "oren", "explanation": "Oren ialah kata adjektif warna yang menarik perhatian." },
+                { "question": "Kucing kesayangan BoBoiBoy, Cattus, bersaiz sangat ________.", "options": ["besar", "kecil", "tinggi"], "answer": 1, "word": "kecil", "explanation": "Kecil ialah kata adjektif ukuran saiz fizikal." },
+                { "question": "Badan alien Adu Du berwarna ________.", "options": ["merah", "hijau", "kuning"], "answer": 1, "word": "hijau", "explanation": "Hijau ialah kata adjektif warna konkrit." },
+                { "question": "Ochobot berbentuk ________ seperti sebiji bola gergasi.", "options": ["bulat", "segi tiga", "petak"], "answer": 0, "word": "bulat", "explanation": "Bulat merujuk kepada kata adjektif bentuk bulat." },
+                { "question": "Belon kuasa Gopal berwarna ________ seperti langit bersih.", "options": ["biru", "hitam", "putih"], "answer": 0, "word": "biru", "explanation": "Biru ialah warna primer konkrit." },
+                { "question": "Baju sejuk BoBoiBoy Ice terasa sangat ________.", "options": ["sejuk", "panas", "pedas"], "answer": 0, "word": "sejuk", "explanation": "Sejuk ialah kata adjektif pancaindera sentuh." },
+                { "question": "Kotak itu sangat ________ untuk diangkat oleh Gopal.", "options": ["berat", "ringan", "lembut"], "answer": 0, "word": "berat", "explanation": "Berat ialah sifat jisim sesuatu barang." },
+                { "question": "Lantai yang baru dimop oleh Tok Aba sangat ________.", "options": ["bersih", "kotor", "kusam"], "answer": 0, "word": "bersih", "explanation": "Bersih menunjukkan keadaan lantai yang tiada habuk." },
+                { "question": "Kasut sukan Ying berwarna ________ merah jambu.", "options": ["merah", "kelabu", "putih"], "answer": 0, "word": "merah", "explanation": "Merah merupakan warna asas yang terang." },
+                { "question": "Rambut Cikgu Papa Zola yang panjang kelihatan ________.", "options": ["hitam", "kuning", "hijau"], "answer": 0, "word": "hitam", "explanation": "Rambut manusia secara umumnya berwarna hitam." },
+                { "question": "Sup herba Tok Aba sangat ________.", "options": ["panas", "beku", "sejuk"], "answer": 0, "word": "panas", "explanation": "Panas ialah kata adjektif pancaindera sentuh rasa haba." },
+                { "question": "Pasu bunga di kedai Yaya sangat ________.", "options": ["kecil", "lebar", "tinggi"], "answer": 0, "word": "kecil", "explanation": "Kecil ialah saiz benda konkrit yang comel." },
+                { "question": "Papan hitam di kelas Tahun 1 berbentuk ________.", "options": ["segi empat", "bulat", "segi tiga"], "answer": 0, "word": "segi empat", "explanation": "Segi empat ialah bentuk bersudut tepat." },
+                { "question": "Bulu arnab peliharaan Ying sangat ________.", "options": ["lembut", "kasar", "tajam"], "answer": 0, "word": "lembut", "explanation": "Lembut ialah deria sentuh rasa bulu arnab." },
+                { "question": "Dinding bilik BoBoiBoy berwarna ________.", "options": ["putih", "gelap", "merah"], "answer": 0, "word": "putih", "explanation": "Putih melambangkan warna bilik yang bersih." },
+                { "question": "Gula-gula madu kegemaran Gopal rasanya sangat ________.", "options": ["manis", "pahit", "masam"], "answer": 0, "word": "manis", "explanation": "Manis ialah rasa gula-gula madu pada lidah." },
+                { "question": "Guli kaca Ochobot kelihatan berkilat dan ________.", "options": ["licin", "kasar", "berduri"], "answer": 0, "word": "licin", "explanation": "Licin merujuk kepada tekstur guli yang tiada calar." },
+                { "question": "Bunga mawar merah di tepi tingkap Tok Aba berbau sangat ________.", "options": ["wangi", "busuk", "hancing"], "answer": 0, "word": "wangi", "explanation": "Wangi ialah kata adjektif pancaindera bau bunga." },
+                { "question": "Matahari pada waktu tengah hari sangat ________.", "options": ["terang", "gelap", "kelam"], "answer": 0, "word": "terang", "explanation": "Terang ialah keadaan cahaya matahari yang kuat." },
+                { "question": "Rumah pondok Adu Du sangat ________.", "options": ["kecil", "luas", "panjang"], "answer": 0, "word": "kecil", "explanation": "Kecil ialah saiz rumah pondok yang ringkas." }
+            ],
+            "2": [
+                { "question": "Duri pokok bunga kertas Tok Aba sangat ________.", "options": ["tumpul", "tajam", "lembut"], "answer": 1, "word": "tajam", "explanation": "Tajam ialah keadaan hujung duri yang boleh mencucuk." },
+                { "question": "Kertas lukisan yang dibawa oleh Ying sangat ________.", "options": ["tebal", "nipis", "berat"], "answer": 1, "word": "nipis", "explanation": "Nipis merujuk kepada dimensi ketebalan kertas yang sedikit." },
+                { "question": "Pemadam papan tulis itu sangat ________.", "options": ["keras", "ringan", "empuk"], "answer": 1, "word": "ringan", "explanation": "Ringan memudahkan pemadam itu digunakan dan dibawa." },
+                { "question": "Jalan ke bilik rahsia Tok Aba sangat ________.", "options": ["lebar", "sempit", "tinggi"], "answer": 1, "word": "sempit", "explanation": "Sempit menunjukkan ruang jalan yang tidak luas." },
+                { "question": "Ais dalam gelas BoBoiBoy Frost terasa ________.", "options": ["panas", "sejuk", "suam"], "answer": 1, "word": "sejuk", "explanation": "Ais mempunyai suhu sejuk secara semula jadi." },
+                { "question": "Air sungai di tepi kampung Tok Aba sangat ________.", "options": ["dangkal", "dalam", "tebal"], "answer": 1, "word": "dalam", "explanation": "Dalam menunjukkan paras air yang tinggi ke bawah." },
+                { "question": "Kain pengelap meja itu terasa kasar and ________.", "options": ["basah", "kering", "wangi"], "answer": 1, "word": "kering", "explanation": "Kering bermaksud kain itu tidak mengandungi air." },
+                { "question": "Kayu pemukul besbol Gopal sangat ________.", "options": ["lembut", "keras", "cair"], "answer": 1, "word": "keras", "explanation": "Keras ialah sifat fizikal pepejal kayu yang kukuh." },
+                { "question": "Asap kapal angkasa Adu Du berbau sangat ________.", "options": ["wangi", "busuk", "harum"], "answer": 1, "word": "busuk", "explanation": "Busuk ialah bau tidak menyenangkan daripada asap pembakaran." },
+                { "question": "Pensel warna Yaya yang tumpul perlu diasah menjadi ________.", "options": ["tajam", "tumpul", "patah"], "answer": 0, "word": "tajam", "explanation": "Pensel diasah supaya tajam and mudah ditulis." },
+                { "question": "Pembaris panjang BoBoiBoy lurus and ________.", "options": ["bengkok", "panjang", "bulat"], "answer": 1, "word": "panjang", "explanation": "Panjang menunjukkan jarak ukuran pembaris." },
+                { "question": "Gopal menjerit kerana menyentuh cerek air yang ________.", "options": ["panas", "sejuk", "beku"], "answer": 0, "word": "panas", "explanation": "Cerek air mendidih mempunyai suhu yang panas." },
+                { "question": "Tayar basikal BoBoiBoy yang kempis terasa ________.", "options": ["lembek", "keras", "pepejal"], "answer": 0, "word": "lembek", "explanation": "Lembek ialah keadaan tayar basikal tiada angin." },
+                { "question": "Pondok rehat di taman sekolah kelihatan ________.", "options": ["luas", "sempit", "tinggi"], "answer": 0, "word": "luas", "explanation": "Luas menunjukkan kawasan lapang pondok yang besar." },
+                { "question": "Batang pokok kelapa di tepi kedai Tok Aba sangat ________.", "options": ["tinggi", "rendah", "pendek"], "answer": 0, "word": "tinggi", "explanation": "Tinggi merujuk kepada kedudukan batang pokok kelapa melentur ke atas." },
+                { "question": "Buah mangga muda yang dipetik Gopal rasanya sangat ________.", "options": ["masam", "manis", "asin"], "answer": 0, "word": "masam", "explanation": "Masam ialah rasa mangga muda yang belum masak." },
+                { "question": "Dinding batu markas Adu Du sangat ________.", "options": ["tebal", "nipis", "lembut"], "answer": 0, "word": "tebal", "explanation": "Tebal merujuk kepada ketebalan struktur batu pertahanan." },
+                { "question": "Lampu bilik yang rosak menjadikan bilik Ying ________.", "options": ["gelap", "terang", "bersinar"], "answer": 0, "word": "gelap", "explanation": "Gelap ialah keadaan ketiadaan cahaya lampu." },
+                { "question": "Buku rujukan tebal milik Fang terasa ________.", "options": ["berat", "ringan", "nipis"], "answer": 0, "word": "berat", "explanation": "Buku tebal mempunyai jisim yang berat." },
+                { "question": "Pasu seramik Tok Aba yang licin berkilat kelihatan ________.", "options": ["licin", "kesat", "kasar"], "answer": 0, "word": "licin", "explanation": "Licin ialah keadaan permukaan seramik yang rata tanpa kasar." }
+            ],
+            "3": [
+                { "question": "Cikgu Papa Zola mengajar murid-murid dengan sangat ________.", "options": ["baik", "malas", "marah"], "answer": 0, "word": "baik", "explanation": "Baik ialah tingkah laku mengajar yang positif." },
+                { "question": "Gopal berasa ________ kerana dituduh merosakkan mainan.", "options": ["gembira", "sedih", "takut"], "answer": 1, "word": "sedih", "explanation": "Sedih ialah emosi batiniah akibat perkara buruk." },
+                { "question": "BoBoiBoy merupakan seorang adiwira yang sangat ________.", "options": ["penakut", "berani", "lemah"], "answer": 1, "word": "berani", "explanation": "Berani ialah sifat sedia menghadapi cabaran." },
+                { "question": "Yaya gembira kerana baju baharunya kelihatan sangat ________.", "options": ["lama", "cantik", "kotor"], "answer": 1, "word": "cantik", "explanation": "Cantik ialah kata adjektif pandangan rupa yang elok." },
+                { "question": "Ying berasa ________ selepas berlari sejauh lima kilometer.", "options": ["penat", "segar", "kenyang"], "answer": 0, "word": "penat", "explanation": "Penat ialah rasa kehilangan tenaga fizikal." },
+                { "question": "Kucing comel itu dipelihara dengan rapi supaya sentiasa ________.", "options": ["sihat", "sakit", "lemah"], "answer": 0, "word": "sihat", "explanation": "Sihat menunjukkan keadaan fizikal haiwan yang cergas." },
+                { "question": "Adu Du berasa ________ melihat BoBoiBoy mendapat pujian.", "options": ["bangga", "cemburu", "gembira"], "answer": 1, "word": "cemburu", "explanation": "Cemburu ialah rasa tidak senang atas kelebihan orang lain." },
+                { "question": "Gopal berasa ________ kerana tidak makan sejak pagi tadi.", "options": ["lapar", "kenyang", "dahaga"], "answer": 0, "word": "lapar", "explanation": "Lapar ialah isyarat perut yang memerlukan makanan." },
+                { "question": "Fang tersenyum ________ apabila dipuji oleh Cikgu Papa Zola.", "options": ["gembira", "takut", "marah"], "answer": 0, "word": "gembira", "explanation": "Gembira ialah perasaan puas hati and ceria." },
+                { "question": "Tok Aba sudah ________ tetapi tenaganya masih kuat.", "options": ["muda", "tua", "baharu"], "answer": 1, "word": "tua", "explanation": "Tua merujuk kepada usia manusia yang lanjut." },
+                { "question": "Kasut sukan baharu BoBoiBoy kelihatan sangat ________.", "options": ["lama", "baharu", "buruk"], "answer": 1, "word": "baharu", "explanation": "Baharu bermakna barang tersebut belum lama digunakan." },
+                { "question": "Sifat Gopal yang ________ mengemas bilik tidak disukai bapanya.", "options": ["rajin", "malas", "cepat"], "answer": 1, "word": "malas", "explanation": "Malas ialah tidak mahu berbuat kerja mengemas." },
+                { "question": "BoBoiBoy Petir bergerak dengan pergerakan yang sangat ________.", "options": ["laju", "lambat", "perlahan"], "answer": 0, "word": "laju", "explanation": "Laju merujuk kepada kadar kepantasan pergerakan kilat." },
+                { "question": "Anak kucing Yaya yang kehilangan ibunya kelihatan ________.", "options": ["manja", "garang", "liar"], "answer": 0, "word": "manja", "explanation": "Manja ialah sifat jinak yang inginkan perhatian." },
+                { "question": "Air teh herba Tok Aba rasanya sangat ________.", "options": ["pahit", "manis", "masin"], "answer": 0, "word": "pahit", "explanation": "Teh herba semula jadi mempunyai rasa pahit." },
+                { "question": "Kapal angkasa kapten Vargoba kelihatan sangat ________.", "options": ["buruk", "cantik", "baharu"], "answer": 0, "word": "buruk", "explanation": "Buruk menunjukkan keadaan rupa yang rosak atau usang." },
+                { "question": "Ying yang ________ sentiasa menyiapkan latihan sekolah awal.", "options": ["rajin", "malas", "gopoh"], "answer": 0, "word": "rajin", "explanation": "Rajin bermaksud sentiasa berusaha gigih melakukan tugasan." },
+                { "question": "Adik Yaya yang masih kecil kelihatan sangat ________.", "options": ["muda", "comel", "tua"], "answer": 1, "word": "comel", "explanation": "Comel bermaksud menarik hati dan sedap dipandang bagi kanak-kanak." },
+                { "question": "Adu Du berasa ________ apabila rancangannya gagal lagi.", "options": ["marah", "gembira", "tenang"], "answer": 0, "word": "marah", "explanation": "Marah ialah emosi kegeraman meluap-luap." },
+                { "question": "BoBoiBoy Gempa mempunyai hati yang sangat ________.", "options": ["lembut", "keras", "kasar"], "answer": 0, "word": "lembut", "explanation": "Lembut hati bermaksud penyayang dan bertimbang rasa." }
+            ],
+            "4": [
+                { "question": "Jarak dari stesen kereta api ke kedai Tok Aba sangat ________.", "options": ["dekat", "jauh", "rapat"], "answer": 1, "word": "jauh", "explanation": "Jauh ialah kedudukan jarak antara dua tempat yang panjang." },
+                { "question": "Ying sampai ________ ke kelas berbanding murid lain.", "options": ["awal", "lambat", "silam"], "answer": 0, "word": "awal", "explanation": "Awal menunjukkan waktu sebelum masa yang ditetapkan." },
+                { "question": "Tali ikat pinggang Gopal dirasakan terlalu ________.", "options": ["longgar", "ketat", "pendek"], "answer": 1, "word": "ketat", "explanation": "Ketat ialah keadaan ukuran pakaian yang terlalu padat." },
+                { "question": "Tiang bendera Sekolah Kebenaran berdiri dengan sangat ________.", "options": ["senget", "tegak", "bengkok"], "answer": 1, "word": "tegak", "explanation": "Tegak ialah kedudukan menegak lurus 90 darjah." },
+                { "question": "Perjalanan balik ke bumi dirasakan sangat ________.", "options": ["lama", "sebentar", "cepat"], "answer": 0, "word": "lama", "explanation": "Lama merujuk kepada jangka masa waktu yang panjang." },
+                { "question": "Kasut sukan lama milik Fang sudah menjadi ________.", "options": ["longgar", "ketat", "sempit"], "answer": 0, "word": "longgar", "explanation": "Longgar bermaksud saiz kasut tidak lagi mencengkam kaki." },
+                { "question": "BoBoiBoy Halilintar menyerang musuh dengan gerakan ________.", "options": ["segera", "lambat", "lewat"], "answer": 0, "word": "segera", "explanation": "Segera menunjukkan tindakan pantas tanpa bertangguh." },
+                { "question": "Lubang tempat BoBoiBoy Tanah menyorok sangat ________.", "options": ["cetek", "dalam", "lebar"], "answer": 1, "word": "dalam", "explanation": "Dalam ialah ukuran kedalaman lubang dari tanah atas." },
+                { "question": "Pertempuran robot itu berlaku di kawasan yang ________.", "options": ["luas", "sempit", "pendek"], "answer": 1, "word": "sempit", "explanation": "Sempit ialah had kawasan terhad yang membataskan gerakan." },
+                { "question": "Jam loceng BoBoiBoy berbunyi dengan sangat ________.", "options": ["bising", "merdu", "sunyi"], "answer": 0, "word": "bising", "explanation": "Bising ialah gangguan bunyi yang kuat mengejutkan tidur." },
+                { "question": "Gopal berlari ke kedai kerana mahu minuman ________.", "options": ["segar", "basi", "pahit"], "answer": 0, "word": "segar", "explanation": "Segar merujuk kepada rasa cecair minuman yang menyegarkan badan." },
+                { "question": "Besi pelindung kapal angkasa dirasakan sangat ________.", "options": ["tebal", "nipis", "lembut"], "answer": 0, "word": "tebal", "explanation": "Tebal menunjukkan ketahanan ketebalan lapisan besi." },
+                { "question": "Zaman ________ dahulu, datuk Tok Aba merupakan pengembara.", "options": ["silam", "sekarang", "hadapan"], "answer": 0, "word": "silam", "explanation": "Silam merujuk kepada dimensi waktu masa lampau." },
+                { "question": "Baju kurung yang dipakai Yaya sangat ________ and selesa.", "options": ["longgar", "ketat", "sempit"], "answer": 0, "word": "longgar", "explanation": "Longgar memberikan keselesaan pergerakan badan." },
+                { "question": "Kedai coklat Tok Aba terletak sangat ________ dengan padang.", "options": ["dekat", "jauh", "luas"], "answer": 0, "word": "dekat", "explanation": "Dekat menunjukkan jarak perjalanan yang pendek." },
+                { "question": "Gopal sampai ke padang permainan paling ________.", "options": ["lewat", "awal", "cepat"], "answer": 0, "word": "lewat", "explanation": "Lewat ialah keadaan masa melepasi jadual perjumpaan." },
+                { "question": "Sungkupan tanah tanaman BoBoiBoy Thorn dirasakan ________.", "options": ["cetek", "dalam", "tinggi"], "answer": 0, "word": "cetek", "explanation": "Cetek ialah kedalaman tanah tanaman yang nipis." },
+                { "question": "Garis garisan penamat ditarik dengan ________.", "options": ["lurus", "bengkok", "senget"], "answer": 0, "word": "lurus", "explanation": "Lurus ialah arah garis yang tiada lencongan lekuk." },
+                { "question": "Kesihatan robot Probe yang dibaiki kini bertambah ________.", "options": ["sihat", "lemah", "teruk"], "answer": 0, "word": "sihat", "explanation": "Sihat menunjukkan pemulihan fungsi robot kembali normal." },
+                { "question": "BoBoiBoy Taufan menghasilkan putaran angin yang ________.", "options": ["kencang", "lemah", "perlahan"], "answer": 0, "word": "kencang", "explanation": "Kencang menunjukkan kelajuan angin yang amat pantas." }
+            ],
+            "5": [
+                { "question": "Tok Aba berasa amat ________ apabila kedainya dikemas kemas.", "options": ["gembira", "kecewa", "marah"], "answer": 0, "word": "gembira", "explanation": "Gembira ialah perasaan tenang dan puas hati." },
+                { "question": "Ying melakukan tugasan sekolah dengan gerakan yang ________.", "options": ["pantas", "gopoh", "lambat"], "answer": 0, "word": "pantas", "explanation": "Pantas ialah kata adjektif cara kelajuan tindakan tersusun." },
+                { "question": "Suara nyanyian Yaya yang ________ membuatkan burung lari.", "options": ["sumbang", "merdu", "nyaring"], "answer": 0, "word": "sumbang", "explanation": "Sumbang menunjukkan kualiti ton suara yang lari nada." },
+                { "question": "Adu Du berasa sangat ________ kerana gagal mendapat bekalan koko.", "options": ["kecewa", "bangga", "tenang"], "answer": 0, "word": "kecewa", "explanation": "Kecewa ialah perasaan hampa akibat keinginan tidak tercapai." },
+                { "question": "BoBoiBoy Cyclone terbang dengan gaya terbang yang ________.", "options": ["tertib", "gopoh", "kasar"], "answer": 0, "word": "tertib", "explanation": "Tertib menunjukkan cara gerakan yang teratur mengikut aturan." },
+                { "question": "Suara Cikgu Papa Zola bercakap di pembesar suara sangat ________.", "options": ["nyaring", "perlahan", "bisik"], "answer": 0, "word": "nyaring", "explanation": "Nyaring ialah kata adjektif pancainderg dengar bunyi lantang tinggi." },
+                { "question": "Gopal berasa sangat ________ apabila hari mula gelap di hutan.", "options": ["bimbang", "marah", "tenang"], "answer": 0, "word": "bimbang", "explanation": "Bimbang ialah perasaan risau akan keselamatan diri." },
+                { "question": "Cara murid-murid Pendidikan Khas beratur masuk kelas sangat ________.", "options": ["sopan", "biadab", "gopoh"], "answer": 0, "word": "sopan", "explanation": "Sopan menunjukkan sahsiah tingkah laku yang beradab." },
+                { "question": "Bunyi letupan kapal angkasa musuh sangat ________.", "options": ["dahsyat", "perlahan", "merdu"], "answer": 0, "word": "dahsyat", "explanation": "Dahsyat menunjukkan keadaan letupan yang luar biasa hebatnya." },
+                { "question": "BoBoiBoy Solar bercakap dengan tutur kata yang ________.", "options": ["tenang", "marah", "gugup"], "answer": 0, "word": "tenang", "explanation": "Tenang ialah keadaan emosi terkawal tanpa gelisah." },
+                { "question": "Sifat penyayang Yaya membuatkannya berasa ________ pada kucing terbiar.", "options": ["kesihan", "benci", "marah"], "answer": 0, "word": "kesihan", "explanation": "Kecewa ialah emosi simpati melihat kesusahan makhluk lain." },
+                { "question": "Gopal melakukan ujian mengecat dengan keadaan ________ sehingga comot.", "options": ["gopoh", "cermat", "tertib"], "answer": 0, "word": "gopoh", "explanation": "Gopoh ialah cara tergesa-gesa tanpa perancangan teliti." },
+                { "question": "Bau masakan sup Tok Aba berbau sangat ________.", "options": ["harum", "hancing", "tengik"], "answer": 0, "word": "harum", "explanation": "Harum merujuk kepada kualiti bau makanan yang lazat." },
+                { "question": "Ying memicit bantal tidur yang sangat ________ di kedai.", "options": ["empuk", "keras", "kasar"], "answer": 0, "word": "empuk", "explanation": "Empuk ialah keadaan kelembutan objek yang mudah dipicit." },
+                { "question": "Rasa cili padi di dalam nasi goreng Adu Du sangat ________.", "options": ["pedas", "manis", "tawar"], "answer": 0, "word": "pedas", "explanation": "Pedas ialah kata adjektif rasa pijar pada lidah." },
+                { "question": "BoBoiBoy Thorn menyiram pokok bunga yang sedang ________.", "options": ["layu", "segar", "mekar"], "answer": 0, "word": "layu", "explanation": "Layu ialah keadaan daun pokok yang kekurangan air." },
+                { "question": "Air sungai di belakang rumah Tok Aba mengalir dengan ________.", "options": ["tenang", "bising", "pantas"], "answer": 0, "word": "tenang", "explanation": "Pergerakan air yang perlahan tanpa gelora dipanggil 'tenang'." },
+                { "question": "Robot Probe berasa ________ apabila dipuji oleh tuan mudanya.", "options": ["bangga", "marah", "malu"], "answer": 0, "word": "bangga", "explanation": "Pujian akan melahirkan perasaan 'bangga' atau dihargai." },
+                { "question": "Baju sukan BoBoiBoy yang kotor dicuci sehingga ________.", "options": ["bersih", "basah", "kusam"], "answer": 0, "word": "bersih", "explanation": "Baju yang bebas daripada kotoran dipanggil 'bersih'." },
+                { "question": "Suasana malam di Stesen Angkasa Tapops sangat ________.", "options": ["sunyi", "bising", "riuh"], "answer": 0, "word": "sunyi", "explanation": "Keadaan yang tiada sebarang bunyi bising dinamakan 'sunyi'." }
+            ],
+            "6": [
+                { "question": "Cuaca hari ini sangat ________ kerana matahari memancar terik.", "options": ["panas", "sejuk", "mendung"], "answer": 0, "word": "panas", "explanation": "Matahari yang terik akan menyebabkan cuaca menjadi 'panas'." },
+                { "question": "Rambut Gopal kelihatan ________ kerana dia jarang menyikatnya.", "options": ["lurus", "kusut", "kemas"], "answer": 1, "word": "kusut", "explanation": "Rambut yang tidak disisir akan menjadi 'kusut'." },
+                { "question": "Tok Aba berasa ________ melihat cucunya berjaya menjadi hero bumi.", "options": ["bangga", "sedih", "takut"], "answer": 0, "word": "bangga", "explanation": "Kejayaan seseorang akan membuatkan ahli keluarga berasa 'bangga'." },
+                { "question": "Perjalanan pulang ke Planet Bumi terasa amat ________.", "options": ["singkat", "lama", "pantas"], "answer": 1, "word": "lama", "explanation": "Lama menunjukkan tempoh masa yang mengambil waktu panjang." },
+                { "question": "Kisah sejarah wira galaksi itu sangat ________.", "options": ["lampau", "moden", "kuno"], "answer": 0, "word": "lampau", "explanation": "Lampau merujuk kepada kejadian yang telah berlaku." },
+                { "question": "Adu Du ketawa dengan ________ apabila robotnya berjaya.", "options": ["lantang", "sayup", "sayu"], "answer": 0, "word": "lantang", "explanation": "Lantang ialah suara yang kuat and jelas." },
+                { "question": "Luka pada tangan BoBoiBoy masih kelihatan ________.", "options": ["kering", "basah", "sembuh"], "answer": 1, "word": "basah", "explanation": "Basah kerana masih berdarah atau belum kering." },
+                { "question": "Probe mengesat badannya yang ________ akibat hujan.", "options": ["kering", "kotor", "basah"], "answer": 2, "word": "basah", "explanation": "Basah bermaksud terkena air hujan." },
+                { "question": "Udara di puncak Gunung Kebenaran sangat ________.", "options": ["nyaman", "kotor", "sesak"], "answer": 0, "word": "nyaman", "explanation": "Nyaman menunjukkan udara yang segar dan menyamankan." },
+                { "question": "Buah epal di atas pokok itu masih ________.", "options": ["masak", "putik", "manis"], "answer": 1, "word": "putik", "explanation": "Putik bermaksud buah yang masih terlalu muda." },
+                { "question": "Air tasik yang jernih itu kelihatan sungguh ________.", "options": ["keruh", "bening", "kusam"], "answer": 1, "word": "bening", "explanation": "Bening ialah perkataan lain bagi jernih dan tembus cahaya." },
+                { "question": "Ying memandang dengan wajah yang ________ apabila kawan-kawannya menang.", "options": ["ceria", "marah", "bosan"], "answer": 0, "word": "ceria", "explanation": "Ceria menunjukkan wajah yang gembira berseri." },
+                { "question": "Kawan yang ________ sentiada bersedia memaafkan kesalahan orang lain.", "options": ["kedekut", "pemurah", "pemaaf"], "answer": 2, "word": "pemaaf", "explanation": "Pemaaf ialah sifat suka memaafkan." },
+                { "question": "Pakaian adiwira BoBoiBoy sungguh ________ dan menawan.", "options": ["tampan", "kusam", "serabut"], "answer": 0, "word": "tampan", "explanation": "Tampan merujuk kepada rupa yang kacak." },
+                { "question": "Suasana di pasar lambak Stesen Angkasa amat ________.", "options": ["sunyi", "bising", "riuh"], "answer": 2, "word": "riuh", "explanation": "Riuh menggambarkan keadaan bising dengan suara ramai orang." },
+                { "question": "Angin bertiup ________ menyegarkan tubuh Yaya.", "options": ["kencang", "sepoi-sepoi", "ribut"], "answer": 1, "word": "sepoi-sepoi", "explanation": "Sepoi-sepoi ialah tiupan angin yang perlahan." },
+                { "question": "Tindakan Adu Du yang ________ merugikan dirinya sendiri.", "options": ["bijak", "gopoh", "matang"], "answer": 1, "word": "gopoh", "explanation": "Gopoh ialah tindakan terburu-buru." },
+                { "question": "Yaya menjadi ________ setelah melihat pokoknya mati.", "options": ["sayu", "gembira", "marah"], "answer": 0, "word": "sayu", "explanation": "Sayu bermaksud sedih yang teramat sangat." },
+                { "question": "Cikgu Papa Zola bertubuh agak ________ berbanding murid-muridnya.", "options": ["kurus", "sasa", "gemuk"], "answer": 1, "word": "sasa", "explanation": "Sasa bermaksud berbadan tegap dan kuat." },
+                { "question": "Pahlawan itu menghunus pedang dengan gaya yang sangat ________.", "options": ["lembik", "tangkas", "lemah"], "answer": 1, "word": "tangkas", "explanation": "Tangkas bermaksud pergerakan yang cepat dan cangkas." }
+            ]
+        };
+
+        // --- DATA: AUTISME (20 CABARAN VISUAL TERSUSUN) ---
+        const quizDataAutisme = [
+            { "concept": "Warna Asas (Merah)", "targetEmoji": "🔴", "instruction": "Ketik warna MERAH (Kuasa Halilintar)", "options": [{ "emoji": "🔴", "isCorrect": true, "bg": "bg-red-500" }, { "emoji": "🔵", "isCorrect": false, "bg": "bg-blue-500" }, { "emoji": "🟢", "isCorrect": false, "bg": "bg-green-500" }] },
+            { "concept": "Warna Asas (Hijau)", "targetEmoji": "🟢", "instruction": "Ketik warna HIJAU (Adu Du)", "options": [{ "emoji": "🟡", "isCorrect": false, "bg": "bg-yellow-400" }, { "emoji": "🟢", "isCorrect": true, "bg": "bg-green-500" }, { "emoji": "🟣", "isCorrect": false, "bg": "bg-purple-500" }] },
+            { "concept": "Warna Asas (Biru)", "targetEmoji": "🔵", "instruction": "Ketik warna BIRU (Kuasa Taufan)", "options": [{ "emoji": "🟠", "isCorrect": false, "bg": "bg-orange-500" }, { "emoji": "🔵", "isCorrect": true, "bg": "bg-blue-500" }, { "emoji": "🔴", "isCorrect": false, "bg": "bg-red-500" }] },
+            { "concept": "Warna Sekunder (Kuning)", "targetEmoji": "🟡", "instruction": "Ketik warna KUNING (Kuasa Cahaya)", "options": [{ "emoji": "🟡", "isCorrect": true, "bg": "bg-yellow-400" }, { "emoji": "⚫", "isCorrect": false, "bg": "bg-gray-800" }, { "emoji": "🟢", "isCorrect": false, "bg": "bg-green-500" }] },
+            { "concept": "Warna Sekunder (Oren)", "targetEmoji": "🟠", "instruction": "Ketik warna OREN (Topi BoBoiBoy)", "options": [{ "emoji": "🟣", "isCorrect": false, "bg": "bg-purple-500" }, { "emoji": "🟠", "isCorrect": true, "bg": "bg-orange-500" }, { "emoji": "🔵", "isCorrect": false, "bg": "bg-blue-500" }] },
+            { "concept": "Bentuk Asas (Bulat)", "targetEmoji": "⚽", "instruction": "Ketik bentuk BULAT (Ochobot)", "options": [{ "emoji": "⭕", "isCorrect": true, "bg": "bg-cyan-100" }, { "emoji": "🔺", "isCorrect": false, "bg": "bg-cyan-100" }, { "emoji": "⬜", "isCorrect": false, "bg": "bg-cyan-100" }] },
+            { "concept": "Bentuk Asas (Petak)", "targetEmoji": "🔲", "instruction": "Ketik bentuk PETAK (Koko Minda)", "options": [{ "emoji": "🔺", "isCorrect": false, "bg": "bg-stone-100" }, { "emoji": "⭕", "isCorrect": false, "bg": "bg-stone-100" }, { "emoji": "⬜", "isCorrect": true, "bg": "bg-stone-200" }] },
+            { "concept": "Bentuk Lanjutan (Segi Tiga)", "targetEmoji": "🔺", "instruction": "Ketik bentuk SEGI TIGA (Kepala Adu Du)", "options": [{ "emoji": "🔺", "isCorrect": true, "bg": "bg-emerald-200" }, { "emoji": "⬜", "isCorrect": false, "bg": "bg-emerald-100" }, { "emoji": "⭐", "isCorrect": false, "bg": "bg-emerald-100" }] },
+            { "concept": "Bentuk Lanjutan (Bintang)", "targetEmoji": "⭐", "instruction": "Ketik bentuk BINTANG", "options": [{ "emoji": "⭕", "isCorrect": false, "bg": "bg-yellow-100" }, { "emoji": "⭐", "isCorrect": true, "bg": "bg-yellow-200" }, { "emoji": "⬜", "isCorrect": false, "bg": "bg-yellow-100" }] },
+            { "concept": "Saiz Asas (Besar)", "targetEmoji": "🤖", "instruction": "Ketik Robot Probe yang BESAR", "options": [{ "emoji": "🤖", "isCorrect": true, "sizeClass": "text-3xl", "bg": "bg-amber-100" }, { "emoji": "🤖", "isCorrect": false, "sizeClass": "text-xl", "bg": "bg-amber-100" }, { "emoji": "⚙️", "isCorrect": false, "sizeClass": "text-lg", "bg": "bg-gray-100" }] },
+            { "concept": "Saiz Lanjutan (Kecil)", "targetEmoji": "🐈", "instruction": "Ketik kucing Cattus yang KECIL", "options": [{ "emoji": "🐈", "isCorrect": false, "sizeClass": "text-3xl", "bg": "bg-orange-100" }, { "emoji": "🐈", "isCorrect": true, "sizeClass": "text-xl", "bg": "bg-orange-200" }, { "emoji": "🐕", "isCorrect": false, "sizeClass": "text-2xl", "bg": "bg-gray-100" }] },
+            { "concept": "Ukuran (Panjang)", "targetEmoji": "🗡️", "instruction": "Ketik pedang yang PANJANG", "options": [{ "emoji": "🗡️", "isCorrect": false, "sizeClass": "text-xl", "bg": "bg-red-100" }, { "emoji": "🛡️", "isCorrect": false, "sizeClass": "text-2xl", "bg": "bg-gray-100" }, { "emoji": "🗡️", "isCorrect": true, "sizeClass": "text-3xl", "bg": "bg-red-200" }] },
+            { "concept": "Ukuran (Pendek)", "targetEmoji": "📏", "instruction": "Ketik pembaris yang PENDEK", "options": [{ "emoji": "📏", "isCorrect": true, "sizeClass": "text-xl", "bg": "bg-blue-200" }, { "emoji": "📏", "isCorrect": false, "sizeClass": "text-3xl", "bg": "bg-blue-100" }, { "emoji": "🖍️", "isCorrect": false, "sizeClass": "text-2xl", "bg": "bg-yellow-100" }] },
+            { "concept": "Nombor Asas (1)", "targetEmoji": "🤖", "instruction": "Satu Ochobot. Ketik nombor 1", "options": [{ "emoji": "1", "isCorrect": true, "bg": "bg-blue-200" }, { "emoji": "2", "isCorrect": false, "bg": "bg-blue-100" }, { "emoji": "3", "isCorrect": false, "bg": "bg-blue-100" }] },
+            { "concept": "Nombor Asas (2)", "targetEmoji": "🔫", "instruction": "Dua pistol Probe. Ketik nombor 2", "options": [{ "emoji": "4", "isCorrect": false, "bg": "bg-purple-100" }, { "emoji": "2", "isCorrect": true, "bg": "bg-purple-200" }, { "emoji": "1", "isCorrect": false, "bg": "bg-purple-100" }] },
+            { "concept": "Nombor Asas (3)", "targetEmoji": "🍪", "instruction": "Tiga biskut Yaya. Ketik nombor 3", "options": [{ "emoji": "1", "isCorrect": false, "bg": "bg-rose-100" }, { "emoji": "2", "isCorrect": false, "bg": "bg-rose-100" }, { "emoji": "3", "isCorrect": true, "bg": "bg-rose-200" }] },
+            { "concept": "Nombor Asas (4)", "targetEmoji": "🍃", "instruction": "Empat helai daun. Ketik nombor 4", "options": [{ "emoji": "3", "isCorrect": false, "bg": "bg-green-100" }, { "emoji": "5", "isCorrect": false, "bg": "bg-green-100" }, { "emoji": "4", "isCorrect": true, "bg": "bg-green-200" }] },
+            { "concept": "Nombor Asas (5)", "targetEmoji": "🌟", "instruction": "Lima bintang. Ketik nombor 5", "options": [{ "emoji": "5", "isCorrect": true, "bg": "bg-amber-200" }, { "emoji": "2", "isCorrect": false, "bg": "bg-amber-100" }, { "emoji": "4", "isCorrect": false, "bg": "bg-amber-100" }] },
+            { "concept": "Bentuk (Hati)", "targetEmoji": "❤️", "instruction": "Ketik bentuk HATI (Sayang)!", "options": [{ "emoji": "⭕", "isCorrect": false, "bg": "bg-rose-100" }, { "emoji": "❤️", "isCorrect": true, "bg": "bg-rose-200" }, { "emoji": "🔺", "isCorrect": false, "bg": "bg-rose-100" }] },
+            { "concept": "Bentuk (Emoji Gembira)", "targetEmoji": "😊", "instruction": "Ketik emoji gembira!", "options": [{ "emoji": "😊", "isCorrect": true, "bg": "bg-yellow-100" }, { "emoji": "😢", "isCorrect": false, "bg": "bg-yellow-100" }, { "emoji": "😡", "isCorrect": false, "bg": "bg-yellow-100" }] }
+        ];
+
+        function getQuizDataForCurrentYear() {
+            if (activeCategory === 'slow-learner') {
+                return quizDataSlowAll[activeYear] || [];
+            } else {
+                let startIndex = 0;
+                let endIndex = 20;
+                if (activeYear === 1) { startIndex = 0; endIndex = 3; }
+                else if (activeYear === 2) { startIndex = 3; endIndex = 7; }
+                else if (activeYear === 3) { startIndex = 7; endIndex = 10; }
+                else if (activeYear === 4) { startIndex = 10; endIndex = 14; }
+                else if (activeYear === 5) { startIndex = 14; endIndex = 17; }
+                else if (activeYear === 6) { startIndex = 17; endIndex = 20; }
+                return quizDataAutisme.slice(startIndex, endIndex);
+            }
+        }
+
+        function selectCategory(category) {
+            if (!isMusicInitialized) {
+                toggleBGM();
+                isMusicInitialized = true;
+            }
+
+            activeCategory = category;
+            document.getElementById('screen-category').classList.add('hidden');
+            const subtitle = document.getElementById('year-selection-subtitle');
+            subtitle.innerText = category === 'slow-learner' ? "Sila pilih kelas murid Slow Learner:" : "Sila pilih kelas murid Autisme:";
+            document.getElementById('screen-year').classList.remove('hidden');
+        }
+
+        function selectYear(year) {
+            activeYear = year;
+            document.getElementById('screen-year').classList.add('hidden');
+            if (activeCategory === 'slow-learner') {
+                document.getElementById('quiz-header').classList.remove('hidden');
+                document.getElementById('header-p1-box').classList.remove('hidden');
+                document.getElementById('header-p2-box').classList.remove('hidden');
+                document.getElementById('start-slow-subtitle').innerText = "Kategori: Slow Learner - Tahun " + year;
+                document.getElementById('screen-start-slow').classList.remove('hidden');
+            } else {
+                document.getElementById('quiz-header').classList.remove('hidden');
+                document.getElementById('header-p1-box').classList.add('hidden'); 
+                document.getElementById('header-p2-box').classList.add('hidden'); 
+                startAutismGame();
+            }
+        }
+
+        function backToCategorySelect() {
+            document.getElementById('screen-year').classList.add('hidden');
+            document.getElementById('screen-flashcard').classList.add('hidden');
+            document.getElementById('screen-superhero-creator').classList.add('hidden');
+            document.getElementById('screen-category').classList.remove('hidden');
+        }
+
+        function backToYearSelect() {
+            document.getElementById('screen-start-slow').classList.add('hidden');
+            document.getElementById('screen-quiz').classList.add('hidden');
+            document.getElementById('screen-autism').classList.add('hidden');
+            document.getElementById('screen-result').classList.add('hidden');
+            document.getElementById('quiz-header').classList.add('hidden');
+            document.getElementById('screen-year').classList.remove('hidden');
+            document.getElementById('ai-quiz-success').classList.add('hidden');
+            document.getElementById('main-body').className = "min-h-screen flex flex-col justify-between p-4 overflow-x-hidden theme-p1";
+        }
+
+        function startSlowLearnerGame() {
+            document.getElementById('screen-start-slow').classList.add('hidden');
+            document.getElementById('screen-quiz').classList.remove('hidden');
+            currentQuestionIndex = 0;
+            scoreP1 = 0;
+            scoreP2 = 0;
+            currentPlayer = 1;
+            updateScoreUI();
+            loadQuestionSlow();
+        }
+
+        function loadQuestionSlow() {
+            const activeQuestions = getQuizDataForCurrentYear();
+            if (activeQuestions.length === 0) return;
+            const currentQuestion = activeQuestions[currentQuestionIndex];
+            const quizContainer = document.getElementById('screen-quiz');
+            const turnBanner = document.getElementById('turn-banner');
+            const questionBubble = document.getElementById('question-bubble');
+            const speakerBadge = document.getElementById('speaker-badge');
+            const bodyTheme = document.getElementById('main-body');
+            const totalQuestions = activeQuestions.length;
+
+            if (currentPlayer === 1) {
+                bodyTheme.className = "min-h-screen flex flex-col justify-between p-4 overflow-x-hidden theme-p1";
+                quizContainer.className = "w-full bg-white rounded-3xl border-8 border-orange-500 p-6 md:p-8 pop-shadow";
+                turnBanner.className = "w-full bg-orange-500 text-white font-cartoon text-base md:text-lg text-center py-2.5 rounded-xl mb-4 shadow-sm";
+                turnBanner.innerHTML = "⚡ GILIRAN PASUKAN BOBOIBOY (P1)";
+                questionBubble.className = "bg-orange-50 rounded-2xl border-4 border-orange-300 p-4 mb-6 relative";
+                speakerBadge.className = "absolute -top-6 -left-2 bg-orange-500 text-white text-[11px] p-1 px-3 rounded-full border-2 border-orange-700 font-cartoon flex items-center gap-1.5 shadow-md";
+                speakerBadge.innerHTML = `
+                    <span>🤠 PAPA ZOLA SOAL:</span>
+                    <button onclick="speakCurrentQuestion()" class="bg-white text-orange-600 w-5 h-5 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition" title="Dengar Soalan">
+                        <i class="fas fa-volume-up text-[10px]"></i>
+                    </button>
+                `;
+            } else {
+                bodyTheme.className = "min-h-screen flex flex-col justify-between p-4 overflow-x-hidden theme-p2";
+                quizContainer.className = "w-full bg-white rounded-3xl border-8 border-green-500 p-6 md:p-8 pop-shadow";
+                turnBanner.className = "w-full bg-green-600 text-white font-cartoon text-base md:text-lg text-center py-2.5 rounded-xl mb-4 shadow-sm";
+                turnBanner.innerHTML = "👽 GILIRAN PASUKAN ADU DU (P2)";
+                questionBubble.className = "bg-green-50 rounded-2xl border-4 border-green-400 p-4 mb-6 relative";
+                speakerBadge.className = "absolute -top-6 -left-2 bg-green-600 text-white text-[11px] p-1 px-3 rounded-full border-2 border-green-800 font-cartoon flex items-center gap-1.5 shadow-md";
+                speakerBadge.innerHTML = `
+                    <span>🤖 PROBE SOAL:</span>
+                    <button onclick="speakCurrentQuestion()" class="bg-white text-green-600 w-5 h-5 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition" title="Dengar Soalan">
+                        <i class="fas fa-volume-up text-[10px]"></i>
+                    </button>
+                `;
+            }
+
+            document.getElementById('level-indicator-slow').innerText = "Tahun " + activeYear;
+            document.getElementById('question-number').innerText = "Soalan " + (currentQuestionIndex + 1) + " / " + totalQuestions;
+            const progressPercent = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+            document.getElementById('progress-bar').style.width = progressPercent + "%";
+            document.getElementById('quiz-question').innerText = currentQuestion.question;
+            
+            const answerButtons = document.querySelectorAll('.answer-option');
+            currentQuestion.options.forEach((opt, index) => {
+                const btn = answerButtons[index];
+                btn.querySelector('.answer-text').innerText = opt;
+            });
+        }
+
+        function startAutismGame() {
+            document.getElementById('screen-autism').classList.remove('hidden');
+            document.getElementById('main-body').className = "min-h-screen flex flex-col justify-between p-4 overflow-x-hidden theme-autism";
+            currentQuestionIndex = 0;
+            scoreAutisme = 0;
+            loadQuestionAutisme();
+        }
+
+        function loadQuestionAutisme() {
+            const activeQuestions = getQuizDataForCurrentYear();
+            if (activeQuestions.length === 0) return;
+            const currentQuestion = activeQuestions[currentQuestionIndex];
+            const totalQuestions = activeQuestions.length;
+            
+            document.getElementById('autism-level-lbl').innerText = "Tahun " + activeYear + " | Cabaran " + (currentQuestionIndex + 1) + "/" + totalQuestions;
+            document.getElementById('autism-concept-lbl').innerText = "Fokus: " + currentQuestion.concept;
+            document.getElementById('autism-visual-target').innerText = currentQuestion.targetEmoji;
+            document.getElementById('autism-visual-instruction').innerText = currentQuestion.instruction;
+            
+            const optionsContainer = document.getElementById('autism-options-container');
+            optionsContainer.innerHTML = ''; 
+            
+            currentQuestion.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                const sizeClass = opt.sizeClass ? opt.sizeClass : "text-5xl";
+                btn.className = "p-4 " + opt.bg + " hover:brightness-110 rounded-3xl border-4 border-gray-300 transition btn-pop text-center flex flex-col items-center justify-center h-36 pop-shadow hover:scale-105 transform";
+                btn.innerHTML = "<span class=\"" + sizeClass + " font-cartoon block bounce-element\">" + opt.emoji + "</span>";
+                btn.onclick = () => checkAnswerAutisme(opt.isCorrect);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswerAutisme(isCorrect) {
+            const modal = document.getElementById('modal-feedback');
+            const card = document.getElementById('feedback-card');
+            const avatar = document.getElementById('feedback-avatar');
+            const title = document.getElementById('feedback-title');
+            const msg = document.getElementById('feedback-message');
+            const btnNext = document.getElementById('btn-next');
+            const motivBox = document.getElementById('feedback-motivation-box');
+            
+            document.getElementById('feedback-explanation-box').classList.add('hidden');
+            document.getElementById('gemini-ai-box').classList.add('hidden');
+
+            if (isCorrect) {
+                scoreAutisme += 20;
+                card.className = "bg-white rounded-3xl border-8 border-indigo-400 max-w-md w-full p-6 text-center shadow-2xl transition transform scale-100";
+                avatar.innerHTML = `
+                    <div class="w-20 h-20 rounded-full overflow-hidden border-4 border-orange-400 shadow-md mx-auto flex items-center justify-center bg-orange-100">
+                        <img src="Boboiboy%20-%20Edited.jpg" class="w-full h-full object-cover" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
+                        <span class="text-4xl hidden">👦</span>
+                    </div>
+                `;
+                title.innerText = "HEBAT!";
+                title.className = "font-cartoon text-4xl text-indigo-600 mb-2";
+                motivBox.className = "bg-indigo-100 border-4 border-indigo-300 rounded-2xl p-4 mb-4";
+                msg.className = "text-indigo-800 font-cartoon text-2xl leading-tight";
+                msg.innerText = "PINTAR! KAMU BERJAYA! 🌟";
+                btnNext.className = "w-full bg-indigo-500 hover:bg-indigo-600 text-white font-cartoon text-xl py-3.5 rounded-2xl border-b-6 border-indigo-700 transition btn-pop shadow-md uppercase";
+                
+                // Pembacaan TTS Automatik untuk Maklum Balas
+                speakWithGeminiTTS("Hebat! Pintar! Kamu berjaya!");
+            } else {
+                card.className = "bg-white rounded-3xl border-8 border-rose-400 max-w-md w-full p-6 text-center shadow-2xl transition transform scale-100";
+                avatar.innerHTML = '<span class="text-7xl">💪⭐️</span>';
+                title.innerText = "SABAR...";
+                title.className = "font-cartoon text-3xl text-rose-500 mb-2";
+                motivBox.className = "bg-rose-100 border-4 border-rose-300 rounded-2xl p-4 mb-4";
+                msg.className = "text-rose-800 font-cartoon text-2xl leading-tight";
+                msg.innerText = "CUBA LAGI! KAMU BOLEH! ❤️";
+                btnNext.className = "w-full bg-rose-400 hover:bg-rose-500 text-white font-cartoon text-xl py-3.5 rounded-2xl border-b-6 border-rose-600 transition btn-pop shadow-md uppercase";
+                
+                speakWithGeminiTTS("Sabar. Cuba lagi! Kamu boleh!");
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function checkAnswer(selectedIndex) {
+            const activeQuestions = getQuizDataForCurrentYear();
+            const currentQuestion = activeQuestions[currentQuestionIndex];
+            const isCorrect = (selectedIndex === currentQuestion.answer);
+            
+            const modal = document.getElementById('modal-feedback');
+            const card = document.getElementById('feedback-card');
+            const avatar = document.getElementById('feedback-avatar');
+            const title = document.getElementById('feedback-title');
+            const msg = document.getElementById('feedback-message');
+            const expl = document.getElementById('feedback-explanation');
+            const btnNext = document.getElementById('btn-next');
+            const motivBox = document.getElementById('feedback-motivation-box');
+            
+            document.getElementById('feedback-explanation-box').classList.remove('hidden');
+            document.getElementById('gemini-ai-box').classList.remove('hidden');
+            document.getElementById('ai-output-container').classList.add('hidden');
+            document.getElementById('ai-error-container').classList.add('hidden');
+            document.getElementById('ai-loading').classList.add('hidden');
+            document.getElementById('btn-gemini-ai').classList.remove('opacity-50', 'pointer-events-none');
+            lastGeneratedAiText = "";
+
+            if (isCorrect) {
+                if (currentPlayer === 1) scoreP1 += 10; else scoreP2 += 10;
+                updateScoreUI();
+
+                if (currentPlayer === 1) {
+                    card.className = "bg-white rounded-3xl border-8 border-orange-500 max-w-md w-full p-6 text-center shadow-2xl transition transform scale-100";
+                    avatar.innerHTML = `
+                        <div class="w-20 h-20 rounded-full overflow-hidden border-4 border-orange-400 shadow-md mx-auto flex items-center justify-center bg-orange-100">
+                            <img src="Boboiboy%20-%20Edited.jpg" class="w-full h-full object-cover" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
+                            <span class="text-4xl hidden">👦</span>
+                        </div>
+                    `;
+                    title.innerText = "MANTAP!";
+                    title.className = "font-cartoon text-4xl text-orange-600 mb-2";
+                    motivBox.className = "bg-orange-100 border-4 border-orange-300 rounded-2xl p-4 mb-4";
+                    msg.className = "text-orange-800 font-cartoon text-2xl leading-tight";
+                    msg.innerText = "TERBAIK ANAK MUDA! 🔥";
+                    btnNext.className = "w-full bg-orange-500 hover:bg-orange-600 text-white font-cartoon text-xl py-3.5 rounded-2xl border-b-6 border-orange-700 transition btn-pop shadow-md uppercase";
+                    
+                    speakWithGeminiTTS("Mantap! Terbaik anak muda!");
+                } else {
+                    card.className = "bg-white rounded-3xl border-8 border-green-500 max-w-md w-full p-6 text-center shadow-2xl transition transform scale-100";
+                    avatar.innerHTML = `
+                        <div class="w-20 h-20 rounded-full overflow-hidden border-4 border-green-400 shadow-md mx-auto flex items-center justify-center bg-green-100">
+                            <img src="Adudu%20-%20Edited.png" class="w-full h-full object-cover" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
+                            <span class="text-4xl hidden">👽</span>
+                        </div>
+                    `;
+                    title.innerText = "MUAHAHA!";
+                    title.className = "font-cartoon text-4xl text-green-700 mb-2";
+                    motivBox.className = "bg-green-100 border-4 border-green-300 rounded-2xl p-4 mb-4";
+                    msg.className = "text-green-800 font-cartoon text-2xl leading-tight";
+                    msg.innerText = "PANDAI KAU! 🛸";
+                    btnNext.className = "w-full bg-green-600 hover:bg-green-700 text-white font-cartoon text-xl py-3.5 rounded-2xl border-b-6 border-green-800 transition btn-pop shadow-md uppercase";
+                    
+                    speakWithGeminiTTS("Muahaha! Pandai kau!");
+                }
+            } else {
+                if (currentPlayer === 1) {
+                    card.className = "bg-white rounded-3xl border-8 border-red-500 max-w-md w-full p-6 text-center shadow-2xl transition transform scale-100";
+                    avatar.innerHTML = `
+                        <div class="w-20 h-20 rounded-full overflow-hidden border-4 border-red-400 shadow-md mx-auto flex items-center justify-center bg-red-100">
+                            <img src="Boboiboy%20-%20Edited.jpg" class="w-full h-full object-cover grayscale" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
+                            <span class="text-4xl hidden">👦</span>
+                        </div>
+                    `;
+                    title.innerText = "ALAMAK!";
+                    title.className = "font-cartoon text-3xl text-red-600 mb-2";
+                    motivBox.className = "bg-red-100 border-4 border-red-300 rounded-2xl p-4 mb-4";
+                    msg.className = "text-red-800 font-cartoon text-2xl leading-tight";
+                    msg.innerText = "JANGAN MENYERAH! ⚡";
+                    btnNext.className = "w-full bg-red-500 hover:bg-red-600 text-white font-cartoon text-xl py-3.5 rounded-2xl border-b-6 border-red-700 transition btn-pop shadow-md uppercase";
+                    
+                    speakWithGeminiTTS("Alamak! Jangan menyerah!");
+                } else {
+                    card.className = "bg-white rounded-3xl border-8 border-purple-500 max-w-md w-full p-6 text-center shadow-2xl transition transform scale-100";
+                    avatar.innerHTML = `
+                        <div class="w-20 h-20 rounded-full overflow-hidden border-4 border-purple-400 shadow-md mx-auto flex items-center justify-center bg-purple-100">
+                            <img src="Adudu%20-%20Edited.png" class="w-full h-full object-cover grayscale" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
+                            <span class="text-4xl hidden">👽</span>
+                        </div>
+                    `;
+                    title.innerText = "ADUDAIY!";
+                    title.className = "font-cartoon text-3xl text-purple-700 mb-2";
+                    motivBox.className = "bg-purple-100 border-4 border-purple-300 rounded-2xl p-4 mb-4";
+                    msg.className = "text-purple-800 font-cartoon text-2xl leading-tight";
+                    msg.innerText = "JANGAN PUTUS ASA! 📦";
+                    btnNext.className = "w-full bg-purple-50 hover:bg-purple-600 text-white font-cartoon text-xl py-3.5 rounded-2xl border-b-6 border-purple-700 transition btn-pop shadow-md uppercase";
+                    
+                    speakWithGeminiTTS("Adudaiy! Jangan putus asa!");
+                }
+            }
+            expl.innerText = currentQuestion.explanation;
+            modal.classList.remove('hidden');
+        }
+
+        // --- GAMEPLAY: KAD IMBASAN AI ---
+        function openAiFlashcards() {
+            if (!isMusicInitialized) {
+                toggleBGM();
+                isMusicInitialized = true;
+            }
+            document.getElementById('screen-category').classList.add('hidden');
+            document.getElementById('screen-flashcard').classList.remove('hidden');
+            document.getElementById('main-body').className = "min-h-screen flex flex-col justify-between p-4 overflow-x-hidden theme-flashcard";
+            
+            // Set semula UI
+            document.getElementById('flashcard-output').classList.add('hidden');
+            document.getElementById('flashcard-loading').classList.add('hidden');
+            document.getElementById('flashcard-custom-input').value = "";
+        }
+
+        async function generatePocketFlashcardAi() {
+            const selectWord = document.getElementById('flashcard-select').value;
+            const customWord = document.getElementById('flashcard-custom-input').value.trim();
+            const word = customWord || selectWord;
+
+            const loadingEl = document.getElementById('flashcard-loading');
+            const outputEl = document.getElementById('flashcard-output');
+            const wordTitleEl = document.getElementById('flashcard-ai-word');
+            const expEl = document.getElementById('flashcard-ai-explanation');
+            const sentEl = document.getElementById('flashcard-ai-sentence');
+            const imgEl = document.getElementById('flashcard-ai-img');
+
+            loadingEl.classList.remove('hidden');
+            outputEl.classList.add('hidden');
+
+            const systemPrompt = "Anda adalah Ochobot, pembantu pintar BoBoiBoy. Terangkan kata adjektif dalam Bahasa Melayu yang SANGAT MUDAH untuk murid Pendidikan Khas.";
+            const userPrompt = `Bina ulasan kad imbasan untuk perkataan: "${word}".
+            Kembalikan jawapan dalam format JSON:
+            {
+              "explanation": "Tafsiran maksud perkataan secara amat mudah (maksimum 12 perkataan).",
+              "sentence": "Satu ayat contoh ceria bertemakan BoBoiBoy / Ochobot (maksimum 10 perkataan)."
+            }`;
+
+            const textPayload = {
+                "contents": [{ "parts": [{ "text": userPrompt }] }],
+                "systemInstruction": { "parts": [{ "text": systemPrompt }] },
+                "generationConfig": {
+                    "responseMimeType": "application/json",
+                    "responseSchema": {
+                        "type": "OBJECT",
+                        "properties": {
+                            "explanation": { "type": "STRING" },
+                            "sentence": { "type": "STRING" }
+                        },
+                        "required": ["explanation", "sentence"]
+                    }
+                }
+            };
+
+            const textEndpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=" + apiKey;
+
+            const imagePromptText = `A vibrant, simple cartoon 3D illustration style representing the adjective "${word}" showing BoBoiBoy character, colorful, kid-friendly background, vector illustration, no text, clean style.`;
+            const imagePayload = {
+                "instances": [{ "prompt": imagePromptText }],
+                "parameters": { "sampleCount": 1 }
+            };
+            const imageEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
+
+            try {
+                const [textResult, imageResult] = await Promise.all([
+                    fetchWithRetry(textEndpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(textPayload)
+                    }, 5, 1000),
+                    fetchWithRetry(imageEndpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(imagePayload)
+                    }, 5, 2000)
+                ]);
+
+                const rawJsonText = textResult.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!rawJsonText) throw new Error("Respons teks kosong");
+                const cardData = JSON.parse(rawJsonText);
+
+                const base64Bytes = imageResult.predictions?.[0]?.bytesBase64Encoded;
+                if (!base64Bytes) throw new Error("Imej gagal dijana");
+
+                wordTitleEl.innerText = word;
+                expEl.innerText = cardData.explanation;
+                sentEl.innerText = cardData.sentence;
+                imgEl.src = `data:image/png;base64,${base64Bytes}`;
+
+                outputEl.classList.remove('hidden');
+                
+                // Sebut teks kad imbasan secara automatik
+                speakWithGeminiTTS(word + ". Maksudnya: " + cardData.explanation + ". Contoh: " + cardData.sentence);
+
+            } catch (err) {
+                console.error(err);
+                showCustomAlert("Ralat Penjana AI", "Alamak! Kuasa Ochobot AI tersangkut sebentar untuk melukis kad ini. Sila cuba lagi kawan!", "❌");
+            } finally {
+                loadingEl.classList.add('hidden');
+            }
+        }
+
+        // --- KAMUS POKET INTERAKTIF OCHOBOT AI & SEMAK AYAT AI ---
+        function openPocketDictionary() {
+            document.getElementById('modal-dictionary').classList.remove('hidden');
+            document.getElementById('dict-input').value = "";
+            document.getElementById('dict-sentence-input').value = "";
+            document.getElementById('dict-image-input').value = "";
+            document.getElementById('dict-output-container').classList.add('hidden');
+            document.getElementById('dict-image-output-container').classList.add('hidden');
+            document.getElementById('dict-error-container').classList.add('hidden');
+            document.getElementById('dict-loading').classList.add('hidden');
+            switchDictTab('maksud');
+        }
+
+        function closePocketDictionary() {
+            document.getElementById('modal-dictionary').classList.add('hidden');
+            stopGeminiTTS();
+        }
+
+        function switchDictTab(tabId) {
+            document.getElementById('dict-tab-content-maksud').classList.add('hidden');
+            document.getElementById('dict-tab-content-semak').classList.add('hidden');
+            document.getElementById('dict-tab-content-sembang').classList.add('hidden');
+            document.getElementById('dict-tab-content-gambar').classList.add('hidden');
+            
+            document.getElementById('tab-maksud').className = "w-1/4 py-2 text-gray-500 border-b-4 border-transparent";
+            document.getElementById('tab-semak').className = "w-1/4 py-2 text-gray-500 border-b-4 border-transparent";
+            document.getElementById('tab-sembang').className = "w-1/4 py-2 text-gray-500 border-b-4 border-transparent";
+            document.getElementById('tab-gambar').className = "w-1/4 py-2 text-gray-500 border-b-4 border-transparent";
+
+            const avatar = document.getElementById('dict-ochobot-avatar');
+            avatar.classList.remove('hidden');
+            avatar.nextElementSibling.classList.add('hidden');
+
+            if (tabId === 'maksud') {
+                document.getElementById('dict-tab-content-maksud').classList.remove('hidden');
+                document.getElementById('tab-maksud').className = "w-1/4 py-2 text-indigo-600 border-b-4 border-indigo-500";
+                avatar.src = "Ochobot%202%20-%20Edited.jpg";
+            } else if (tabId === 'semak') {
+                document.getElementById('dict-tab-content-semak').classList.remove('hidden');
+                document.getElementById('tab-semak').className = "w-1/4 py-2 text-indigo-600 border-b-4 border-indigo-500";
+                avatar.src = "Ochobot%202%20-%20Edited.jpg";
+            } else if (tabId === 'sembang') {
+                document.getElementById('dict-tab-content-sembang').classList.remove('hidden');
+                document.getElementById('tab-sembang').className = "w-1/4 py-2 text-indigo-600 border-b-4 border-indigo-500";
+                changeChatCharacter();
+            } else if (tabId === 'gambar') {
+                document.getElementById('dict-tab-content-gambar').classList.remove('hidden');
+                document.getElementById('tab-gambar').className = "w-1/4 py-2 text-indigo-600 border-b-4 border-indigo-500";
+                avatar.src = "Ochobot%202%20-%20Edited.jpg";
+            }
+            document.getElementById('dict-output-container').classList.add('hidden');
+            document.getElementById('dict-image-output-container').classList.add('hidden');
+            document.getElementById('dict-error-container').classList.add('hidden');
+            document.getElementById('dict-loading').classList.add('hidden');
+            stopGeminiTTS();
+        }
+
+        async function askPocketDictionary() {
+            const word = document.getElementById('dict-input').value.trim();
+            if (!word) {
+                showCustomAlert("Ochobot Pintar", "Sila masukkan satu perkataan kata adjektif dahulu!", "💡");
+                return;
+            }
+
+            const loadingEl = document.getElementById('dict-loading');
+            const outputEl = document.getElementById('dict-output-container');
+            const errorEl = document.getElementById('dict-error-container');
+            const titleEl = document.getElementById('dict-output-title');
+            const explanationEl = document.getElementById('dict-output-explanation');
+            const sentenceSection = document.getElementById('dict-sentence-section');
+            const sentenceEl = document.getElementById('dict-output-sentence');
+            const emojiEl = document.getElementById('dict-output-emoji');
+
+            loadingEl.classList.remove('hidden');
+            outputEl.classList.add('hidden');
+            errorEl.classList.add('hidden');
+
+            const systemPrompt = "Anda adalah Ochobot, robot AI pembantu BoBoiBoy. Anda merupakan Kamus Poket Kata Adjektif yang pintar dan ceria untuk murid-murid berkeperluan khas (Slow Learner / Autisme).";
+            const userPrompt = `Terangkan perkataan kata adjektif "${word}" dalam bahasa Melayu yang SANGAT MUDAH difahami oleh murid bermasalah pembelajaran.
+            Berikan jawapan dalam format JSON dengan struktur berikut:
+            {
+              "explanation": "Penerangan maksud yang sangat ringkas dan mesra MBK (maksimum 15 patah perkataan).",
+              "sentence": "Satu ayat contoh yang kelakar/menarik bertemakan BoBoiBoy atau Papa Zola (maksimum 10 patah perkataan).",
+              "emoji": "Satu emoji sahaja yang menggambarkan perkataan tersebut"
+            }`;
+
+            const payload = {
+                "contents": [{ "parts": [{ "text": userPrompt }] }],
+                "systemInstruction": { "parts": [{ "text": systemPrompt }] },
+                "generationConfig": {
+                    "responseMimeType": "application/json",
+                    "responseSchema": {
+                        "type": "OBJECT",
+                        "properties": {
+                            "explanation": { "type": "STRING" },
+                            "sentence": { "type": "STRING" },
+                            "emoji": { "type": "STRING" }
+                        },
+                        "required": ["explanation", "sentence", "emoji"]
+                    }
+                }
+            };
+
+            const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=" + apiKey;
+
+            try {
+                const result = await fetchWithRetry(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }, 5, 1000);
+
+                const rawJsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!rawJsonText) throw new Error("Gagal memperoleh respons kamus.");
+
+                const dictObject = JSON.parse(rawJsonText);
+                if (dictObject) {
+                    titleEl.innerText = "Maksud Mudah Ochobot:";
+                    explanationEl.innerText = dictObject.explanation;
+                    sentenceSection.classList.remove('hidden');
+                    sentenceEl.innerText = dictObject.sentence;
+                    emojiEl.innerText = dictObject.emoji || "💡";
+                    outputEl.classList.remove('hidden');
+                    
+                    speakWithGeminiTTS(word + ". Maksudnya: " + dictObject.explanation + ". Contoh: " + dictObject.sentence);
+                } else {
+                    throw new Error("Format tidak sah.");
+                }
+            } catch (err) {
+                console.error(err);
+                errorEl.classList.remove('hidden');
+            } finally {
+                loadingEl.classList.add('hidden');
+            }
+        }
+
+        async function generateAiRiddle() {
+            const word = document.getElementById('dict-input').value.trim();
+            if (!word) {
+                showCustomAlert("Ochobot Teka-Teki", "Sila masukkan satu perkataan jawapan dahulu!", "💡");
+                return;
+            }
+
+            const loadingEl = document.getElementById('dict-loading');
+            const outputEl = document.getElementById('dict-output-container');
+            const errorEl = document.getElementById('dict-error-container');
+            const titleEl = document.getElementById('dict-output-title');
+            const explanationEl = document.getElementById('dict-output-explanation');
+            const sentenceSection = document.getElementById('dict-sentence-section');
+            const emojiEl = document.getElementById('dict-output-emoji');
+
+            loadingEl.classList.remove('hidden');
+            outputEl.classList.add('hidden');
+            errorEl.classList.add('hidden');
+
+            const systemPrompt = "Anda adalah Papa Zola, guru Kebenaran yang kelakar! Anda suka memberi teka-teki pantun dua kerat kepada anak murid.";
+            const userPrompt = `Bina satu teka-teki pantun dua kerat yang SANGAT MUDAH untuk murid Pendidikan Khas. Jawapan teka-teki ini mestilah perkataan adjektif "${word}". Jangan berikan jawapan dalam teks pantun tersebut.`;
+
+            const payload = {
+                "contents": [{ "parts": [{ "text": userPrompt }] }],
+                "systemInstruction": { "parts": [{ "text": systemPrompt }] }
+            };
+
+            const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=" + apiKey;
+
+            try {
+                const result = await fetchWithRetry(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }, 5, 1000);
+
+                const aiResponseText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (aiResponseText) {
+                    const cleanedText = aiResponseText.replace(/[*'"`]/g, '').trim();
+                    titleEl.innerText = "Teka-Teki Kebenaran:";
+                    explanationEl.innerText = cleanedText + "\n\n(Jawapan: " + word + ")";
+                    sentenceSection.classList.add('hidden'); 
+                    emojiEl.innerText = "🤔";
+                    outputEl.classList.remove('hidden');
+                    
+                    speakWithGeminiTTS("Teka-teki cikgu Papa Zola! " + cleanedText);
+                } else {
+                    throw new Error("Respons kosong.");
+                }
+            } catch (err) {
+                console.error(err);
+                errorEl.classList.remove('hidden');
+            } finally {
+                loadingEl.classList.add('hidden');
+            }
+        }
+
+        // SEMAK AYAT KENDIRI MURID OLEH AI
+        async function checkMySentenceAi() {
+            const word = document.getElementById('dict-word-focus').value.trim();
+            const sentence = document.getElementById('dict-sentence-input').value.trim();
+
+            if (!word || !sentence) {
+                showCustomAlert("Ochobot Penyemak", "Sila masukkan kata adjektif dan tulis ayat kamu dahulu!", "💡");
+                return;
+            }
+
+            const loadingEl = document.getElementById('dict-loading');
+            const outputEl = document.getElementById('dict-output-container');
+            const errorEl = document.getElementById('dict-error-container');
+            const titleEl = document.getElementById('dict-output-title');
+            const explanationEl = document.getElementById('dict-output-explanation');
+            const sentenceSection = document.getElementById('dict-sentence-section');
+            const emojiEl = document.getElementById('dict-output-emoji');
+
+            loadingEl.classList.remove('hidden');
+            outputEl.classList.add('hidden');
+            errorEl.classList.add('hidden');
+
+            const systemPrompt = "Anda adalah Ochobot, pembantu guru Pendidikan Khas yang periang. Tugas anda adalah menyemak ayat yang dibina oleh murid pemulihan khas. Gunakan bahasa yang sangat ringkas, memotivasikan, dan sentiasa positif. Sila berikan rating pencapaian bintang (1 hingga 5 ⭐).";
+            const userPrompt = `Kata Adjektif Fokus: "${word}"\nAyat Murid: "${sentence}"\n\nSila semak sama ada penggunaan kata adjektif dalam ayat ini betul atau tidak. Beri pujian dan terangkan secara ringkas jika ada kesalahan. Tambahkan rating bintang (cth: ⭐⭐⭐⭐⭐) di akhir maklum balas.`;
+
+            const payload = {
+                "contents": [{ "parts": [{ "text": userPrompt }] }],
+                "systemInstruction": { "parts": [{ "text": systemPrompt }] }
+            };
+
+            const realEndpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=" + apiKey;
+
+            try {
+                const result = await fetchWithRetry(realEndpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }, 5, 1000);
+
+                const aiResponseText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (aiResponseText) {
+                    const cleanedText = aiResponseText.replace(/[*'"`#]/g, '').trim();
+                    titleEl.innerText = "Keputusan Semakan Ochobot:";
+                    explanationEl.innerText = cleanedText;
+                    sentenceSection.classList.add('hidden'); 
+                    emojiEl.innerText = "📝";
+                    outputEl.classList.remove('hidden');
+                    
+                    speakWithGeminiTTS(cleanedText);
+                } else {
+                    throw new Error("Respons kosong.");
+                }
+            } catch (err) {
+                console.error(err);
+                errorEl.classList.remove('hidden');
+            } finally {
+                loadingEl.classList.add('hidden');
+            }
+        }
+
+        // --- SISTEM SEMBANG WATAK (GEMINI API) ---
+        function changeChatCharacter() {
+            const character = document.getElementById('chat-char-select').value;
+            const dictAvatar = document.getElementById('dict-ochobot-avatar');
+            const chatWindow = document.getElementById('chat-window');
+
+            characterChatHistory = []; // Reset sejarah sembang
+            stopGeminiTTS();
+            dictAvatar.classList.remove('hidden');
+            dictAvatar.nextElementSibling.classList.add('hidden');
+
+            if (character === 'boboiboy') {
+                dictAvatar.src = "Boboiboy%20-%20Edited.jpg";
+                chatWindow.innerHTML = '<div class="text-orange-600 font-bold bg-orange-50 p-2 rounded-lg">⚡ BoBoiBoy: Hai kawan! Saya sedia bersembang dengan anda! Kongsikan sebarang kata adjektif, jom mula!</div>';
+            } else if (character === 'ochobot') {
+                dictAvatar.src = "Ochobot%202%20-%20Edited.jpg";
+                chatWindow.innerHTML = '<div class="text-indigo-600 font-bold bg-indigo-50 p-2 rounded-lg">🤖 Ochobot: Hai kawan! Mari mulakan sembang kebenaran kita hari ini! Sila gunakan perkataan kegemaran anda!</div>';
+            } else if (character === 'adudu') {
+                dictAvatar.src = "Adudu%20-%20Edited.png";
+                chatWindow.innerHTML = '<div class="text-green-700 font-bold bg-green-50 p-2 rounded-lg">👽 Alien Adudu: Cis, ada budak mahu sembang dengan aku? Cepat beritahu aku apa-apa kata adjektif, jangan buang masa aku! Muahaha!</div>';
+            }
+        }
+
+        function clearChatHistory() {
+            changeChatCharacter();
+        }
+
+        async function sendCharacterChatMessage() {
+            const userInputField = document.getElementById('chat-user-input');
+            const userMsg = userInputField.value.trim();
+            if (!userMsg) return;
+
+            const chatWindow = document.getElementById('chat-window');
+            const character = document.getElementById('chat-char-select').value;
+            const loadingEl = document.getElementById('dict-loading');
+
+            chatWindow.innerHTML += `<div class="text-gray-700 font-bold bg-gray-100 p-2 rounded-lg text-right">Anda: ${userMsg}</div>`;
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+            userInputField.value = "";
+
+            loadingEl.classList.remove('hidden');
+            stopGeminiTTS();
+
+            let characterSystemInstruction = "";
+            let charName = "";
+            let colorClass = "";
+
+            if (character === 'boboiboy') {
+                charName = "BoBoiBoy";
+                colorClass = "text-orange-600 bg-orange-50";
+                characterSystemInstruction = "Anda adalah BoBoiBoy, adiwira bumi yang sangat bersemangat, ceria, baik hati dan amat mesra kanak-kanak. Anda sedang bersembang dengan seorang murid berkeperluan khas. Galakkan mereka menggunakan kata adjektif dalam sembang secara santai. Balas dalam bahasa Melayu yang amat ringkas (maksimum 2-3 ayat pendek).";
+            } else if (character === 'ochobot') {
+                charName = "Ochobot";
+                colorClass = "text-indigo-600 bg-indigo-50";
+                characterSystemInstruction = "Anda adalah Ochobot, robot pembantu yang pintar, penyayang, and suka menolong. Anda suka menerangkan sesuatu dengan sabar kepada murid berkeperluan khas. Balas dalam bahasa Melayu yang amat ringkas (maksimum 2-3 ayat pendek) menggunakan kata-kata mesra dan emoji.";
+            } else if (character === 'adudu') {
+                charName = "Adu Du";
+                colorClass = "text-green-700 bg-green-50";
+                characterSystemInstruction = "Anda adalah Adu Du, alien hijau seteru utama BoBoiBoy yang kelakar, ego tinggi, pemarah tetapi sebenarnya kelakar dan tidak membahayakan murid. Anda suka mencabar murid berkeperluan khas dengan cara yang melucukan. Balas dalam bahasa Melayu yang amat ringkas (maksimum 2-3 ayat pendek).";
+            }
+
+            characterChatHistory.push({ role: "user", parts: [{ text: userMsg }] });
+
+            const payload = {
+                "contents": characterChatHistory,
+                "systemInstruction": { "parts": [{ "text": characterSystemInstruction }] }
+            };
+
+            const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=" + apiKey;
+
+            try {
+                const result = await fetchWithRetry(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }, 5, 1000);
+
+                const aiReply = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (aiReply) {
+                    const cleanedText = aiReply.replace(/[*'"`]/g, '').trim();
+                    characterChatHistory.push({ role: "model", parts: [{ text: cleanedText }] });
+                    
+                    chatWindow.innerHTML += `
+                        <div class="${colorClass} font-bold p-2 rounded-lg flex justify-between items-center gap-2">
+                            <span>${charName}: ${cleanedText}</span>
+                            <button onclick="speakTextTTS('${cleanedText}')" class="bg-white/80 hover:bg-white text-gray-700 w-5 h-5 rounded-full flex items-center justify-center shrink-0 shadow-sm" title="Dengar">
+                                <i class="fas fa-volume-up text-[10px]"></i>
+                            </button>
+                        </div>
+                    `;
+                    chatWindow.scrollTop = chatWindow.scrollHeight;
+                    
+                    // Mainkan sebutan suara watak secara automatik
+                    speakTextTTS(cleanedText);
+                } else {
+                    throw new Error("Balasan kosong");
+                }
+            } catch (err) {
+                console.error(err);
+                chatWindow.innerHTML += `<div class="text-red-600 font-bold bg-red-50 p-2 rounded-lg">Sistem: Alamak, talian perhubungan angkasa terputus! Cuba hantar mesej lagi.</div>`;
+            } finally {
+                loadingEl.classList.add('hidden');
+            }
+        }
+
+        // --- SISTEM GENERATOR GAMBAR IMAGEN 4.0 ---
+        async function generateAiImage() {
+            const word = document.getElementById('dict-image-input').value.trim();
+            if (!word) {
+                showCustomAlert("Ochobot Pelukis", "Sila taip satu perkataan kata adjektif atau situasi!", "💡");
+                return;
+            }
+
+            const loadingEl = document.getElementById('dict-loading');
+            const outputEl = document.getElementById('dict-image-output-container');
+            const outputImgEl = document.getElementById('dict-output-image-el');
+            const errorEl = document.getElementById('dict-error-container');
+
+            loadingEl.classList.remove('hidden');
+            outputEl.classList.add('hidden');
+            errorEl.classList.add('hidden');
+            stopGeminiTTS();
+
+            const promptText = `A bright, cute cartoon 3D illustration style representing the adjective "${word}" showing BoBoiBoy character, colorful, kid-friendly background, vector illustration, no text, clean style.`;
+            
+            const payload = {
+                instances: [
+                    { prompt: promptText }
+                ],
+                parameters: {
+                    sampleCount: 1
+                }
+            };
+
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
+
+            try {
+                const result = await fetchWithRetry(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }, 5, 2000);
+
+                const base64Bytes = result.predictions?.[0]?.bytesBase64Encoded;
+                if (base64Bytes) {
+                    const imageUrl = `data:image/png;base64,${base64Bytes}`;
+                    outputImgEl.src = imageUrl;
+                    outputEl.classList.remove('hidden');
+                    
+                    speakWithGeminiTTS("Gambar BoBoiBoy " + word + " sedia untuk dilihat!");
+                } else {
+                    throw new Error("Imej tidak berjaya dijana oleh Imagen.");
+                }
+            } catch (err) {
+                console.error(err);
+                errorEl.classList.remove('hidden');
+            } finally {
+                loadingEl.classList.add('hidden');
+            }
+        }
+
+        // --- SISTEM PEMBANTU BARU: PENCIPTA SUPERHERO AI OCHOBOT ---
+        function openSuperheroCreator() {
+            if (!isMusicInitialized) {
+                toggleBGM();
+                isMusicInitialized = true;
+            }
+            document.getElementById('screen-category').classList.add('hidden');
+            document.getElementById('screen-superhero-creator').classList.remove('hidden');
+            document.getElementById('main-body').className = "min-h-screen flex flex-col justify-between p-4 overflow-x-hidden theme-superhero";
+            
+            // Set semula UI
+            document.getElementById('superhero-name-input').value = "";
+            document.getElementById('superhero-output').classList.add('hidden');
+            document.getElementById('superhero-loading').classList.add('hidden');
+        }
+
+        async function generateSuperheroAi() {
+            const name = document.getElementById('superhero-name-input').value.trim() || "Wira Adjektif";
+            const adj = document.getElementById('superhero-adj-select').value;
+            const element = document.getElementById('superhero-power-select').value;
+
+            const loadingEl = document.getElementById('superhero-loading');
+            const outputEl = document.getElementById('superhero-output');
+            const titleEl = document.getElementById('superhero-ai-title');
+            const storyEl = document.getElementById('superhero-ai-story');
+            const imgEl = document.getElementById('superhero-ai-img');
+
+            loadingEl.classList.remove('hidden');
+            outputEl.classList.add('hidden');
+            stopGeminiTTS();
+
+            // Prompt Teks Gemini 2.5 Flash
+            const systemPrompt = "Anda adalah Ochobot, pembantu pintar bertemakan BoBoiBoy. Tulis kisah adiwira dalam Bahasa Melayu yang SANGAT MUDAH, PENDEK, dan memotivasikan murid pemulihan khas.";
+            const userPrompt = `Bina sebuah profil cerita pengenalan pendek (maksimum 3 ayat ringkas) untuk adiwira baharu bernama "${name}". Dia mempunyai sifat kekuatan yang sangat "${adj}" dan mengawal kuasa elemen "${element}". Ceritakan bagaimana sifat adjektif itu membantunya menyelamatkan bumi dengan gembira!`;
+
+            const textPayload = {
+                "contents": [{ "parts": [{ "text": userPrompt }] }],
+                "systemInstruction": { "parts": [{ "text": systemPrompt }] }
+            };
+
+            const textEndpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=" + apiKey;
+
+            // Prompt Gambar Imagen 4.0
+            const imagePromptText = `A vibrant 3D cartoon style portrait of a cute BoBoiBoy-inspired superhero kid named "${name}" who is highly "${adj}" utilizing the powerful element of "${element}", glowing effects, dynamic action pose, clean design, bright kids illustration background, no text.`;
+            const imagePayload = {
+                "instances": [{ "prompt": imagePromptText }],
+                "parameters": { "sampleCount": 1 }
+            };
+            const imageEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
+
+            try {
+                // Panggilan selari teks dan gambar
+                const [textResult, imageResult] = await Promise.all([
+                    fetchWithRetry(textEndpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(textPayload)
+                    }, 5, 1000),
+                    fetchWithRetry(imageEndpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(imagePayload)
+                    }, 5, 2000)
+                ]);
+
+                // Proses Teks
+                const storyText = textResult.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!storyText) throw new Error("Gagal menjana cerita");
+                const cleanedStory = storyText.replace(/[*'"`]/g, '').trim();
+                lastGeneratedSuperheroStory = cleanedStory;
+
+                // Proses Gambar
+                const base64Bytes = imageResult.predictions?.[0]?.bytesBase64Encoded;
+                if (!base64Bytes) throw new Error("Gagal menjana potret hero");
+
+                // Kemas Kini UI
+                titleEl.innerText = name;
+                storyEl.innerText = cleanedStory;
+                imgEl.src = `data:image/png;base64,${base64Bytes}`;
+
+                outputEl.classList.remove('hidden');
+                
+                // Main sebutan automatik
+                speakWithGeminiTTS(`Superhero baharu telah lahir! Namanya ${name}. ${cleanedStory}`);
+
+            } catch (err) {
+                console.error(err);
+                showCustomAlert("Ralat Penjana Adiwira", "Alamak! Kuasa Ochobot tersangkut sebentar semasa menenun adiwira anda. Sila cuba lagi!", "❌");
+            } finally {
+                loadingEl.classList.add('hidden');
+            }
+        }
+
+        function speakSuperheroStory() {
+            const name = document.getElementById('superhero-ai-title').innerText;
+            if (name && lastGeneratedSuperheroStory) {
+                speakWithGeminiTTS(`Ini adalah ${name}. ${lastGeneratedSuperheroStory}`);
+            }
+        }
+
+        // --- INTEGRASI BARU: GEMINI 2.5 TTS (TEXT-TO-SPEECH) INTEGRATION ---
+        let currentAudioSource = null;
+        let audioCtx = null;
+
+        function stopGeminiTTS() {
+            if (currentAudioSource) {
+                try {
+                    currentAudioSource.stop();
+                } catch(e) {}
+                currentAudioSource = null;
+            }
+        }
+
+        async function speakWithGeminiTTS(textToSpeak) {
+            stopGeminiTTS();
+            
+            // Dapatkan konfigurasi suara terpilih dari menu
+            const selectedVoice = document.getElementById('tts-voice-select').value || 'Kore';
+
+            const payload = {
+                contents: [{ parts: [{ text: textToSpeak }] }],
+                generationConfig: {
+                    responseModalities: ["AUDIO"],
+                    speechConfig: {
+                        voiceConfig: {
+                            prebuiltVoiceConfig: {
+                                voiceName: selectedVoice
+                            }
+                        }
+                    }
+                }
+            };
+
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error("Gagal memanggil API Suara Gemini");
+                const result = await response.json();
+                
+                const base64Audio = result.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+                if (!base64Audio) {
+                    console.log("No audio data returned from Gemini TTS");
+                    return;
+                }
+
+                // Decode base64 to binary buffer
+                const rawAudioBytes = base64ToUint8Array(base64Audio);
+                
+                // Play raw L16 linear PCM audio via Web Audio API
+                // Gemini TTS yields mono 16-bit PCM (usually 24000Hz or 16000Hz, we can default to 24000Hz)
+                const sampleRate = 24000;
+                
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+
+                // Convert 16-bit PCM bytes to Float32 array
+                const numSamples = rawAudioBytes.length / 2;
+                const float32Data = new Float32Array(numSamples);
+                const dataView = new DataView(rawAudioBytes.buffer);
+
+                for (let i = 0; i < numSamples; i++) {
+                    // PCM16 is little-endian signed integer
+                    const sample = dataView.getInt16(i * 2, true);
+                    float32Data[i] = sample / 32768; // Normalize to -1.0 to 1.0
+                }
+
+                const audioBuffer = audioCtx.createBuffer(1, numSamples, sampleRate);
+                audioBuffer.getChannelData(0).set(float32Data);
+
+                const source = audioCtx.createBufferSource();
+                source.buffer = audioBuffer;
+                source.connect(audioCtx.destination);
+                source.start(0);
+                currentAudioSource = source;
+
+            } catch (err) {
+                console.error("Gemini TTS Error:", err);
+                // Fallback to browser Web Speech API if Gemini TTS fails or offline
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                    utterance.lang = 'ms-MY';
+                    utterance.rate = 0.9;
+                    window.speechSynthesis.speak(utterance);
+                }
+            }
+        }
+
+        // Helper to convert Base64 string to Uint8Array
+        function base64ToUint8Array(base64String) {
+            const binaryString = window.atob(base64String);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes;
+        }
+
+        // Sebutan Suara Soalan Semasa
+        function speakCurrentQuestion() {
+            const activeQuestions = getQuizDataForCurrentYear();
+            if (activeQuestions.length === 0) return;
+            const currentQuestion = activeQuestions[currentQuestionIndex];
+            
+            // Tukar garisan kosong kepada jeda pembacaan
+            const readableQuestion = currentQuestion.question.replace("________", "tempat kosong");
+            speakWithGeminiTTS(readableQuestion);
+        }
+
+        // Sebutan Suara Kad Imbasan Pintar Semasa
+        function speakFlashcard() {
+            const word = document.getElementById('flashcard-ai-word').innerText;
+            const explanation = document.getElementById('flashcard-ai-explanation').innerText;
+            const sentence = document.getElementById('flashcard-ai-sentence').innerText;
+            
+            if (word && explanation) {
+                speakWithGeminiTTS(word + ". Maksudnya: " + explanation + ". Contoh: " + sentence);
+            }
+        }
+
+        // Sebutan Suara Mana-mana Teks Rawak
+        function speakTextTTS(text) {
+            if (text) speakWithGeminiTTS(text);
+        }
+
+        // LAPORAN GURU AI PADA SKRIN KEPUTUSAN
+        async function generateAiTeacherReport() {
+            const loadingEl = document.getElementById('ai-report-loading');
+            const outputContainerEl = document.getElementById('ai-report-output-container');
+            const outputTextEl = document.getElementById('ai-report-text');
+            const generateBtn = document.getElementById('btn-generate-report');
+
+            try {
+                loadingEl.classList.remove('hidden');
+                outputContainerEl.classList.add('hidden');
+                generateBtn.classList.add('opacity-50', 'pointer-events-none');
+                stopGeminiTTS();
+
+                const finalScore = activeCategory === 'slow-learner' ? Math.max(scoreP1, scoreP2) : scoreAutisme;
+                const activeQuestions = getQuizDataForCurrentYear();
+                const totalScorePossible = activeQuestions.length * (activeCategory === 'slow-learner' ? 10 : 20);
+
+                const systemPrompt = "Anda adalah pakar pedagogi Pendidikan Khas di Malaysia yang menolong guru. Berikan laporan dan cadangan dalam bahasa Melayu profesional, teratur, dan membina.";
+                const userPrompt = `Jana satu laporan prestasi ringkas dan 2 cadangan aktiviti susulan untuk menyokong murid Pendidikan Khas.
+                Maklumat Sesi:
+                Kategori Murid: ${activeCategory === 'slow-learner' ? 'Slow Learner (Asas 3M)' : 'Autisme Non-Verbal'}
+                Tahun Pengajian: Tahun ${activeYear}
+                Markah Diperolehi: ${finalScore} daripada ${totalScorePossible}
+                Topik: Penguasaan Kata Adjektif.
+                Sila pastikan laporan ini pendek, padat (maksimum 3 perenggan) and memberi kata-kata semangat kepada guru. Jangan gunakan formatting rumit seperti asterisks.`;
+
+                const payload = {
+                    "contents": [{ "parts": [{ "text": userPrompt }] }],
+                    "systemInstruction": { "parts": [{ "text": systemPrompt }] }
+                };
+
+                const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=" + apiKey;
+
+                const result = await fetchWithRetry(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }, 5, 1000);
+
+                const aiResponseText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (aiResponseText) {
+                    const cleanedText = aiResponseText.replace(/[*'"`#]/g, '').trim();
+                    outputTextEl.innerText = cleanedText;
+                    outputContainerEl.classList.remove('hidden');
+                } else {
+                    throw new Error("Respons kosong dari API.");
+                }
+            } catch (err) {
+                console.error(err);
+                showCustomAlert("Ralat Analisis", "Alamak! Cikgu, laporan AI tidak dapat dijana pada masa ini.", "❌");
+            } finally {
+                loadingEl.classList.add('hidden');
+                generateBtn.classList.remove('opacity-50', 'pointer-events-none');
+            }
+        }
+
+        function showCustomAlert(title, message, emoji) {
+            document.getElementById('alert-emoji').innerText = emoji || "💡";
+            document.getElementById('alert-title').innerText = title;
+            document.getElementById('alert-message').innerText = message;
+            document.getElementById('modal-alert').classList.remove('hidden');
+        }
+
+        function closeCustomAlert() {
+            document.getElementById('modal-alert').classList.add('hidden');
+        }
+
+        async function fetchWithRetry(url, options, retries, delay) {
+            retries = retries || 5;
+            delay = delay || 1000;
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) throw new Error("Ralat respons: " + response.status);
+                
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                if (retries > 1) {
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    return fetchWithRetry(url, options, retries - 1, delay * 2);
+                } else { 
+                    throw error; 
+                }
+            }
+        }
+
+        function nextQuestion() {
+            document.getElementById('modal-feedback').classList.add('hidden');
+            const activeQuestions = getQuizDataForCurrentYear();
+            stopGeminiTTS();
+            
+            if (activeCategory === 'slow-learner') {
+                currentPlayer = (currentPlayer === 1) ? 2 : 1;
+                currentQuestionIndex++;
+                if (currentQuestionIndex < activeQuestions.length) { 
+                    loadQuestionSlow(); 
+                } else { 
+                    showResults(); 
+                }
+            } else {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < activeQuestions.length) { 
+                    loadQuestionAutisme(); 
+                } else { 
+                    showResults(); 
+                }
+            }
+        }
+
+        // --- SISTEM PEMBANTU LAIN ---
+        function updateScoreUI() {
+            document.getElementById('score-p1').innerText = "Markah: " + scoreP1;
+            document.getElementById('score-p2').innerText = "Markah: " + scoreP2;
+        }
+
+        function showResults() {
+            document.getElementById('screen-quiz').classList.add('hidden');
+            document.getElementById('screen-autism').classList.add('hidden');
+            document.getElementById('screen-result').classList.remove('hidden');
+            document.getElementById('main-body').className = "min-h-screen flex flex-col justify-between p-4 overflow-x-hidden bg-white";
+            stopGeminiTTS();
+            
+            const wBanner = document.getElementById('winner-banner');
+            const wEmoji = document.getElementById('winner-emoji');
+            const wTitle = document.getElementById('winner-title');
+            const scoreCompBox = document.getElementById('score-comparison-box');
+            const mainTitle = document.getElementById('result-main-title');
+            
+            // Set semula kotak AI Cerita
+            document.getElementById('ai-story-box').classList.remove('hidden');
+            document.getElementById('ai-story-output-container').classList.add('hidden');
+            
+            // Set semula kotak Laporan Guru
+            document.getElementById('ai-report-output-container').classList.add('hidden');
+            document.getElementById('btn-generate-report').classList.remove('opacity-50', 'pointer-events-none');
+            
+            if (activeCategory === 'slow-learner') {
+                scoreCompBox.classList.remove('hidden');
+                mainTitle.innerText = "TAMAT PERLAWANAN TAHUN " + activeYear + "!";
+                document.getElementById('final-score-p1').innerText = scoreP1;
+                document.getElementById('final-score-p2').innerText = scoreP2;
+                
+                if (scoreP1 > scoreP2) {
+                    wBanner.className = "bg-orange-100 border-4 border-orange-400 rounded-2xl p-6 mb-6";
+                    wEmoji.innerText = "⚡🏆";
+                    wTitle.innerText = "BOBOIBOY MENANG!";
+                } else if (scoreP2 > scoreP1) {
+                    wBanner.className = "bg-green-100 border-4 border-green-500 rounded-2xl p-6 mb-6";
+                    wEmoji.innerText = "👽🏆";
+                    wTitle.innerText = "ADU DU MENANG!";
+                } else {
+                    wBanner.className = "bg-blue-100 border-4 border-blue-400 rounded-2xl p-6 mb-6";
+                    wEmoji.innerText = "🤝";
+                    wTitle.innerText = "PERTANDINGAN SERI!";
+                }
+            } else {
+                scoreCompBox.classList.add('hidden');
+                mainTitle.innerText = "TAHNIAH HERO VISUAL TAHUN " + activeYear + "!";
+                wBanner.className = "bg-indigo-100 border-4 border-indigo-400 rounded-2xl p-6 mb-6";
+                wEmoji.innerText = "🎨🎈👑";
+                wTitle.innerText = "LENGKAP! KAMU DAPAT " + scoreAutisme + " MATA!";
+            }
+        }
+
+        function resetGame() {
+            document.getElementById('screen-result').classList.add('hidden');
+            stopGeminiTTS();
+            if (activeCategory === 'slow-learner') { 
+                startSlowLearnerGame(); 
+            } else { 
+                startAutismGame(); 
+            }
+        }
+    </script>
+</body>
+</html>

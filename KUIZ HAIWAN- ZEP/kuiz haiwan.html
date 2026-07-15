@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuiz Sains Tahun 4 - Mod 2 Pemain</title>
+    <!-- Tailwind CSS untuk gaya -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        @keyframes bounce-short {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        .animate-bounce-short {
+            animation: bounce-short 0.4s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 py-10 px-2 md:px-4 font-sans min-h-screen">
+
+    <div id="app" class="w-full h-full max-w-5xl mx-auto">
+        <!-- Kandungan akan dijana oleh JavaScript -->
+    </div>
+
+    <script>
+        // Data soalan kuiz
+        const questionsData = [
+            {
+                question: "Apakah yang dimaksudkan dengan haiwan vertebrata?",
+                options: [
+                    "Haiwan yang hidup di dalam air sahaja",
+                    "Haiwan yang mempunyai tulang belakang",
+                    "Haiwan yang tidak mempunyai tulang belakang",
+                    "Haiwan yang boleh terbang"
+                ],
+                correctAnswer: 1,
+                emoji: "🦴"
+            },
+            {
+                question: "Berdasarkan buku teks, yang manakah antara berikut merupakan haiwan invertebrata?",
+                options: [
+                    "Kura-kura",
+                    "Katak",
+                    "Kuda",
+                    "Belalang"
+                ],
+                correctAnswer: 3,
+                emoji: "🐛"
+            },
+            {
+                question: "Ular ialah contoh haiwan vertebrata kerana ia...",
+                options: [
+                    "mempunyai tulang belakang",
+                    "menjalar di atas tanah",
+                    "mempunyai bisa yang bahaya",
+                    "tiada kaki"
+                ],
+                correctAnswer: 0,
+                emoji: "🐍"
+            },
+            {
+                question: "Haiwan manakah yang TIDAK mempunyai tulang belakang?",
+                options: [
+                    "Ikan",
+                    "Burung",
+                    "Cacing",
+                    "Kuda"
+                ],
+                correctAnswer: 2,
+                emoji: "🪱"
+            },
+            {
+                question: "Pilih kumpulan yang KESEMUANYA adalah haiwan vertebrata.",
+                options: [
+                    "Katak, Kura-kura, Ikan",
+                    "Lebah, Nyamuk, Belalang",
+                    "Kuda, Burung, Cacing",
+                    "Udang, Ular, Katak"
+                ],
+                correctAnswer: 0,
+                emoji: "🐸"
+            }
+        ];
+
+        // State Aplikasi
+        let gameState = 'start'; // 'start', 'playing', 'result'
+        let currentQuestion = 0;
+
+        const getInitialPlayerState = () => ({ 
+            score: 0, attempts: 0, locked: false, cooldown: false, feedback: null, type: '' 
+        });
+        
+        let p1 = getInitialPlayerState();
+        let p2 = getInitialPlayerState();
+
+        const appContainer = document.getElementById('app');
+
+        // Fungsi Mula Permainan
+        function startGame() {
+            gameState = 'playing';
+            currentQuestion = 0;
+            p1 = getInitialPlayerState();
+            p2 = getInitialPlayerState();
+            render();
+        }
+
+        // Fungsi Kendali Jawapan
+        function handleAnswerClick(playerNum, selectedIndex) {
+            const isP1 = playerNum === 1;
+            let pState = isP1 ? p1 : p2;
+
+            if (pState.locked || pState.cooldown) return;
+
+            const isCorrect = selectedIndex === questionsData[currentQuestion].correctAnswer;
+
+            if (isCorrect) {
+                pState.score += 1;
+                pState.locked = true;
+                pState.feedback = 'Tahniah! Betul! 🌟';
+                pState.type = 'correct';
+            } else {
+                if (pState.attempts === 0) {
+                    // Salah kali pertama
+                    pState.attempts = 1;
+                    pState.cooldown = true;
+                    pState.feedback = 'Kurang tepat. Cuba lagi! 💪';
+                    pState.type = 'retry';
+
+                    setTimeout(() => {
+                        pState.cooldown = false;
+                        pState.feedback = null;
+                        pState.type = '';
+                        render();
+                    }, 2000);
+                } else {
+                    // Salah kali kedua
+                    pState.attempts = 2;
+                    pState.locked = true;
+                    pState.feedback = 'Maaf, masih salah. ➡️';
+                    pState.type = 'wrong';
+                }
+            }
+
+            render();
+
+            // Semak jika kedua-dua sudah selesai
+            if (p1.locked && p2.locked) {
+                setTimeout(() => {
+                    moveToNextQuestion();
+                }, 2500);
+            }
+        }
+
+        // Beralih ke soalan seterusnya
+        function moveToNextQuestion() {
+            if (currentQuestion < questionsData.length - 1) {
+                currentQuestion += 1;
+                p1.attempts = 0; p1.locked = false; p1.cooldown = false; p1.feedback = null; p1.type = '';
+                p2.attempts = 0; p2.locked = false; p2.cooldown = false; p2.feedback = null; p2.type = '';
+            } else {
+                gameState = 'result';
+            }
+            render();
+        }
+
+        // Render Skrin Pemain
+        function renderPlayerArea(playerNum, pState, colorTheme) {
+            const q = questionsData[currentQuestion];
+            const isLocked = pState.locked || pState.cooldown;
+            
+            const feedbackStyles = {
+                correct: `bg-green-100 border-green-500 text-green-700`,
+                retry: `bg-yellow-100 border-yellow-500 text-yellow-700`,
+                wrong: `bg-red-100 border-red-500 text-red-700`
+            };
+
+            const feedbackIcons = {
+                correct: 'check-circle-2',
+                retry: 'alert-circle',
+                wrong: 'x-circle'
+            };
+
+            let optionsHtml = q.options.map((option, index) => {
+                const btnClasses = isLocked 
+                    ? 'border-gray-200 bg-white/50 text-gray-400 cursor-not-allowed' 
+                    : `${colorTheme.btnBorder} bg-white ${colorTheme.btnHover} text-gray-700 active:scale-[0.98] shadow-sm`;
+                
+                const spanClasses = isLocked 
+                    ? 'bg-gray-100 text-gray-400' 
+                    : colorTheme.badge;
+
+                return `
+                    <button
+                        onclick="handleAnswerClick(${playerNum}, ${index})"
+                        ${isLocked ? 'disabled' : ''}
+                        class="w-full text-left p-3 rounded-xl border-2 font-semibold text-[15px] transition-all duration-200 flex items-center ${btnClasses}"
+                    >
+                        <span class="inline-block min-w-[28px] h-7 text-center leading-7 rounded-full mr-3 text-sm font-bold ${spanClasses}">
+                            ${['A', 'B', 'C', 'D'][index]}
+                        </span>
+                        <span class="leading-tight">${option}</span>
+                    </button>
+                `;
+            }).join('');
+
+            let feedbackHtml = '';
+            if (pState.feedback) {
+                const iconColor = pState.type === 'correct' ? 'text-green-600' : pState.type === 'retry' ? 'text-yellow-600' : 'text-red-600';
+                feedbackHtml = `
+                    <div class="p-3 rounded-xl border flex items-center justify-center gap-2 animate-bounce-short ${feedbackStyles[pState.type]}">
+                        <i data-lucide="${feedbackIcons[pState.type]}" class="w-6 h-6 ${iconColor}"></i>
+                        <p class="font-bold text-sm md:text-base">${pState.feedback}</p>
+                    </div>
+                `;
+            } else if (pState.locked) {
+                feedbackHtml = `<p class="text-center text-sm font-medium text-gray-500 animate-pulse">Menunggu rakan...</p>`;
+            }
+
+            return `
+                <div class="flex-1 p-4 md:p-6 ${colorTheme.bg}">
+                    <h4 class="text-xl font-bold text-center mb-4 ${colorTheme.text}">
+                        Murid ${playerNum}
+                    </h4>
+                    <div class="space-y-3">
+                        ${optionsHtml}
+                    </div>
+                    <div class="h-20 mt-4 flex flex-col justify-center">
+                        ${feedbackHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Fungsi Render Utama
+        function render() {
+            let html = '';
+
+            if (gameState === 'start') {
+                html = `
+                    <div class="flex flex-col items-center justify-center text-center p-8 bg-white rounded-3xl shadow-xl border-4 border-purple-400 max-w-lg mx-auto mt-10">
+                        <div class="flex gap-4 text-6xl mb-4">
+                            <span class="animate-bounce">👦🏽</span>
+                            <span class="animate-bounce" style="animation-delay: 0.2s">👧🏻</span>
+                        </div>
+                        <h1 class="text-3xl md:text-4xl font-extrabold text-purple-700 mb-2">
+                            Kuiz Sains Tahun 4
+                        </h1>
+                        <h2 class="text-xl md:text-2xl font-bold text-blue-600 mb-4">
+                            Haiwan Vertebrata & Invertebrata
+                        </h2>
+                        <div class="bg-purple-50 p-4 rounded-xl border border-purple-100 mb-8 w-full">
+                            <h3 class="font-bold text-purple-800 flex items-center justify-center gap-2 mb-2">
+                                <i data-lucide="users" class="w-5 h-5"></i> Mod 2 Pemain (Serentak)
+                            </h3>
+                            <p class="text-gray-600 text-sm font-medium">
+                                Duduk bersebelahan! Setiap murid ada ruang menjawab sendiri. Anda mempunyai 2 peluang untuk setiap soalan.
+                            </p>
+                        </div>
+                        <button
+                            onclick="startGame()"
+                            class="flex items-center gap-2 bg-purple-500 hover:bg-purple-600 text-white font-bold py-4 px-8 rounded-full text-xl transition-all transform hover:scale-105 active:scale-95 shadow-lg"
+                        >
+                            <i data-lucide="play" class="fill-current w-6 h-6"></i>
+                            Mula Pertarungan!
+                        </button>
+                    </div>
+                `;
+            } 
+            else if (gameState === 'playing') {
+                const q = questionsData[currentQuestion];
+                
+                const p1Area = renderPlayerArea(1, p1, {
+                    bg: 'bg-pink-50/40',
+                    text: 'text-pink-600',
+                    btnBorder: 'border-pink-200',
+                    btnHover: 'hover:border-pink-500 hover:bg-pink-50',
+                    badge: 'bg-pink-100 text-pink-700'
+                });
+
+                const p2Area = renderPlayerArea(2, p2, {
+                    bg: 'bg-blue-50/40',
+                    text: 'text-blue-600',
+                    btnBorder: 'border-blue-200',
+                    btnHover: 'hover:border-blue-500 hover:bg-blue-50',
+                    badge: 'bg-blue-100 text-blue-700'
+                });
+
+                html = `
+                    <div class="max-w-5xl mx-auto mt-6 bg-white rounded-3xl shadow-xl overflow-hidden border-2 border-purple-100 flex flex-col">
+                        <div class="bg-purple-600 p-4 text-white flex justify-between items-center">
+                            <span class="font-bold flex items-center gap-2 bg-pink-500 px-4 py-1.5 rounded-full shadow-sm text-sm md:text-base">
+                                Murid 1: ${p1.score}
+                            </span>
+                            <span class="font-bold bg-purple-800 px-4 py-1.5 rounded-full shadow-sm text-sm md:text-base">
+                                Soalan ${currentQuestion + 1} / 5
+                            </span>
+                            <span class="font-bold flex items-center gap-2 bg-blue-500 px-4 py-1.5 rounded-full shadow-sm text-sm md:text-base">
+                                Murid 2: ${p2.score}
+                            </span>
+                        </div>
+                        <div class="p-6 md:p-8 bg-gray-50 border-b-2 border-gray-100 flex flex-col items-center text-center">
+                            <div class="text-4xl bg-white p-3 rounded-2xl shadow-sm mb-4">${q.emoji}</div>
+                            <h3 class="text-xl md:text-2xl font-bold text-gray-800 leading-snug max-w-3xl">
+                                ${q.question}
+                            </h3>
+                        </div>
+                        <div class="flex flex-col md:flex-row divide-y-2 md:divide-y-0 md:divide-x-2 divide-gray-200 flex-1">
+                            ${p1Area}
+                            ${p2Area}
+                        </div>
+                    </div>
+                `;
+            } 
+            else if (gameState === 'result') {
+                let resultMessage = "";
+                if (p1.score > p2.score) {
+                    resultMessage = "🎉 Murid 1 Menang! 🎉";
+                } else if (p2.score > p1.score) {
+                    resultMessage = "🎉 Murid 2 Menang! 🎉";
+                } else {
+                    resultMessage = "🤝 Keputusan Seri! 🤝";
+                }
+
+                html = `
+                    <div class="flex flex-col items-center justify-center text-center p-8 bg-white rounded-3xl shadow-xl border-4 border-purple-400 max-w-2xl mx-auto mt-10">
+                        <h2 class="text-3xl font-extrabold text-gray-800 mb-6">Kuiz Tamat!</h2>
+                        
+                        <h3 class="text-2xl font-black text-purple-600 mb-8 animate-pulse">${resultMessage}</h3>
+
+                        <div class="flex flex-col md:flex-row gap-6 w-full mb-8">
+                            <div class="flex-1 bg-pink-50 rounded-2xl p-6 border-2 border-pink-200">
+                                <p class="text-xl font-bold text-pink-600 mb-2">Murid 1</p>
+                                <p class="text-5xl font-black text-pink-500">
+                                    ${p1.score} <span class="text-2xl text-pink-300">/ 5</span>
+                                </p>
+                            </div>
+                            <div class="flex-1 bg-blue-50 rounded-2xl p-6 border-2 border-blue-200">
+                                <p class="text-xl font-bold text-blue-600 mb-2">Murid 2</p>
+                                <p class="text-5xl font-black text-blue-500">
+                                    ${p2.score} <span class="text-2xl text-blue-300">/ 5</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <button
+                            onclick="startGame()"
+                            class="flex items-center gap-2 bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-8 rounded-full text-lg transition-all transform hover:scale-105 active:scale-95 shadow-lg"
+                        >
+                            <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                            Main Semula
+                        </button>
+                    </div>
+                `;
+            }
+
+            appContainer.innerHTML = html;
+            
+            // Re-initialize ikon Lucide selepas memuatkan DOM baru
+            lucide.createIcons();
+        }
+
+        // Render pertama kali
+        render();
+
+    </script>
+</body>
+</html>

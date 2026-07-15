@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permainan Pengurusan Diri - 3 Pemain Serentak</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f0f9ff;
+            touch-action: manipulation;
+            user-select: none; /* Elak teks di highlight secara tidak sengaja */
+        }
+        .bounce { animation: bounce 2s infinite; }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-20px);}
+            60% {transform: translateY(-10px);}
+        }
+        .shake { animation: shake 0.5s; }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 md:p-8">
+
+    <div id="app-container" class="bg-white rounded-3xl shadow-xl w-full max-w-4xl overflow-hidden border-4 border-blue-300 relative">
+        
+        <!-- Skrin Mula -->
+        <div id="start-screen" class="p-8 text-center flex flex-col items-center justify-center min-h-[500px]">
+            <div class="flex gap-4 mb-6 bounce">
+                <div class="text-6xl md:text-7xl">🔴</div>
+                <div class="text-6xl md:text-7xl">🔵</div>
+                <div class="text-6xl md:text-7xl">🟢</div>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-black text-blue-600 mb-4">Pengurusan Diri</h1>
+            <p class="text-xl text-gray-600 mb-8 font-bold bg-blue-50 p-4 rounded-xl">Main Serentak! <br>Setiap murid tekan di kawasan warna masing-masing.</p>
+            <button onclick="showNameScreen()" class="bg-green-500 hover:bg-green-600 text-white text-3xl font-bold py-4 px-12 rounded-full shadow-lg transform transition active:scale-95 border-b-8 border-green-700">
+                MULA MAIN
+            </button>
+        </div>
+
+        <!-- Skrin Masukkan Nama -->
+        <div id="name-screen" class="hidden p-8 flex flex-col items-center justify-center min-h-[500px]">
+            <h2 class="text-3xl md:text-4xl font-black text-blue-600 mb-6">Sila Masukkan Nama</h2>
+            <div class="w-full max-w-md flex flex-col gap-4 mb-8">
+                <div class="flex items-center p-3 bg-red-50 rounded-xl border-4 border-red-200">
+                    <span class="text-3xl mr-3">🔴</span>
+                    <input type="text" id="input-name-0" placeholder="Nama Murid 1" class="flex-1 p-2 rounded-lg border-2 border-gray-200 text-xl font-bold focus:outline-none focus:border-red-500" autocomplete="off">
+                </div>
+                <div class="flex items-center p-3 bg-blue-50 rounded-xl border-4 border-blue-200">
+                    <span class="text-3xl mr-3">🔵</span>
+                    <input type="text" id="input-name-1" placeholder="Nama Murid 2" class="flex-1 p-2 rounded-lg border-2 border-gray-200 text-xl font-bold focus:outline-none focus:border-blue-500" autocomplete="off">
+                </div>
+                <div class="flex items-center p-3 bg-green-50 rounded-xl border-4 border-green-200">
+                    <span class="text-3xl mr-3">🟢</span>
+                    <input type="text" id="input-name-2" placeholder="Nama Murid 3" class="flex-1 p-2 rounded-lg border-2 border-gray-200 text-xl font-bold focus:outline-none focus:border-green-500" autocomplete="off">
+                </div>
+            </div>
+            <button onclick="startGame()" class="bg-blue-500 hover:bg-blue-600 text-white text-2xl font-bold py-4 px-12 rounded-full shadow-lg transform transition active:scale-95 border-b-8 border-blue-700">
+                TERUSKAN
+            </button>
+        </div>
+
+        <!-- Skrin Kuiz -->
+        <div id="quiz-screen" class="hidden p-4 flex flex-col items-center min-h-[500px]">
+            
+            <!-- Papan Skor 3 Pemain -->
+            <div class="w-full flex justify-between gap-2 md:gap-4 mb-4">
+                <div class="flex-1 flex justify-center items-center p-2 rounded-xl bg-red-100 border-2 border-red-300">
+                    <span class="text-xl md:text-2xl mr-2">🔴</span>
+                    <span class="font-black text-red-600 text-lg md:text-2xl">⭐ <span id="score-0">0</span></span>
+                </div>
+                <div class="flex-1 flex justify-center items-center p-2 rounded-xl bg-blue-100 border-2 border-blue-300">
+                    <span class="text-xl md:text-2xl mr-2">🔵</span>
+                    <span class="font-black text-blue-600 text-lg md:text-2xl">⭐ <span id="score-1">0</span></span>
+                </div>
+                <div class="flex-1 flex justify-center items-center p-2 rounded-xl bg-green-100 border-2 border-green-300">
+                    <span class="text-xl md:text-2xl mr-2">🟢</span>
+                    <span class="font-black text-green-600 text-lg md:text-2xl">⭐ <span id="score-2">0</span></span>
+                </div>
+            </div>
+
+            <!-- Kad Gambar & Soalan (Tengah) -->
+            <div class="bg-gray-50 border-4 border-gray-200 rounded-3xl p-4 mb-4 w-full md:w-2/3 flex flex-col justify-center items-center shadow-inner h-48 md:h-56">
+                <div id="question-image" class="text-7xl md:text-8xl filter drop-shadow-md transition-transform duration-300 hover:scale-110 cursor-pointer mb-2">
+                    <!-- Gambar -->
+                </div>
+                <h2 id="question-text" class="text-xl md:text-2xl font-black text-center text-gray-800 px-2">
+                    <!-- Soalan -->
+                </h2>
+            </div>
+
+            <p class="text-gray-500 font-bold mb-2 animate-pulse">Sila pilih jawapan di zon masing-masing 👇</p>
+
+            <!-- Zon Jawapan Serentak -->
+            <div class="w-full flex flex-col md:flex-row gap-2 md:gap-4">
+                
+                <!-- Zon Merah -->
+                <div class="flex-1 bg-red-50 p-3 md:p-4 rounded-2xl border-4 border-red-200 flex flex-col items-center">
+                    <h3 id="label-name-0" class="font-black text-red-600 text-lg mb-3">🔴 Murid Merah</h3>
+                    <div id="player-0-options" class="w-full flex flex-col gap-2"></div>
+                    <div id="player-0-status" class="mt-2 text-4xl hidden font-black"></div>
+                </div>
+
+                <!-- Zon Biru -->
+                <div class="flex-1 bg-blue-50 p-3 md:p-4 rounded-2xl border-4 border-blue-200 flex flex-col items-center">
+                    <h3 id="label-name-1" class="font-black text-blue-600 text-lg mb-3">🔵 Murid Biru</h3>
+                    <div id="player-1-options" class="w-full flex flex-col gap-2"></div>
+                    <div id="player-1-status" class="mt-2 text-4xl hidden font-black"></div>
+                </div>
+
+                <!-- Zon Hijau -->
+                <div class="flex-1 bg-green-50 p-3 md:p-4 rounded-2xl border-4 border-green-200 flex flex-col items-center">
+                    <h3 id="label-name-2" class="font-black text-green-600 text-lg mb-3">🟢 Murid Hijau</h3>
+                    <div id="player-2-options" class="w-full flex flex-col gap-2"></div>
+                    <div id="player-2-status" class="mt-2 text-4xl hidden font-black"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Skrin Tamat -->
+        <div id="end-screen" class="hidden p-6 md:p-8 text-center flex flex-col items-center justify-center min-h-[500px]">
+            <div class="text-8xl mb-4 bounce">🏆</div>
+            <h1 class="text-4xl md:text-5xl font-black text-blue-600 mb-6">Hebat Semua!</h1>
+            <p class="text-xl text-gray-700 mb-6 font-bold">Ini adalah jumlah bintang yang dikumpul:</p>
+            
+            <div class="w-full flex justify-center gap-4 mb-10">
+                <div class="flex flex-col items-center bg-red-100 p-4 rounded-2xl border-4 border-red-300 w-1/3">
+                    <span class="text-4xl mb-2">🔴</span>
+                    <span id="end-name-0" class="font-bold text-gray-700 mb-1 text-sm md:text-base">Merah</span>
+                    <span class="text-2xl font-black text-red-600"><span id="final-score-0">0</span> ⭐</span>
+                </div>
+                <div class="flex flex-col items-center bg-blue-100 p-4 rounded-2xl border-4 border-blue-300 w-1/3">
+                    <span class="text-4xl mb-2">🔵</span>
+                    <span id="end-name-1" class="font-bold text-gray-700 mb-1 text-sm md:text-base">Biru</span>
+                    <span class="text-2xl font-black text-blue-600"><span id="final-score-1">0</span> ⭐</span>
+                </div>
+                <div class="flex flex-col items-center bg-green-100 p-4 rounded-2xl border-4 border-green-300 w-1/3">
+                    <span class="text-4xl mb-2">🟢</span>
+                    <span id="end-name-2" class="font-bold text-gray-700 mb-1 text-sm md:text-base">Hijau</span>
+                    <span class="text-2xl font-black text-green-600"><span id="final-score-2">0</span> ⭐</span>
+                </div>
+            </div>
+
+            <button onclick="resetGame()" class="bg-blue-500 hover:bg-blue-600 text-white text-2xl font-bold py-4 px-10 rounded-full shadow-lg transform transition active:scale-95 border-b-8 border-blue-700">
+                MAIN SEMULA
+            </button>
+        </div>
+
+        <!-- Lapisan Keputusan (Modal) -->
+        <div id="praise-modal" class="hidden absolute inset-0 bg-white/95 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-6 text-center transition-opacity duration-300">
+            <div id="praise-emoji" class="text-8xl md:text-9xl mb-4 bounce">🎉</div>
+            <h2 id="praise-text" class="text-3xl md:text-4xl font-black text-blue-600 mb-8 drop-shadow-sm px-4">Bagus!</h2>
+            <button onclick="nextRound()" class="bg-green-500 text-white text-2xl font-bold py-4 px-12 rounded-full shadow-lg transform transition active:scale-95 border-b-8 border-green-700">
+                Soalan Seterusnya ➔
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // Data Pemain dengan kelas warna spesifik untuk butang
+        const players = [
+            { id: 0, name: "Merah", color: "red", bgBtn: "bg-red-500", borderBtn: "border-red-300", hoverBtn: "hover:bg-red-50", textBtn: "text-red-800", score: 0 },
+            { id: 1, name: "Biru", color: "blue", bgBtn: "bg-blue-500", borderBtn: "border-blue-300", hoverBtn: "hover:bg-blue-50", textBtn: "text-blue-800", score: 0 },
+            { id: 2, name: "Hijau", color: "green", bgBtn: "bg-green-500", borderBtn: "border-green-300", hoverBtn: "hover:bg-green-50", textBtn: "text-green-800", score: 0 }
+        ];
+
+        let currentRound = 1;
+        const totalRounds = 5; // Total 5 soalan sahaja untuk dimain serentak
+        let lockedAnswers = [null, null, null]; // Simpan status jika murid dah jawab
+
+        // Data Soalan
+        const allQuestions = [
+            { image: "🪥", text: "Apakah alat ini?", options: ["Berus Gigi", "Sikat"], correctIndex: 0, praiseText: "Pandai! Ini berus gigi.", praiseEmoji: "🦷" },
+            { image: "🧼", text: "Kita gunakan ini semasa...", options: ["Makan", "Mandi"], correctIndex: 1, praiseText: "Hebat! Sabun untuk mandi.", praiseEmoji: "🚿" },
+            { image: "🪮", text: "Alat ini digunakan untuk...", options: ["Potong Kuku", "Sikat Rambut"], correctIndex: 1, praiseText: "Bagus! Rambut jadi kemas.", praiseEmoji: "✨" },
+            { image: "💅", text: "Kita mesti sentiasa memotong...", options: ["Kuku", "Telinga"], correctIndex: 0, praiseText: "Tepat sekali! Kuku mesti pendek.", praiseEmoji: "👍" },
+            { image: "🚰", text: "Sebelum makan kita mesti...", options: ["Tidur", "Basuh Tangan"], correctIndex: 1, praiseText: "Syabas! Tangan bersih.", praiseEmoji: "🤲" },
+            { image: "🧴", text: "Untuk cuci rambut, kita guna...", options: ["Syampu", "Ubat Gigi"], correctIndex: 0, praiseText: "Betul! Rambut jadi wangi.", praiseEmoji: "🫧" },
+            { image: "👕", text: "Selepas mandi, kita mesti pakai pakaian yang...", options: ["Kotor", "Bersih"], correctIndex: 1, praiseText: "Pandai! Pakaian bersih selesa.", praiseEmoji: "👚" }
+        ];
+
+        let availableQuestions = [];
+        let currentQuestion;
+
+        // Elemen DOM
+        const startScreen = document.getElementById('start-screen');
+        const nameScreen = document.getElementById('name-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const endScreen = document.getElementById('end-screen');
+        const praiseModal = document.getElementById('praise-modal');
+
+        function bercakap(teks) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const tuturan = new SpeechSynthesisUtterance(teks);
+                tuturan.lang = 'ms-MY';
+                tuturan.rate = 0.85;
+                tuturan.pitch = 1.1;
+                window.speechSynthesis.speak(tuturan);
+            }
+        }
+
+        function showNameScreen() {
+            startScreen.classList.add('hidden');
+            nameScreen.classList.remove('hidden');
+        }
+
+        function startGame() {
+            nameScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            
+            // Dapatkan nama dari input
+            players[0].name = document.getElementById('input-name-0').value.trim() || "Merah";
+            players[1].name = document.getElementById('input-name-1').value.trim() || "Biru";
+            players[2].name = document.getElementById('input-name-2').value.trim() || "Hijau";
+
+            // Kemaskini label nama di skrin kuiz
+            document.getElementById('label-name-0').innerText = `🔴 ${players[0].name}`;
+            document.getElementById('label-name-1').innerText = `🔵 ${players[1].name}`;
+            document.getElementById('label-name-2').innerText = `🟢 ${players[2].name}`;
+            
+            players.forEach(p => p.score = 0);
+            currentRound = 1;
+            
+            // Salin dan rawakkan soalan
+            availableQuestions = [...allQuestions].sort(() => 0.5 - Math.random());
+            
+            updateScoreBoard();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            lockedAnswers = [null, null, null]; // Reset jawapan untuk soalan baru
+            currentQuestion = availableQuestions.pop();
+            
+            document.getElementById('question-image').innerText = currentQuestion.image;
+            document.getElementById('question-text').innerText = currentQuestion.text;
+            document.getElementById('question-image').onclick = () => bercakap(currentQuestion.text);
+            
+            // Bina butang untuk setiap murid
+            players.forEach((p, pIndex) => {
+                const optionsContainer = document.getElementById(`player-${pIndex}-options`);
+                const statusDiv = document.getElementById(`player-${pIndex}-status`);
+                
+                optionsContainer.innerHTML = '';
+                statusDiv.classList.add('hidden'); // Sembunyikan status Betul/Salah
+                
+                currentQuestion.options.forEach((option, optIndex) => {
+                    const btn = document.createElement('button');
+                    // Kelas reka bentuk lalai
+                    btn.className = `w-full bg-white border-4 ${p.borderBtn} ${p.hoverBtn} ${p.textBtn} text-lg md:text-xl font-bold py-4 px-2 rounded-2xl shadow-sm transform transition active:scale-95`;
+                    btn.innerText = option;
+                    btn.onclick = () => handlePlayerAnswer(pIndex, optIndex, btn, optionsContainer);
+                    optionsContainer.appendChild(btn);
+                });
+            });
+
+            bercakap(currentQuestion.text);
+        }
+
+        function handlePlayerAnswer(playerIndex, selectedIndex, buttonElement, containerElement) {
+            // Jika murid ini dah jawab, abaikan klik seterusnya
+            if (lockedAnswers[playerIndex] !== null) return;
+            
+            lockedAnswers[playerIndex] = selectedIndex; // Rekod jawapan
+            
+            // Beri visual bahawa jawapan telah 'dikunci'
+            const allButtons = containerElement.querySelectorAll('button');
+            allButtons.forEach((btn, idx) => {
+                if (idx === selectedIndex) {
+                    btn.classList.add(players[playerIndex].bgBtn, 'text-white');
+                    btn.classList.remove('bg-white');
+                } else {
+                    btn.classList.add('opacity-30'); // Malapkan jawapan yang tidak dipilih
+                }
+            });
+
+            // Semak adakah SEMUA murid telah menjawab?
+            if (lockedAnswers[0] !== null && lockedAnswers[1] !== null && lockedAnswers[2] !== null) {
+                // Beri sedikit kelewatan sebelum semak supaya murid sedar semua dah siap tekan
+                setTimeout(evaluateAllAnswers, 800);
+            }
+        }
+
+        function evaluateAllAnswers() {
+            let adaYangBetul = false;
+
+            // Semak jawapan setiap murid
+            players.forEach((p, pIndex) => {
+                const statusDiv = document.getElementById(`player-${pIndex}-status`);
+                statusDiv.classList.remove('hidden');
+
+                if (lockedAnswers[pIndex] === currentQuestion.correctIndex) {
+                    p.score += 1;
+                    statusDiv.innerHTML = "✅ BETUL";
+                    statusDiv.className = "mt-2 text-2xl md:text-3xl text-green-500 font-black bounce";
+                    adaYangBetul = true;
+                } else {
+                    statusDiv.innerHTML = "❌ SALAH";
+                    statusDiv.className = "mt-2 text-2xl md:text-3xl text-red-500 font-black";
+                }
+            });
+
+            updateScoreBoard();
+
+            // Papar pujian jika ada sekurang-kurangnya seorang yang betul
+            setTimeout(() => {
+                if (adaYangBetul) {
+                    bercakap(currentQuestion.praiseText);
+                    document.getElementById('praise-text').innerText = currentQuestion.praiseText;
+                    document.getElementById('praise-emoji').innerText = currentQuestion.praiseEmoji;
+                    
+                    confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+                } else {
+                    bercakap("Alamak, semua salah! Tidak mengapa, cuba lagi.");
+                    document.getElementById('praise-text').innerText = "Cuba soalan lain!";
+                    document.getElementById('praise-emoji').innerText = "💪";
+                }
+                
+                praiseModal.classList.remove('hidden');
+            }, 1000); // Tunjuk ✅ / ❌ selama 1 saat sebelum keluar modal pujian
+        }
+
+        function nextRound() {
+            praiseModal.classList.add('hidden');
+            currentRound++;
+            
+            if (currentRound > totalRounds || availableQuestions.length === 0) {
+                showEndScreen();
+            } else {
+                loadQuestion();
+            }
+        }
+
+        function showEndScreen() {
+            quizScreen.classList.add('hidden');
+            endScreen.classList.remove('hidden');
+            
+            players.forEach((p, idx) => {
+                document.getElementById(`end-name-${idx}`).innerText = p.name;
+                document.getElementById(`final-score-${idx}`).innerText = p.score;
+            });
+            
+            const duration = 3 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+                const particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+
+            bercakap(`Tahniah semua murid! Permainan tamat.`);
+        }
+
+        function resetGame() {
+            endScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            
+            // Kosongkan input nama untuk permainan seterusnya
+            document.getElementById('input-name-0').value = '';
+            document.getElementById('input-name-1').value = '';
+            document.getElementById('input-name-2').value = '';
+        }
+
+        function updateScoreBoard() {
+            players.forEach((p, idx) => {
+                document.getElementById(`score-${idx}`).innerText = p.score;
+            });
+        }
+    </script>
+</body>
+</html>

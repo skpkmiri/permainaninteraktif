@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jom Tambah: Edisi Avatar (3 Pemain)!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            /* Latar belakang ceria ala Avatar World */
+            background: linear-gradient(135deg, #fbcfe8 0%, #e9d5ff 50%, #cffafe 100%);
+            background-attachment: fixed;
+            touch-action: manipulation;
+        }
+        
+        .emoji-item {
+            display: inline-block;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.1));
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0) rotate(-15deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-15px); }
+            60% { transform: translateY(-7px); }
+        }
+
+        .bounce-anim {
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        .shake-anim {
+            animation: shake 0.4s ease;
+        }
+
+        /* Bintang / Permata bergoyang */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+        .float-anim {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            z-index: 40;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-2 sm:p-4 overflow-x-hidden relative">
+
+    <!-- Hiasan Latar Belakang -->
+    <div class="fixed top-4 left-4 text-4xl float-anim opacity-70" style="animation-delay: 0s;">✨</div>
+    <div class="fixed bottom-10 right-10 text-5xl float-anim opacity-70" style="animation-delay: 1s;">🎀</div>
+    <div class="fixed top-10 right-20 text-4xl float-anim opacity-70" style="animation-delay: 2s;">🐶</div>
+
+    <!-- Tajuk Utama -->
+    <h1 class="text-3xl sm:text-4xl font-black text-purple-700 drop-shadow-md mb-4 mt-2 text-center z-10 bg-white/50 px-6 py-2 rounded-full border-4 border-white backdrop-blur-sm">
+        Pertandingan Tambah! 🏙️
+    </h1>
+
+    <!-- Container Utama: Grid untuk 3 Pemain -->
+    <div id="game-container" class="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 z-10">
+        <!-- Kad pemain akan dijana oleh JavaScript di sini -->
+    </div>
+
+    <!-- Skrin Tahniah -->
+    <div id="celebration-screen" class="hidden fixed inset-0 bg-gradient-to-tr from-purple-600 to-pink-500 bg-opacity-95 z-50 flex flex-col items-center justify-center text-white backdrop-blur-md">
+        <div class="flex gap-4 mb-6 bounce-anim" id="winner-avatars">
+            <!-- Avatar pemenang diletakkan di sini -->
+        </div>
+        <h2 class="text-5xl sm:text-7xl font-black mb-4 text-center drop-shadow-lg" id="winner-title">Pemain Menang!</h2>
+        <p class="text-2xl sm:text-3xl mb-8 text-center px-4 font-bold">Berjaya kumpul 10 permata!</p>
+        <button onclick="initGame()" class="bg-yellow-300 text-purple-800 font-black text-3xl py-4 px-10 rounded-[2rem] shadow-[0_8px_0_#ca8a04] hover:bg-yellow-200 hover:-translate-y-1 active:translate-y-2 active:shadow-[0_0px_0_#ca8a04] transition-all border-4 border-white">
+            Main Semula!
+        </button>
+    </div>
+
+    <script>
+        // Konfigurasi 3 Pemain
+        const playersConfig = [
+            { id: 0, title: "Pemain 1", avatar: "👧", colorName: "pink" },
+            { id: 1, title: "Pemain 2", avatar: "👦", colorName: "cyan" },
+            { id: 2, title: "Pemain 3", avatar: "🐱", colorName: "purple" }
+        ];
+
+        // Tetapan Tema Warna mengikut Tailwind Classes
+        const themeColors = {
+            pink: {
+                cardBorder: "border-pink-300", title: "text-pink-600",
+                badgeBg: "bg-pink-100", badgeText: "text-pink-600", badgeBorder: "border-pink-300",
+                boxBg: "bg-pink-50", boxBorder: "border-pink-200",
+                numText: "text-pink-500", qMarkBorder: "border-pink-300", qMarkText: "text-pink-500",
+                btnBorderB: "border-pink-300", btnText: "text-pink-600",
+                btnHover: "hover:bg-pink-50 hover:border-b-[8px] border-pink-200"
+            },
+            cyan: {
+                cardBorder: "border-cyan-300", title: "text-cyan-600",
+                badgeBg: "bg-cyan-100", badgeText: "text-cyan-700", badgeBorder: "border-cyan-300",
+                boxBg: "bg-cyan-50", boxBorder: "border-cyan-200",
+                numText: "text-cyan-500", qMarkBorder: "border-cyan-300", qMarkText: "text-cyan-500",
+                btnBorderB: "border-cyan-300", btnText: "text-cyan-600",
+                btnHover: "hover:bg-cyan-50 hover:border-b-[8px] border-cyan-200"
+            },
+            purple: {
+                cardBorder: "border-purple-300", title: "text-purple-600",
+                badgeBg: "bg-purple-100", badgeText: "text-purple-700", badgeBorder: "border-purple-300",
+                boxBg: "bg-purple-50", boxBorder: "border-purple-200",
+                numText: "text-purple-500", qMarkBorder: "border-purple-300", qMarkText: "text-purple-500",
+                btnBorderB: "border-purple-300", btnText: "text-purple-600",
+                btnHover: "hover:bg-purple-50 hover:border-b-[8px] border-purple-200"
+            }
+        };
+
+        // Objek tema Avatar World
+        const emojis = ['🍔', '📱', '🎮', '🛹', '🎀', '🦄', '👟', '🎒', '🍦', '🍩'];
+        
+        // Status Semasa Pemain
+        let gameState = [];
+        const maxScore = 10;
+        let gameActive = true;
+
+        // --- Sistem Bunyi (Web Audio API) ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playTone(freq, type, duration) {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.type = type;
+            oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime); // Perlahankan sikit untuk 3 pemain
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + duration);
+        }
+
+        function playCorrectSound() {
+            playTone(523.25, 'sine', 0.1); 
+            setTimeout(() => playTone(659.25, 'sine', 0.1), 100); 
+            setTimeout(() => playTone(783.99, 'sine', 0.15), 200);
+        }
+
+        function playWrongSound() {
+            playTone(300, 'triangle', 0.2);
+            setTimeout(() => playTone(250, 'triangle', 0.2), 150);
+        }
+
+        function playWinSound() {
+            [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+                setTimeout(() => playTone(freq, 'sine', 0.2), i * 150);
+            });
+        }
+
+        // --- Logik Permainan ---
+
+        function initGame() {
+            document.getElementById('celebration-screen').classList.add('hidden');
+            gameActive = true;
+            gameState = playersConfig.map(p => ({
+                score: 0,
+                num1: 0,
+                num2: 0,
+                answer: 0,
+                isWaiting: false
+            }));
+
+            renderUI();
+            
+            // Jana soalan pertama untuk semua pemain
+            for (let i = 0; i < playersConfig.length; i++) {
+                generateQuestion(i);
+            }
+        }
+
+        function renderUI() {
+            const container = document.getElementById('game-container');
+            container.innerHTML = '';
+
+            playersConfig.forEach((p, index) => {
+                const t = themeColors[p.colorName];
+                
+                container.innerHTML += `
+                    <div id="player-card-${index}" class="bg-white/95 backdrop-blur-sm rounded-[2rem] shadow-xl p-4 sm:p-5 border-[5px] ${t.cardBorder} flex flex-col h-full transform transition duration-300 relative">
+                        
+                        <!-- Header Pemain -->
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-2xl font-black ${t.title} flex items-center gap-2">
+                                <span class="text-3xl">${p.avatar}</span> ${p.title}
+                            </h2>
+                            <div class="${t.badgeBg} ${t.badgeText} px-4 py-1.5 rounded-full font-black text-xl border-[3px] ${t.badgeBorder} shadow-sm flex items-center gap-1">
+                                💎 <span id="score-${index}">0</span>
+                            </div>
+                        </div>
+
+                        <!-- Kawasan Soalan -->
+                        <div class="${t.boxBg} rounded-3xl p-4 mb-4 flex-grow border-[3px] ${t.boxBorder} shadow-inner flex flex-col justify-center">
+                            
+                            <!-- Visual Emoji -->
+                            <div id="visual-area-${index}" class="flex flex-wrap items-center justify-center gap-2 mb-4 text-3xl sm:text-4xl min-h-[70px]">
+                                <!-- Emoji akan dijana di sini -->
+                            </div>
+
+                            <!-- Nombor & Simbol -->
+                            <div class="text-4xl sm:text-5xl font-black flex justify-center items-center gap-3">
+                                <span id="num1-${index}" class="${t.numText} drop-shadow-sm">?</span>
+                                <span class="text-gray-400">+</span>
+                                <span id="num2-${index}" class="${t.numText} drop-shadow-sm">?</span>
+                                <span class="text-gray-300">=</span>
+                                <span id="qmark-${index}" class="${t.qMarkText} bg-white border-4 ${t.qMarkBorder} border-dashed w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shadow-sm">?</span>
+                            </div>
+                        </div>
+
+                        <!-- Maklum Balas -->
+                        <div id="feedback-${index}" class="h-10 mb-3 text-xl font-black rounded-2xl flex items-center justify-center opacity-0 transition-opacity duration-300">
+                        </div>
+
+                        <!-- Pilihan Jawapan -->
+                        <div class="grid grid-cols-3 gap-2 sm:gap-3" id="options-area-${index}">
+                            <!-- Butang akan dijana di sini -->
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function generateQuestion(pIndex) {
+            if (!gameActive) return;
+            
+            gameState[pIndex].isWaiting = false;
+            
+            let n1, n2;
+            do {
+                n1 = Math.floor(Math.random() * 9) + 1;
+                n2 = Math.floor(Math.random() * 9) + 1;
+            } while (n1 + n2 > 10);
+
+            gameState[pIndex].num1 = n1;
+            gameState[pIndex].num2 = n2;
+            gameState[pIndex].answer = n1 + n2;
+
+            // Kemaskini UI Nombor
+            document.getElementById(`num1-${pIndex}`).innerText = n1;
+            document.getElementById(`num2-${pIndex}`).innerText = n2;
+            
+            const qMark = document.getElementById(`qmark-${pIndex}`);
+            qMark.innerText = "?";
+            const t = themeColors[playersConfig[pIndex].colorName];
+            qMark.className = `${t.qMarkText} bg-white border-4 ${t.qMarkBorder} border-dashed w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shadow-sm`;
+
+            // Kemaskini Visual Emoji
+            const selectedEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+            const visualArea = document.getElementById(`visual-area-${pIndex}`);
+            visualArea.innerHTML = '';
+            
+            const group1 = document.createElement('div');
+            group1.className = `flex flex-wrap justify-center gap-1 ${t.badgeBg} p-2 rounded-xl border-2 ${t.badgeBorder}`;
+            for (let i = 0; i < n1; i++) group1.innerHTML += `<span class="emoji-item" style="animation-delay: ${i*0.1}s">${selectedEmoji}</span>`;
+            
+            const plus = document.createElement('span');
+            plus.className = 'text-gray-300 mx-1 text-3xl font-black';
+            plus.innerText = '+';
+
+            const group2 = document.createElement('div');
+            group2.className = `flex flex-wrap justify-center gap-1 ${t.badgeBg} p-2 rounded-xl border-2 ${t.badgeBorder}`;
+            for (let i = 0; i < n2; i++) group2.innerHTML += `<span class="emoji-item" style="animation-delay: ${(n1+i)*0.1}s">${selectedEmoji}</span>`;
+
+            visualArea.appendChild(group1);
+            visualArea.appendChild(plus);
+            visualArea.appendChild(group2);
+
+            generateOptions(pIndex);
+
+            // Reset Maklum Balas
+            const feedbackArea = document.getElementById(`feedback-${pIndex}`);
+            feedbackArea.style.opacity = '0';
+        }
+
+        function generateOptions(pIndex) {
+            const ans = gameState[pIndex].answer;
+            let options = [ans];
+            
+            while (options.length < 3) {
+                let randomWrong = Math.floor(Math.random() * 10) + 1;
+                if (!options.includes(randomWrong)) {
+                    options.push(randomWrong);
+                }
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            const optionsArea = document.getElementById(`options-area-${pIndex}`);
+            optionsArea.innerHTML = '';
+            const t = themeColors[playersConfig[pIndex].colorName];
+
+            options.forEach(num => {
+                const btn = document.createElement('button');
+                btn.className = `bg-white border-b-[6px] ${t.btnBorderB} ${t.btnText} font-black text-3xl sm:text-4xl py-3 rounded-2xl shadow-sm ${t.btnHover} active:translate-y-1 active:border-b-0 transition-all border-2`;
+                btn.innerText = num;
+                btn.onclick = () => checkAnswer(pIndex, num, btn);
+                optionsArea.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(pIndex, selected, btnElement) {
+            if (gameState[pIndex].isWaiting || !gameActive) return;
+
+            const feedbackArea = document.getElementById(`feedback-${pIndex}`);
+            const qMark = document.getElementById(`qmark-${pIndex}`);
+            const t = themeColors[playersConfig[pIndex].colorName];
+
+            if (selected === gameState[pIndex].answer) {
+                // JAWAPAN BETUL
+                gameState[pIndex].isWaiting = true;
+                playCorrectSound();
+                
+                gameState[pIndex].score++;
+                document.getElementById(`score-${pIndex}`).innerText = gameState[pIndex].score;
+                
+                qMark.innerText = gameState[pIndex].answer;
+                qMark.className = `text-white bg-green-500 border-4 border-green-600 w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center bounce-anim shadow-lg text-4xl`;
+                
+                btnElement.className = `bg-green-400 border-b-[6px] border-green-600 text-white font-black text-3xl sm:text-4xl py-3 rounded-2xl border-2 border-x-green-300 border-t-green-300`;
+                
+                feedbackArea.innerText = "✨ Bagus! ✨";
+                feedbackArea.className = "h-10 mb-3 text-xl font-black rounded-2xl flex items-center justify-center bg-green-100 text-green-600 opacity-100 transition-opacity duration-300 border-2 border-green-300";
+
+                createMiniConfetti(pIndex);
+
+                if (gameState[pIndex].score >= maxScore) {
+                    gameActive = false; // Hentikan permainan untuk semua
+                    setTimeout(() => showCelebration(pIndex), 1000);
+                } else {
+                    setTimeout(() => generateQuestion(pIndex), 1500);
+                }
+
+            } else {
+                // JAWAPAN SALAH
+                playWrongSound();
+                btnElement.className = `bg-red-200 border-b-0 border-red-400 text-white font-black text-3xl sm:text-4xl py-3 rounded-2xl opacity-70 translate-y-1 border-2 pointer-events-none`;
+                
+                const card = document.getElementById(`player-card-${pIndex}`);
+                card.classList.add('shake-anim');
+                setTimeout(() => card.classList.remove('shake-anim'), 400);
+
+                feedbackArea.innerText = "Kira semula!";
+                feedbackArea.className = "h-10 mb-3 text-xl font-black rounded-2xl flex items-center justify-center bg-red-100 text-red-500 opacity-100 transition-opacity duration-300 border-2 border-red-200";
+            }
+        }
+
+        // Hasilkan Confetti kecil berpusat di kawasan pemain yang betul
+        function createMiniConfetti(pIndex) {
+            const card = document.getElementById(`player-card-${pIndex}`);
+            const rect = card.getBoundingClientRect();
+            const colors = ['#fbcfe8', '#cffafe', '#e9d5ff', '#fef08a', '#a7f3d0'];
+            
+            for(let i=0; i<15; i++) {
+                let confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                
+                // Kedudukan rawak dalam kotak pemain
+                const startX = rect.left + (Math.random() * rect.width);
+                const startY = rect.top + (rect.height / 2);
+                
+                confetti.style.left = startX + 'px';
+                confetti.style.top = startY + 'px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                if(Math.random() > 0.5) confetti.style.borderRadius = '0px';
+
+                document.body.appendChild(confetti);
+
+                let animation = confetti.animate([
+                    { transform: `translate3d(0,0,0) rotate(0deg) scale(1)`, opacity: 1 },
+                    { transform: `translate3d(${(Math.random()-0.5)*200}px, ${(Math.random())*200}px, 0) rotate(${Math.random()*720}deg) scale(0)`, opacity: 0 }
+                ], {
+                    duration: Math.random() * 1000 + 1000,
+                    easing: 'cubic-bezier(.37,0,.9,.3)'
+                });
+
+                animation.onfinish = () => confetti.remove();
+            }
+        }
+
+        function showCelebration(winnerIndex) {
+            playWinSound();
+            const p = playersConfig[winnerIndex];
+            
+            document.getElementById('winner-avatars').innerHTML = `<div class="text-8xl">${p.avatar}</div><div class="text-8xl">🏆</div>`;
+            document.getElementById('winner-title').innerText = `Tahniah ${p.title}!`;
+            document.getElementById('celebration-screen').classList.remove('hidden');
+            
+            // Confetti besar di seluruh skrin
+            const colors = ['#fbcfe8', '#cffafe', '#e9d5ff', '#fef08a', '#a7f3d0'];
+            for(let i=0; i<50; i++) {
+                setTimeout(() => {
+                    let confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.top = '-10px';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    document.body.appendChild(confetti);
+
+                    let animation = confetti.animate([
+                        { transform: `translate3d(0,0,0) rotate(0deg) scale(1.5)`, opacity: 1 },
+                        { transform: `translate3d(${(Math.random()-0.5)*300}px, ${window.innerHeight}px, 0) rotate(${Math.random()*720}deg) scale(0)`, opacity: 0 }
+                    ], {
+                        duration: Math.random() * 2000 + 2000,
+                        easing: 'cubic-bezier(.37,0,.9,.3)'
+                    });
+                    animation.onfinish = () => confetti.remove();
+                }, i * 50);
+            }
+        }
+
+        // Mulakan game bila laman web siap dimuat
+        window.onload = initGame;
+
+    </script>
+</body>
+</html>

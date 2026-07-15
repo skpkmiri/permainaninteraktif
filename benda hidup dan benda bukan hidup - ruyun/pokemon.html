@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sains Battle - Benda Hidup & Bukan Hidup</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen relative flex flex-col items-center justify-center p-4 overflow-hidden text-gray-900 select-none bg-gray-100 font-mono">
+
+    <!-- Background Pokeball Design -->
+    <div class="absolute inset-0 z-0 flex flex-col">
+        <div class="h-1/2 w-full bg-red-600 border-b-8 border-black"></div>
+        <div class="h-1/2 w-full bg-white"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-white border-8 border-black rounded-full flex items-center justify-center z-10 shadow-xl">
+            <div class="w-12 h-12 bg-gray-200 border-4 border-black rounded-full"></div>
+        </div>
+    </div>
+
+    <!-- Main Game Container -->
+    <main class="z-20 relative w-full max-w-3xl bg-white/95 border-4 border-black rounded-2xl p-6 md:p-10 shadow-[8px_8px_0_rgba(0,0,0,1)] flex flex-col items-center text-center">
+        
+        <!-- Header - Scoreboard -->
+        <div id="scoreboard" class="w-full flex justify-between items-center mb-8 bg-gray-100 border-2 border-black rounded-lg p-3 hidden">
+            <div id="p1-box" class="p-2 px-4 border-2 border-black rounded bg-white">
+                <span class="block text-sm font-bold">Pemain 1</span>
+                <span id="p1-score" class="text-xl font-black">HP: 0</span>
+            </div>
+            <div id="round-text" class="font-bold text-gray-700">
+                Pusingan 1/3
+            </div>
+            <div id="p2-box" class="p-2 px-4 border-2 border-black rounded bg-white">
+                <span class="block text-sm font-bold">Pemain 2</span>
+                <span id="p2-score" class="text-xl font-black">HP: 0</span>
+            </div>
+        </div>
+
+        <!-- START SCREEN -->
+        <div id="screen-start" class="flex flex-col items-center w-full animate-fade-in">
+            <h1 class="text-4xl md:text-5xl font-black text-yellow-400 drop-shadow-[3px_3px_0_rgba(0,0,0,1)] mb-4 tracking-widest">
+                SAINS BATTLE
+            </h1>
+            <p class="text-lg md:text-xl text-gray-800 font-bold mb-8 uppercase border-b-4 border-black pb-2">
+                Benda Hidup vs Bukan Hidup
+            </p>
+            <div class="text-8xl mb-8 animate-bounce">
+                🔥🦎
+            </div>
+            <button onclick="startGame()" class="bg-yellow-400 hover:bg-yellow-300 text-black font-black py-4 px-6 rounded-lg border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all uppercase tracking-wider text-lg sm:text-xl w-full sm:w-auto">
+                Mula (2 Pemain) ▶️
+            </button>
+        </div>
+
+        <!-- ANNOUNCE TURN SCREEN -->
+        <div id="screen-announce" class="flex flex-col items-center py-10 animate-fade-in hidden">
+            <div id="player-turn-icon" class="text-6xl mb-6">🔵</div>
+            <h2 id="player-turn-text" class="text-3xl font-black mb-6 uppercase">Giliran Pemain 1!</h2>
+            <p class="text-gray-700 mb-8 font-bold">Bersedia untuk pertempuran seterusnya?</p>
+            <button id="btn-ready" onclick="showQuestion()" class="font-black py-4 px-6 rounded-lg border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all uppercase tracking-wider text-lg sm:text-xl w-full sm:w-auto">
+                Sedia!
+            </button>
+        </div>
+
+        <!-- PLAYING SCREEN -->
+        <div id="screen-playing" class="flex flex-col items-center w-full animate-fade-in hidden">
+            <p class="text-xl font-bold text-gray-600 mb-2 uppercase">Adakah ia benda hidup?</p>
+            
+            <div id="question-icon" class="text-9xl my-6 filter drop-shadow-md bg-gray-100 rounded-full h-48 w-48 flex items-center justify-center border-4 border-black">
+                🔥🦎
+            </div>
+            
+            <h2 id="question-item" class="text-4xl font-black mb-10 text-gray-800 uppercase tracking-widest">
+                Charmander
+            </h2>
+            
+            <div class="flex flex-col sm:flex-row gap-4 w-full justify-center mt-4">
+                <button onclick="handleAnswer(true)" class="bg-green-600 hover:bg-green-500 text-white font-black py-4 px-6 rounded-lg border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all uppercase tracking-wider text-lg sm:text-xl flex-1">
+                    🌱 HIDUP
+                </button>
+                <button onclick="handleAnswer(false)" class="bg-red-600 hover:bg-red-500 text-white font-black py-4 px-6 rounded-lg border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all uppercase tracking-wider text-lg sm:text-xl flex-1">
+                    🪨 BUKAN HIDUP
+                </button>
+            </div>
+        </div>
+
+        <!-- WRONG SCREEN -->
+        <div id="screen-wrong" class="flex flex-col items-center py-10 animate-fade-in w-full hidden">
+            <div class="text-7xl mb-4">❌</div>
+            <h2 class="text-3xl font-black text-red-600 mb-4 uppercase">Serangan tersasar!</h2>
+            <div class="bg-red-100 border-4 border-red-500 rounded-lg p-4 mb-8 w-full">
+                <p class="text-xl font-bold text-red-800 uppercase">Alamak, jawapan salah.</p>
+            </div>
+            <button onclick="tryAgain()" class="bg-yellow-400 hover:bg-yellow-300 text-black font-black py-4 px-6 rounded-lg border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all uppercase tracking-wider text-lg sm:text-xl w-full sm:w-auto">
+                🔄 Cuba Lagi!
+            </button>
+        </div>
+
+        <!-- CORRECT SCREEN -->
+        <div id="screen-correct" class="flex flex-col items-center py-10 animate-fade-in w-full hidden">
+            <div class="text-7xl mb-4">🌟</div>
+            <h2 class="text-4xl font-black text-green-600 mb-2 uppercase drop-shadow-md">GREAT!</h2>
+            <p id="points-text" class="text-lg font-bold text-gray-500 mb-6 uppercase">+10 Markah</p>
+            
+            <div class="bg-gray-100 border-4 border-black rounded-lg p-5 mb-8 w-full text-left relative">
+                <div class="absolute -top-3 left-6 w-0 h-0 border-l-[10px] border-r-[10px] border-b-[12px] border-transparent border-b-black"></div>
+                <p id="explanation-text" class="text-lg text-gray-800 font-bold leading-relaxed uppercase">Penjelasan</p>
+            </div>
+
+            <button id="btn-next" onclick="nextTurn()" class="font-black py-4 px-6 rounded-lg border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all uppercase tracking-wider text-lg sm:text-xl w-full sm:w-auto">
+                Seterusnya ▶️
+            </button>
+        </div>
+
+        <!-- FINISHED SCREEN -->
+        <div id="screen-finished" class="flex flex-col items-center animate-fade-in w-full hidden">
+            <div class="text-7xl mb-4">🏆</div>
+            <h2 class="text-4xl font-black mb-6 uppercase">Pertempuran Tamat!</h2>
+            
+            <div class="flex w-full gap-4 mb-8 justify-center">
+                <div class="flex-1 border-4 border-black p-4 rounded-lg bg-blue-100">
+                    <p class="font-bold mb-2">PEMAIN 1</p>
+                    <p id="final-p1-score" class="text-4xl font-black">0</p>
+                </div>
+                <div class="flex-1 border-4 border-black p-4 rounded-lg bg-red-100">
+                    <p class="font-bold mb-2">PEMAIN 2</p>
+                    <p id="final-p2-score" class="text-4xl font-black">0</p>
+                </div>
+            </div>
+
+            <h3 id="winner-text" class="text-2xl font-bold mb-8 uppercase text-yellow-500 bg-gray-900 p-3 rounded shadow-md border-2 border-white">
+                Keputusan
+            </h3>
+
+            <button onclick="resetGame()" class="bg-green-600 hover:bg-green-500 text-white font-black py-4 px-6 rounded-lg border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all uppercase tracking-wider text-lg sm:text-xl w-full sm:w-auto">
+                🔄 Main Semula
+            </button>
+        </div>
+
+    </main>
+
+    <script>
+        const questions = [
+            { id: 1, item: "Charmander", icon: "🔥🦎", isLiving: true, explanation: "Charmander adalah benda hidup! Ia bernafas, makan buah-buahan, dan boleh membesar." },
+            { id: 2, item: "Poké Ball", icon: "🔴⚪", isLiving: false, explanation: "Poké Ball adalah benda bukan hidup. Ia hanyalah alat yang tidak bernafas atau makan." },
+            { id: 3, item: "Pidgey (Burung)", icon: "🦅", isLiving: true, explanation: "Pidgey adalah benda hidup! Ia bertelur, minum air dan terbang mencari makanan." },
+            { id: 4, item: "Basikal", icon: "🚲", isLiving: false, explanation: "Basikal tidak boleh membesar atau bergerak sendiri. Ia benda bukan hidup." },
+            { id: 5, item: "Bulbasaur", icon: "🐸🌱", isLiving: true, explanation: "Bulbasaur mempunyai ciri haiwan dan tumbuhan. Ia bernafas dan memerlukan air untuk hidup!" },
+            { id: 6, item: "Potion (Ubat)", icon: "🧴", isLiving: false, explanation: "Potion (ubat penyembuh) adalah cecair buatan manusia. Ia bukan benda hidup." }
+        ];
+
+        let currentPlayer = 1;
+        let scores = { 1: 0, 2: 0 };
+        let qIndex = 0;
+        let attempts = 0;
+
+        function showScreen(screenId) {
+            ['screen-start', 'screen-announce', 'screen-playing', 'screen-wrong', 'screen-correct', 'screen-finished'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+
+        function updateScoreboard() {
+            document.getElementById('p1-score').innerText = `HP: ${scores[1]}`;
+            document.getElementById('p2-score').innerText = `HP: ${scores[2]}`;
+            document.getElementById('round-text').innerText = `Pusingan ${Math.ceil((qIndex + 1) / 2)}/3`;
+            
+            const p1Box = document.getElementById('p1-box');
+            const p2Box = document.getElementById('p2-box');
+            
+            if (currentPlayer === 1) {
+                p1Box.className = "p-2 px-4 border-2 border-black rounded bg-blue-500 text-white font-bold";
+                p2Box.className = "p-2 px-4 border-2 border-black rounded bg-white text-gray-900";
+            } else {
+                p1Box.className = "p-2 px-4 border-2 border-black rounded bg-white text-gray-900";
+                p2Box.className = "p-2 px-4 border-2 border-black rounded bg-red-500 text-white font-bold";
+            }
+        }
+
+        function startGame() {
+            scores = { 1: 0, 2: 0 };
+            qIndex = 0;
+            currentPlayer = 1;
+            attempts = 0;
+            document.getElementById('scoreboard').classList.remove('hidden');
+            announceTurn();
+        }
+
+        function announceTurn() {
+            document.getElementById('player-turn-icon').innerText = currentPlayer === 1 ? "🔵" : "🔴";
+            document.getElementById('player-turn-text').innerText = `Giliran Pemain ${currentPlayer}!`;
+            
+            const btnReady = document.getElementById('btn-ready');
+            if (currentPlayer === 1) {
+                btnReady.className = "bg-blue-600 hover:bg-blue-500 text-white font-black py-4 px-6 rounded-lg border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all uppercase tracking-wider text-lg sm:text-xl w-full sm:w-auto";
+            } else {
+                btnReady.className = "bg-red-600 hover:bg-red-500 text-white font-black py-4 px-6 rounded-lg border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all uppercase tracking-wider text-lg sm:text-xl w-full sm:w-auto";
+            }
+            
+            updateScoreboard();
+            showScreen('screen-announce');
+        }
+
+        function showQuestion() {
+            const currentQ = questions[qIndex];
+            document.getElementById('question-icon').innerText = currentQ.icon;
+            document.getElementById('question-item').innerText = currentQ.item;
+            showScreen('screen-playing');
+        }
+
+        function handleAnswer(userAnswerIsLiving) {
+            const currentQ = questions[qIndex];
+            const isCorrect = userAnswerIsLiving === currentQ.isLiving;
+
+            if (isCorrect) {
+                const pointsEarned = attempts === 0 ? 10 : 5;
+                scores[currentPlayer] += pointsEarned;
+                
+                document.getElementById('points-text').innerText = attempts === 0 ? "+10 Markah (Tepat Sempurna!)" : "+5 Markah (Usaha Baik!)";
+                document.getElementById('explanation-text').innerText = currentQ.explanation;
+                
+                const btnNext = document.getElementById('btn-next');
+                btnNext.className = currentPlayer === 1 
+                    ? "bg-blue-600 hover:bg-blue-500 text-white font-black py-4 px-6 rounded-lg border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all uppercase tracking-wider text-lg sm:text-xl w-full sm:w-auto"
+                    : "bg-red-600 hover:bg-red-500 text-white font-black py-4 px-6 rounded-lg border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all uppercase tracking-wider text-lg sm:text-xl w-full sm:w-auto";
+                
+                updateScoreboard();
+                showScreen('screen-correct');
+            } else {
+                attempts++;
+                showScreen('screen-wrong');
+            }
+        }
+
+        function tryAgain() {
+            showScreen('screen-playing');
+        }
+
+        function nextTurn() {
+            if (qIndex + 1 < questions.length) {
+                currentPlayer = currentPlayer === 1 ? 2 : 1;
+                qIndex++;
+                attempts = 0;
+                announceTurn();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            document.getElementById('scoreboard').classList.add('hidden');
+            document.getElementById('final-p1-score').innerText = scores[1];
+            document.getElementById('final-p2-score').innerText = scores[2];
+            
+            const winnerText = document.getElementById('winnerText');
+            if (scores[1] > scores[2]) {
+                document.getElementById('winner-text').innerText = "🎉 Pemain 1 Menang!";
+            } else if (scores[2] > scores[1]) {
+                document.getElementById('winner-text').innerText = "🎉 Pemain 2 Menang!";
+            } else {
+                document.getElementById('winner-text').innerText = "🤝 Keputusan Seri!";
+            }
+            showScreen('screen-finished');
+        }
+
+        function resetGame() {
+            showScreen('screen-start');
+        }
+    </script>
+</body>
+</html>

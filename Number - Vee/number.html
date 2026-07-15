@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Numbers Quiz - Shared Device Edition</title>
+    <!-- Tailwind CSS for modern, responsive design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for friendly, legible typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #f0fdf4; /* Light friendly green background */
+        }
+        .heading-font {
+            font-family: 'Fredoka One', cursive;
+        }
+        /* Sparkle animation for AI elements */
+        .sparkle-border {
+            position: relative;
+            background: linear-gradient(90deg, #10b981, #3b82f6, #8b5cf6, #10b981);
+            background-size: 300% 300%;
+            animation: moveGradient 4s alternate infinite;
+        }
+        @keyframes moveGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between p-4 md:p-8">
+
+    <!-- Header Section -->
+    <header class="w-full max-w-2xl text-center my-4">
+        <h1 class="heading-font text-3xl md:text-4xl text-emerald-600 drop-shadow-sm">🔢 English Numbers Quiz</h1>
+        <p class="text-emerald-800 font-semibold mt-1">Shared Device Edition for Vanitha's English Class</p>
+    </header>
+
+    <!-- Main Game Container -->
+    <main class="w-full max-w-2xl bg-white rounded-3xl shadow-xl border-4 border-emerald-100 p-6 md:p-8 relative overflow-hidden flex-grow flex flex-col justify-between">
+        
+        <!-- Setup Screen (Player Registration) -->
+        <div id="setup-screen" class="space-y-6 py-4">
+            <h2 class="heading-font text-2xl text-center text-emerald-700">🎮 Setup Dual Players</h2>
+            <p class="text-center text-slate-600 text-sm bg-emerald-50 p-3 rounded-2xl border border-emerald-100">
+                🤝 <strong>Classroom Tip:</strong> Put this device on a desk between both pupils. You will take turns and pass the device back and forth!
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                <!-- Player 1 Setup -->
+                <div class="p-5 bg-indigo-50 rounded-2xl border-2 border-indigo-100 space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-3xl" id="p1-avatar-display">🦁</span>
+                        <h3 class="font-bold text-indigo-800 heading-font">Player 1 (Blue)</h3>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-indigo-700 mb-1">NAME</label>
+                        <input type="text" id="p1-name" value="Player 1" class="w-full p-3 rounded-xl border border-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 font-semibold text-indigo-900">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-indigo-700 mb-1">CHOOSE AVATAR</label>
+                        <div class="grid grid-cols-5 gap-2 text-xl">
+                            <button type="button" onclick="selectAvatar(1, '🦁')" class="p-1 hover:scale-125 transition-all">🦁</button>
+                            <button type="button" onclick="selectAvatar(1, '🐼')" class="p-1 hover:scale-125 transition-all">🐼</button>
+                            <button type="button" onclick="selectAvatar(1, '🦊')" class="p-1 hover:scale-125 transition-all">🦊</button>
+                            <button type="button" onclick="selectAvatar(1, '🐨')" class="p-1 hover:scale-125 transition-all">🐨</button>
+                            <button type="button" onclick="selectAvatar(1, '🐸')" class="p-1 hover:scale-125 transition-all">🐸</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Player 2 Setup -->
+                <div class="p-5 bg-amber-50 rounded-2xl border-2 border-amber-100 space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-3xl" id="p2-avatar-display">🦊</span>
+                        <h3 class="font-bold text-amber-800 heading-font">Player 2 (Orange)</h3>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-amber-700 mb-1">NAME</label>
+                        <input type="text" id="p2-name" value="Player 2" class="w-full p-3 rounded-xl border border-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-400 font-semibold text-amber-900">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-amber-700 mb-1">CHOOSE AVATAR</label>
+                        <div class="grid grid-cols-5 gap-2 text-xl">
+                            <button type="button" onclick="selectAvatar(2, '🦁')" class="p-1 hover:scale-125 transition-all">🦁</button>
+                            <button type="button" onclick="selectAvatar(2, '🐼')" class="p-1 hover:scale-125 transition-all">🐼</button>
+                            <button type="button" onclick="selectAvatar(2, '🦊')" class="p-1 hover:scale-125 transition-all">🦊</button>
+                            <button type="button" onclick="selectAvatar(2, '🐨')" class="p-1 hover:scale-125 transition-all">🐨</button>
+                            <button type="button" onclick="selectAvatar(2, '🐸')" class="p-1 hover:scale-125 transition-all">🐸</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="startGame()" class="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] text-lg heading-font mt-4">
+                Start Challenge! 🚀
+            </button>
+        </div>
+
+        <!-- NEW: Pass the Device Interstitial Screen -->
+        <div id="pass-device-screen" class="hidden text-center py-10 space-y-6">
+            <div class="text-6xl animate-bounce">📱 🔄</div>
+            <h2 class="heading-font text-3xl text-emerald-600">Your Turn!</h2>
+            
+            <div id="pass-instruction-box" class="p-6 rounded-3xl border-4 max-w-md mx-auto transition-all">
+                <span id="next-player-avatar" class="text-5xl block mb-2">🦁</span>
+                <p class="text-lg text-slate-700">Please pass the device to</p>
+                <h3 id="next-player-name" class="heading-font text-2xl text-slate-800 mt-1">Player 1</h3>
+                <p class="text-xs text-slate-400 italic mt-3">🤫 No peeking while passing the device!</p>
+            </div>
+
+            <button onclick="confirmDeviceReady()" class="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl shadow-lg transition-all hover:scale-105 active:scale-95 text-lg">
+                I'm Ready! 🚀
+            </button>
+        </div>
+
+        <!-- Active Quiz Screen -->
+        <div id="quiz-screen" class="hidden space-y-6 flex-grow flex flex-col justify-between">
+            
+            <!-- Turn Indicator & Score Board -->
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Player 1 Score box -->
+                    <div id="p1-score-card" class="p-3 rounded-2xl border-2 transition-all flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-2xl" id="p1-live-avatar">🦁</span>
+                            <div>
+                                <h4 class="font-bold text-xs truncate max-w-[100px]" id="p1-live-name">Player 1</h4>
+                                <span class="text-xs opacity-75">Score</span>
+                            </div>
+                        </div>
+                        <span id="p1-live-score" class="text-2xl font-extrabold heading-font">0</span>
+                    </div>
+
+                    <!-- Player 2 Score box -->
+                    <div id="p2-score-card" class="p-3 rounded-2xl border-2 transition-all flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-2xl" id="p2-live-avatar">🦊</span>
+                            <div>
+                                <h4 class="font-bold text-xs truncate max-w-[100px]" id="p2-live-name">Player 2</h4>
+                                <span class="text-xs opacity-75">Score</span>
+                            </div>
+                        </div>
+                        <span id="p2-live-score" class="text-2xl font-extrabold heading-font">0</span>
+                    </div>
+                </div>
+
+                <!-- Turn banner -->
+                <div id="turn-banner" class="w-full text-center py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all duration-300">
+                    <span id="turn-banner-text">It's Player 1's Turn!</span>
+                </div>
+
+                <!-- Overall Progress Bar -->
+                <div>
+                    <div class="flex justify-between items-center text-slate-500 text-xs font-bold mb-1">
+                        <span id="progress-text">Question 1 of 10</span>
+                        <span>Total Progress</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden border border-slate-200">
+                        <div id="progress-bar" class="bg-emerald-500 h-full transition-all duration-300 rounded-full" style="width: 10%;"></div>
+                    </div>
+                </div>
+
+                <!-- Live Voice Reader Integration -->
+                <div class="flex justify-between items-center bg-emerald-50/50 p-2 rounded-2xl border border-emerald-100">
+                    <span class="text-xs font-semibold text-emerald-800 flex items-center">
+                        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse mr-2"></span>
+                        Need help reading?
+                    </span>
+                    <button id="tts-btn" onclick="playQuestionAudio()" class="flex items-center space-x-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm hover:scale-105">
+                        <span id="tts-btn-icon">🔊</span>
+                        <span id="tts-btn-text">✨ Listen to Question</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Question & Hint Section -->
+            <div class="my-2">
+                <h2 id="question-text" class="text-xl md:text-2xl font-bold text-slate-800 leading-snug">
+                    Question text goes here.
+                </h2>
+                
+                <!-- Hint Button and Hint Text -->
+                <div class="mt-4">
+                    <button id="hint-btn" onclick="toggleHint()" class="text-xs font-bold text-emerald-600 hover:text-emerald-700 underline focus:outline-none transition-all">
+                        💡 Need a hint?
+                    </button>
+                    <p id="hint-text" class="hidden text-sm text-amber-700 bg-amber-50 rounded-xl p-3 border border-amber-200 mt-2 italic">
+                        Hint goes here.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Answer Options Grid -->
+            <div id="options-container" class="grid grid-cols-1 gap-3 my-2">
+                <!-- Option buttons will be dynamically generated here -->
+            </div>
+
+            <!-- Feedback Overlay / Box with AI explanations -->
+            <div id="feedback-box" class="hidden rounded-2xl p-4 md:p-5 border-2 transition-all duration-300 space-y-4">
+                <div class="flex items-center space-x-3 mb-1">
+                    <span id="feedback-icon" class="text-2xl"></span>
+                    <h3 id="feedback-title" class="text-xl font-bold heading-font">Feedback Title</h3>
+                </div>
+                <p id="feedback-rationale" class="text-slate-700 text-sm md:text-base leading-relaxed"></p>
+                
+                <!-- AI Explainer Integration Button -->
+                <div class="border-t border-dashed pt-3 flex flex-col items-start">
+                    <button id="ai-explain-btn" onclick="getAIExplanation()" class="flex items-center space-x-2 text-xs font-bold text-indigo-700 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-xl border border-indigo-200 transition-all select-none">
+                        <span>🤖 ✨ Ask AI Explainer</span>
+                    </button>
+                    <!-- Explainer output -->
+                    <div id="ai-explain-container" class="hidden w-full mt-3 bg-indigo-50 border border-indigo-100 rounded-xl p-3 text-slate-700 text-sm italic relative">
+                        <span class="absolute -top-2 left-4 px-1.5 py-0.5 bg-indigo-600 text-[10px] text-white rounded font-bold uppercase tracking-wider">Gemini Explains</span>
+                        <p id="ai-explain-text" class="pt-1">Thinking...</p>
+                    </div>
+                </div>
+
+                <button id="next-btn" onclick="prepareNextTurn()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-md transition-all hover:scale-[1.02] active:scale-[0.98]">
+                    Next Turn ➡️
+                </button>
+            </div>
+
+        </div>
+
+        <!-- End Screen -->
+        <div id="end-screen" class="hidden text-center py-8 space-y-6">
+            <div class="text-6xl animate-bounce">🏆</div>
+            <h2 id="winner-title" class="heading-font text-3xl text-emerald-600">Congratulations!</h2>
+            <p id="winner-subtitle" class="text-lg text-slate-700">You have completed the match.</p>
+            
+            <!-- Double Score Display -->
+            <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto pt-2">
+                <div class="bg-indigo-50 border-2 border-indigo-200 rounded-2xl p-4">
+                    <span class="block text-2xl" id="p1-end-avatar">🦁</span>
+                    <span class="block text-slate-600 font-bold truncate text-sm" id="p1-end-name">Player 1</span>
+                    <span id="p1-end-score" class="text-3xl font-extrabold text-indigo-600 heading-font">0</span>
+                </div>
+                <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4">
+                    <span class="block text-2xl" id="p2-end-avatar">🦊</span>
+                    <span class="block text-slate-600 font-bold truncate text-sm" id="p2-end-name">Player 2</span>
+                    <span id="p2-end-score" class="text-3xl font-extrabold text-amber-600 heading-font">0</span>
+                </div>
+            </div>
+
+            <p id="performance-message" class="text-slate-600 italic px-4"></p>
+
+            <div class="flex flex-col space-y-3 max-w-sm mx-auto pt-2">
+                <!-- AI Dynamic Question Generation Button (Tie-Breaker or Bonus Round) -->
+                <button id="ai-gen-btn" onclick="generateAIQuestion()" class="w-full py-4 text-white font-bold rounded-2xl shadow-lg transition-all text-base flex items-center justify-center space-x-2 sparkle-border hover:scale-105 active:scale-95">
+                    <span>🔄 ✨ Dynamic AI Tie-Breaker</span>
+                </button>
+                
+                <button onclick="restartQuiz()" class="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl shadow-lg transition-all hover:scale-105 active:scale-95 text-base">
+                    Play Again 🔄
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Friendly Error Alert Container -->
+    <div id="alert-banner" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-11/12 max-w-md bg-rose-600 text-white py-3 px-4 rounded-2xl shadow-xl z-50 flex items-center justify-between transition-all">
+        <div class="flex items-center space-x-3 text-sm font-semibold">
+            <span>🚨</span>
+            <span id="alert-banner-text">Error message.</span>
+        </div>
+        <button onclick="hideAlert()" class="text-white hover:text-rose-200 font-bold focus:outline-none px-2 text-lg">×</button>
+    </div>
+
+    <!-- Footer Copyright -->
+    <footer class="text-center text-xs text-emerald-700 my-4 opacity-75">
+        Designed for interactive language learning.
+    </footer>
+
+    <!-- Quiz Logic, Data, and Gemini API integration Script -->
+    <script>
+        const apiKey = ""; // Set dynamically by environment
+        let currentAudio = null;
+
+        const baseQuizData = [
+            {
+                "question": "What is the correct spelling for the ordinal form of the number 9 (e.g., the position after eighth)?",
+                "answerOptions": [
+                    { "text": "Nineth", "rationale": "This is a common mistake! Many write 'nineth' because of 'nine', but it is incorrect.", "isCorrect": false },
+                    { "text": "Ninth", "rationale": "The word drops the letter 'e' from its base spelling when it becomes an ordinal number.", "isCorrect": true },
+                    { "text": "Nine", "rationale": "'Nine' is a cardinal number used for counting, not for showing rank or order.", "isCorrect": false },
+                    { "text": "Ninethe", "rationale": "This is an incorrect spelling.", "isCorrect": false }
+                ],
+                "hint": "Unlike 'fourth' or 'seventh', this word drops the ending 'e' before adding 'th'."
+            },
+            {
+                "question": "If you finish a race in position number 1, you are in ________ place.",
+                "answerOptions": [
+                    { "text": "one", "rationale": "'One' is a counting (cardinal) number, not an order (ordinal) number.", "isCorrect": false },
+                    { "text": "once", "rationale": "'Once' means one time (frequency), not first place.", "isCorrect": false },
+                    { "text": "first", "rationale": "We use the ordinal number 'first' to show position number 1.", "isCorrect": true },
+                    { "text": "firsts", "rationale": "This is plural and grammatically incorrect here.", "isCorrect": false }
+                ],
+                "hint": "Think about the special word we use for rankings instead of counting."
+            },
+            {
+                "question": "Which sentence is grammatically correct when talking about the number 1?",
+                "answerOptions": [
+                    { "text": "I have one dogs.", "rationale": "Since 'one' is singular, the noun must be singular as well. 'Dogs' is plural.", "isCorrect": false },
+                    { "text": "I have one dog.", "rationale": "Correct! One is a singular number, so we use the singular noun 'dog'.", "isCorrect": true },
+                    { "text": "I have a dogs.", "rationale": "'A' is singular, but 'dogs' is plural. They do not match.", "isCorrect": false },
+                    { "text": "I have ones dog.", "rationale": "'Ones' is not used this way to count a single item.", "isCorrect": false }
+                ],
+                "hint": "The number 1 is singular, so the animal we are describing must also be singular."
+            },
+            {
+                "question": "What does the English idiom \"on cloud nine\" mean?",
+                "answerOptions": [
+                    { "text": "To be very sad", "rationale": "This idiom refers to a positive emotion, not a negative one.", "isCorrect": false },
+                    { "text": "To be extremely happy", "rationale": "\"On cloud nine\" means to be in a state of perfect happiness or extreme joy.", "isCorrect": true },
+                    { "text": "To be daydreaming", "rationale": "Being \"in the clouds\" can mean daydreaming, but \"on cloud nine\" means happy.", "isCorrect": false },
+                    { "text": "To be high up in a plane", "rationale": "While clouds relate to flying, this is a figurative phrase, not a literal one.", "isCorrect": false }
+                ],
+                "hint": "This phrase relates to a feeling of floating high up in the sky because of a very strong, positive emotion."
+            },
+            {
+                "question": "How do you correctly write the fraction 1/2 in English words?",
+                "answerOptions": [
+                    { "text": "One-second", "rationale": "We do not use 'second' for 1/2. We have a special word for it.", "isCorrect": false },
+                    { "text": "One-two", "rationale": "Fractions cannot be written as two direct cardinal numbers next to each other.", "isCorrect": false },
+                    { "text": "Half", "rationale": "We use the word 'half' (or 'a half') to describe dividing something into two equal parts.", "isCorrect": true },
+                    { "text": "Second", "rationale": "This refers to the position after first, not a fraction of a whole.", "isCorrect": false }
+                ],
+                "hint": "If you cut a whole apple into two equal parts, each part is called a..."
+            },
+            {
+                "question": "Which is the correct spelling for the number 8?",
+                "answerOptions": [
+                    { "text": "Ate", "rationale": "'Ate' is the past tense of the verb 'eat'. It sounds the same but has a different meaning and spelling.", "isCorrect": false },
+                    { "text": "Aight", "rationale": "This is slang for 'all right' and is not a number.", "isCorrect": false },
+                    { "text": "Eigt", "rationale": "This spelling is incomplete.", "isCorrect": false },
+                    { "text": "Eight", "rationale": "Correct! 'Eight' is the standard spelling for the number 8.", "isCorrect": true }
+                ],
+                "hint": "It sounds exactly like the past tense of 'eat', but is spelled with five letters starting with 'E'."
+            },
+            {
+                "question": "Complete the common idiom: \"It takes ____ to tango.\"",
+                "answerOptions": [
+                    { "text": "one", "rationale": "A tango is a partner dance and cannot be done alone. The idiom means cooperation is needed.", "isCorrect": false },
+                    { "text": "two", "rationale": "The idiom \"takes two to tango\" means that both people involved in a difficult situation or argument share responsibility.", "isCorrect": true },
+                    { "text": "three", "rationale": "Tango is traditionally a dance for two people, so three does not fit.", "isCorrect": false },
+                    { "text": "four", "rationale": "This number is too high for this traditional duet-dance idiom.", "isCorrect": false }
+                ],
+                "hint": "Think about how many people are required to dance this specific South American partner dance."
+            },
+            {
+                "question": "What does it mean when you give someone a \"high five\"?",
+                "answerOptions": [
+                    { "text": "To slap palms together in celebration", "rationale": "Correct! A 'high five' is a gesture of celebration where two people slap their raised palms together.", "isCorrect": true },
+                    { "text": "To jump five times", "rationale": "While active, this is not what the gesture describes.", "isCorrect": false },
+                    { "text": "To count to five on your fingers", "rationale": "This is just counting, not a celebratory gesture.", "isCorrect": false },
+                    { "text": "To wave goodbye from far away", "rationale": "We wave goodbye to say farewell, not to give a 'high five'.", "isCorrect": false }
+                ],
+                "hint": "Think about what gesture you make with your open hand to celebrate a great play with a teammate."
+            },
+            {
+                "question": "Choose the grammatically correct sentence for the number 3.",
+                "answerOptions": [
+                    { "text": "There are three cat on the roof.", "rationale": "Since 'three' is a plural number, the noun 'cat' must be plural ('cats').", "isCorrect": false },
+                    { "text": "There are three cats on the roof.", "rationale": "Correct! For numbers 2 and above, the countable noun must be in its plural form.", "isCorrect": true },
+                    { "text": "There are three of cat on the roof.", "rationale": "We do not use 'of' directly before a singular noun in this way.", "isCorrect": false },
+                    { "text": "There are third cats on the roof.", "rationale": "We cannot use the ordinal number 'third' here because we are counting the total number of cats.", "isCorrect": false }
+                ],
+                "hint": "For numbers 2 and above, the noun must be in its plural form."
+            },
+            {
+                "question": "The word \"decade\" represents a period of how many years?",
+                "answerOptions": [
+                    { "text": "Two", "rationale": "A period of two years is a biennium, not a decade.", "isCorrect": false },
+                    { "text": "Five", "rationale": "Five years is a lustrum or quinquennium.", "isCorrect": false },
+                    { "text": "Ten", "rationale": "The prefix 'dec-' relates to the number 10, making a decade a period of ten years.", "isCorrect": true },
+                    { "text": "Twelve", "rationale": "Twelve years is not a decade (twelve items is called a dozen).", "isCorrect": false }
+                ],
+                "hint": "The prefix 'dec-' comes from the Greek word for this double-digit number."
+            }
+        ];
+
+        let quizData = [...baseQuizData];
+        let currentIndex = 0;
+        let isAnswered = false;
+        let selectedOptionText = "";
+
+        // Game State Variables
+        let p1Name = "Player 1";
+        let p2Name = "Player 2";
+        let p1Avatar = "🦁";
+        let p2Avatar = "🦊";
+        let scores = [0, 0]; // [Player 1 Score, Player 2 Score]
+        let activePlayer = 0; // 0 = Player 1, 1 = Player 2
+
+        // Setup Screen Handlers
+        function selectAvatar(playerNum, emoji) {
+            if (playerNum === 1) {
+                p1Avatar = emoji;
+                document.getElementById('p1-avatar-display').innerText = emoji;
+            } else {
+                p2Avatar = emoji;
+                document.getElementById('p2-avatar-display').innerText = emoji;
+            }
+        }
+
+        function startGame() {
+            p1Name = document.getElementById('p1-name').value.trim() || "Player 1";
+            p2Name = document.getElementById('p2-name').value.trim() || "Player 2";
+
+            // Bind names & avatars dynamically to gameplay UI
+            document.getElementById('p1-live-name').innerText = p1Name;
+            document.getElementById('p1-live-avatar').innerText = p1Avatar;
+            document.getElementById('p2-live-name').innerText = p2Name;
+            document.getElementById('p2-live-avatar').innerText = p2Avatar;
+
+            // Transition Screens
+            document.getElementById('setup-screen').classList.add('hidden');
+            
+            // Set first turn state and start sequence
+            activePlayer = 0;
+            scores = [0, 0];
+            currentIndex = 0;
+            
+            showPassDeviceScreen();
+        }
+
+        // Interstitial Turn Manager
+        function showPassDeviceScreen() {
+            // Hide normal screens
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.add('hidden');
+            
+            const passScreen = document.getElementById('pass-device-screen');
+            const nextAvatarEl = document.getElementById('next-player-avatar');
+            const nextNameEl = document.getElementById('next-player-name');
+            const box = document.getElementById('pass-instruction-box');
+
+            const nextName = activePlayer === 0 ? p1Name : p2Name;
+            const nextAvatar = activePlayer === 0 ? p1Avatar : p2Avatar;
+
+            // Apply player specific colors on the middle instruction box
+            if (activePlayer === 0) {
+                box.className = "p-6 rounded-3xl border-4 border-indigo-200 bg-indigo-50 max-w-md mx-auto transition-all scale-105 shadow-md";
+                nextNameEl.className = "heading-font text-3xl text-indigo-700 mt-1";
+            } else {
+                box.className = "p-6 rounded-3xl border-4 border-amber-200 bg-amber-50 max-w-md mx-auto transition-all scale-105 shadow-md";
+                nextNameEl.className = "heading-font text-3xl text-amber-700 mt-1";
+            }
+
+            nextAvatarEl.innerText = nextAvatar;
+            nextNameEl.innerText = nextName;
+
+            passScreen.classList.remove('hidden');
+        }
+
+        function confirmDeviceReady() {
+            document.getElementById('pass-device-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function updateScoreUI() {
+            document.getElementById('p1-live-score').innerText = scores[0];
+            document.getElementById('p2-live-score').innerText = scores[1];
+
+            const card1 = document.getElementById('p1-score-card');
+            const card2 = document.getElementById('p2-score-card');
+            const turnBanner = document.getElementById('turn-banner');
+            const turnBannerText = document.getElementById('turn-banner-text');
+
+            if (activePlayer === 0) {
+                // Style Active Player 1 (Blue/Indigo)
+                card1.className = "p-3 rounded-2xl border-4 border-indigo-500 bg-indigo-50/50 flex items-center justify-between shadow-md scale-105 transition-all";
+                card2.className = "p-3 rounded-2xl border-2 border-slate-200 bg-white flex items-center justify-between opacity-60 scale-95 transition-all";
+                
+                turnBanner.className = "w-full text-center py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all duration-300 bg-indigo-600 text-white";
+                turnBannerText.innerText = `👉 ${p1Avatar} ${p1Name}'s Question!`;
+            } else {
+                // Style Active Player 2 (Amber/Orange)
+                card2.className = "p-3 rounded-2xl border-4 border-amber-500 bg-amber-50/50 flex items-center justify-between shadow-md scale-105 transition-all";
+                card1.className = "p-3 rounded-2xl border-2 border-slate-200 bg-white flex items-center justify-between opacity-60 scale-95 transition-all";
+
+                turnBanner.className = "w-full text-center py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all duration-300 bg-amber-600 text-white";
+                turnBannerText.innerText = `👉 ${p2Avatar} ${p2Name}'s Question!`;
+            }
+        }
+
+        // Common Gemini Fetch Engine with 5-step exponential backoff
+        async function fetchGemini(payload, model, endpoint = "generateContent") {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:${endpoint}?key=${apiKey}`;
+            let delay = 1000;
+            
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (response.ok) {
+                        return await response.json();
+                    }
+                } catch (e) {
+                    // Suppressed per prompt instructions
+                }
+                await new Promise(resolve => setTimeout(resolve, delay));
+                delay *= 2;
+            }
+            throw new Error("Unable to connect to Gemini AI services right now. Please try again in a moment.");
+        }
+
+        function loadQuestion() {
+            // Stop any ongoing audio
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            resetTTSButton();
+
+            isAnswered = false;
+            selectedOptionText = "";
+            const currentQuestion = quizData[currentIndex];
+
+            // Update Turn UI Indicator
+            updateScoreUI();
+
+            // Update Progress Header
+            document.getElementById('progress-text').innerText = `Question ${currentIndex + 1} of ${quizData.length}`;
+            
+            // Progress Bar Update
+            const percentage = ((currentIndex) / quizData.length) * 100;
+            document.getElementById('progress-bar').style.width = `${percentage || 5}%`;
+
+            // Set text content
+            document.getElementById('question-text').innerText = currentQuestion.question;
+            document.getElementById('hint-text').innerText = currentQuestion.hint;
+            document.getElementById('hint-text').classList.add('hidden');
+            document.getElementById('hint-btn').innerText = "💡 Need a hint?";
+
+            // Hide feedback box & explanation block
+            document.getElementById('feedback-box').classList.add('hidden');
+            document.getElementById('ai-explain-container').classList.add('hidden');
+            document.getElementById('ai-explain-btn').disabled = false;
+            document.getElementById('ai-explain-btn').innerHTML = "<span>🤖 ✨ Ask AI Explainer</span>";
+
+            // Render options
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            currentQuestion.answerOptions.forEach((option) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-2xl border-2 border-emerald-100 bg-emerald-50/50 hover:bg-emerald-50 hover:border-emerald-300 transition-all font-semibold text-slate-700 flex justify-between items-center outline-none select-none text-sm md:text-base";
+                btn.innerHTML = `
+                    <span>${option.text}</span>
+                    <span class="indicator-icon hidden"></span>
+                `;
+                btn.onclick = () => selectOption(btn, option);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function toggleHint() {
+            const hintText = document.getElementById('hint-text');
+            const hintBtn = document.getElementById('hint-btn');
+            if (hintText.classList.contains('hidden')) {
+                hintText.classList.remove('hidden');
+                hintBtn.innerText = "🙈 Hide hint";
+            } else {
+                hintText.classList.add('hidden');
+                hintBtn.innerText = "💡 Need a hint?";
+            }
+        }
+
+        function selectOption(selectedBtn, option) {
+            if (isAnswered) return; // Prevent multiple clicks
+            isAnswered = true;
+            selectedOptionText = option.text;
+
+            const feedbackBox = document.getElementById('feedback-box');
+            const feedbackTitle = document.getElementById('feedback-title');
+            const feedbackIcon = document.getElementById('feedback-icon');
+            const feedbackRationale = document.getElementById('feedback-rationale');
+
+            // Find all buttons in the options container
+            const buttons = document.querySelectorAll('#options-container button');
+
+            const currentActiveName = activePlayer === 0 ? p1Name : p2Name;
+
+            // Update user score and display styling depending on correctness
+            if (option.isCorrect) {
+                scores[activePlayer]++;
+                
+                // Style selected button as correct
+                selectedBtn.classList.remove('bg-emerald-50/50', 'border-emerald-100');
+                selectedBtn.classList.add('bg-green-100', 'border-green-500', 'text-green-900');
+                selectedBtn.querySelector('.indicator-icon').innerHTML = "🟢";
+                selectedBtn.querySelector('.indicator-icon').classList.remove('hidden');
+
+                // Style the Feedback Box
+                feedbackBox.className = "rounded-2xl p-4 md:p-5 border-2 bg-green-50 border-green-200 block transition-all space-y-4";
+                feedbackTitle.innerText = `Well done, ${currentActiveName}!`;
+                feedbackTitle.className = "text-xl font-bold heading-font text-green-800";
+                feedbackIcon.innerText = "🎉";
+            } else {
+                // Style selected button as incorrect
+                selectedBtn.classList.remove('bg-emerald-50/50', 'border-emerald-100');
+                selectedBtn.classList.add('bg-red-100', 'border-red-400', 'text-red-900');
+                selectedBtn.querySelector('.indicator-icon').innerHTML = "❌";
+                selectedBtn.querySelector('.indicator-icon').classList.remove('hidden');
+
+                // Highlight the correct answer quietly
+                buttons.forEach((btn, idx) => {
+                    const opt = quizData[currentIndex].answerOptions[idx];
+                    if (opt.isCorrect) {
+                        btn.classList.add('border-green-300', 'bg-green-50/50');
+                    }
+                });
+
+                // Style the Feedback Box
+                feedbackBox.className = "rounded-2xl p-4 md:p-5 border-2 bg-red-50 border-red-200 block transition-all space-y-4";
+                feedbackTitle.innerText = `Try again, ${currentActiveName}!`;
+                feedbackTitle.className = "text-xl font-bold heading-font text-red-800";
+                feedbackIcon.innerText = "💡";
+            }
+
+            // Show rationale and show feedback element
+            feedbackRationale.innerText = option.rationale;
+            
+            // Sync current dynamic scores on screen immediately
+            document.getElementById('p1-live-score').innerText = scores[0];
+            document.getElementById('p2-live-score').innerText = scores[1];
+        }
+
+        // --- GEMINI DYNAMIC INTEGRATION: 🤖 ✨ AI EXPLAINER ---
+        async function getAIExplanation() {
+            const explainBtn = document.getElementById('ai-explain-btn');
+            const container = document.getElementById('ai-explain-container');
+            const output = document.getElementById('ai-explain-text');
+
+            explainBtn.disabled = true;
+            explainBtn.innerHTML = "<span>🧠 Preparing Explanation...</span>";
+            container.classList.remove('hidden');
+            output.innerText = "Asking Gemini for explanation...";
+
+            const currentQuestion = quizData[currentIndex];
+            const correctOpt = currentQuestion.answerOptions.find(o => o.isCorrect);
+            const activePlayerName = activePlayer === 0 ? p1Name : p2Name;
+
+            const prompt = `You are an encouraging, friendly assistant for Vanitha, an English teacher. Explain to an elementary student named ${activePlayerName} why the correct answer to the question "${currentQuestion.question}" is "${correctOpt.text}", and optionally why selecting "${selectedOptionText}" is either correct or incorrect. Keep your explanation extremely encouraging, warm, simple, address them directly by name, and write under 3 short sentences.`;
+
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: "You are a friendly classroom assistant explaining English grammar & spelling about numbers under 10 to young learners. Keep language accessible, supportive and simple." }] }
+            };
+
+            try {
+                const data = await fetchGemini(payload, "gemini-2.5-flash-preview-09-2025");
+                const aiExplanation = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                output.innerText = aiExplanation || "Sorry, I couldn't cook up an explanation right now!";
+                explainBtn.innerHTML = "<span>🤖 Explainer Complete!</span>";
+            } catch (err) {
+                showAlert(err.message);
+                container.classList.add('hidden');
+                explainBtn.disabled = false;
+                explainBtn.innerHTML = "<span>🤖 ✨ Ask AI Explainer</span>";
+            }
+        }
+
+        // --- GEMINI DYNAMIC INTEGRATION: 🔊 ✨ DYNAMIC TTS READ-ALOUD ---
+        async function playQuestionAudio() {
+            const btn = document.getElementById('tts-btn');
+            const btnIcon = document.getElementById('tts-btn-icon');
+            const btnText = document.getElementById('tts-btn-text');
+
+            // Toggle play/pause if audio already running
+            if (currentAudio) {
+                if (!currentAudio.paused) {
+                    currentAudio.pause();
+                    btnIcon.innerText = "▶️";
+                    btnText.innerText = "✨ Resume Listening";
+                    return;
+                } else {
+                    currentAudio.play();
+                    btnIcon.innerText = "⏸️";
+                    btnText.innerText = "✨ Pause Listening";
+                    return;
+                }
+            }
+
+            btn.disabled = true;
+            btnText.innerText = "✨ Preparing Voice...";
+
+            const activePlayerName = activePlayer === 0 ? p1Name : p2Name;
+            const textToSay = `Hey ${activePlayerName}! The question is: ${quizData[currentIndex].question}. The options are: ` + 
+                quizData[currentIndex].answerOptions.map((opt, i) => `Option ${i+1}, ${opt.text}.`).join(" ");
+
+            const payload = {
+                contents: [{ parts: [{ text: `Say cheerfully and clearly: ${textToSay}` }] }],
+                generationConfig: {
+                    responseModalities: ["AUDIO"],
+                    speechConfig: {
+                        voiceConfig: {
+                            prebuiltVoiceConfig: {
+                                voiceName: "Leda" // Friendly, clear educational voice
+                            }
+                        }
+                    }
+                }
+            };
+
+            try {
+                const data = await fetchGemini(payload, "gemini-2.5-flash-preview-tts", "generateContent");
+                const audioPart = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+                
+                if (audioPart && audioPart.inlineData) {
+                    const base64PCM = audioPart.inlineData.data;
+                    const mimeType = audioPart.inlineData.mimeType || "audio/L16;rate=24000";
+                    
+                    let rate = 24000;
+                    const rateMatch = mimeType.match(/rate=(\d+)/);
+                    if (rateMatch) rate = parseInt(rateMatch[1]);
+
+                    const wavURL = pcmToWav(base64PCM, rate);
+                    currentAudio = new Audio(wavURL);
+                    
+                    currentAudio.onplay = () => {
+                        btn.disabled = false;
+                        btnIcon.innerText = "⏸️";
+                        btnText.innerText = "✨ Pause Listening";
+                    };
+
+                    currentAudio.onended = () => {
+                        resetTTSButton();
+                        currentAudio = null;
+                    };
+
+                    currentAudio.play();
+                } else {
+                    throw new Error("No voice synthesized. Try again!");
+                }
+            } catch (err) {
+                showAlert(err.message);
+                resetTTSButton();
+            }
+        }
+
+        function resetTTSButton() {
+            const btn = document.getElementById('tts-btn');
+            const btnIcon = document.getElementById('tts-btn-icon');
+            const btnText = document.getElementById('tts-btn-text');
+            btn.disabled = false;
+            btnIcon.innerText = "🔊";
+            btnText.innerText = "✨ Listen to Question";
+        }
+
+        // Convert raw L16 PCM to browser-playable WAV Format
+        function pcmToWav(base64Pcm, sampleRate = 24000) {
+            const binaryString = atob(base64Pcm);
+            const buffer = new ArrayBuffer(binaryString.length);
+            const bytes = new Uint8Array(buffer);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            
+            const pcmData = new Int16Array(buffer);
+            const wavHeader = new ArrayBuffer(44);
+            const view = new DataView(wavHeader);
+            
+            // "RIFF" chunk descriptor
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, 36 + pcmData.length * 2, true);
+            writeString(view, 8, 'WAVE');
+            
+            // "fmt " sub-chunk
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);  
+            view.setUint16(22, 1, true);  
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);  
+            view.setUint16(34, 16, true); 
+            
+            // "data" sub-chunk
+            writeString(view, 36, 'data');
+            view.setUint32(40, pcmData.length * 2, true);
+            
+            const completeWav = new Uint8Array(44 + pcmData.length * 2);
+            completeWav.set(new Uint8Array(wavHeader), 0);
+            completeWav.set(new Uint8Array(buffer), 44);
+            
+            const blob = new Blob([completeWav], { type: 'audio/wav' });
+            return URL.createObjectURL(blob);
+        }
+        
+        function writeString(view, offset, string) {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        }
+
+        // --- GEMINI DYNAMIC INTEGRATION: 🔄 ✨ GENERATE EXTRA AI QUESTION ---
+        async function generateAIQuestion() {
+            const btn = document.getElementById('ai-gen-btn');
+            btn.disabled = true;
+            btn.innerHTML = "<span>⚡ Crafting Premium Question...</span>";
+
+            const schema = {
+                type: "OBJECT",
+                properties: {
+                    question: { type: "STRING", description: "A simple, child-friendly English grammar, spelling, or idiom question focusing strictly on numbers up to 10." },
+                    answerOptions: {
+                        type: "ARRAY",
+                        description: "Exactly 4 options. Only 1 must be correct.",
+                        items: {
+                            type: "OBJECT",
+                            properties: {
+                                text: { type: "STRING" },
+                                rationale: { type: "STRING", description: "Feedback for this choice. For the correct choice say 'Well done!' plus explanation. For wrong ones say 'Try again!' plus explanation." },
+                                isCorrect: { type: "BOOLEAN" }
+                            },
+                            required: ["text", "rationale", "isCorrect"]
+                        }
+                    },
+                    hint: { type: "STRING", description: "A helpful, friendly classroom hint." }
+                },
+                required: ["question", "answerOptions", "hint"]
+            };
+
+            const payload = {
+                contents: [{ parts: [{ text: "Generate a brand new multiple-choice English grammar, spelling, or idiom question focusing on numbers up to 10. Make it extremely unique and appropriate for young language learners." }] }],
+                systemInstruction: { parts: [{ text: "You are designing interactive, highly engaging questions for an elementary level English class about numbers under 10." }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: schema
+                }
+            };
+
+            try {
+                const data = await fetchGemini(payload, "gemini-2.5-flash-preview-09-2025");
+                const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                const newQuestion = JSON.parse(generatedText);
+
+                // Add to quiz queue
+                quizData.push(newQuestion);
+                
+                // Set turn pointers to play this brand new bonus/tiebreaker question
+                currentIndex = quizData.length - 1;
+                document.getElementById('end-screen').classList.add('hidden');
+                
+                // Let the player with fewer points (or Player 1 if tied) answer this tiebreaker
+                if (scores[0] === scores[1]) {
+                    activePlayer = 0; // TIE BREAKER: Player 1 gets first try!
+                } else {
+                    activePlayer = scores[0] < scores[1] ? 0 : 1; // Give trailing player a chance!
+                }
+
+                showPassDeviceScreen();
+                
+                btn.disabled = false;
+                btn.innerHTML = "<span>🔄 ✨ Dynamic AI Tie-Breaker</span>";
+            } catch (err) {
+                showAlert("Failed to construct an AI Question: " + err.message);
+                btn.disabled = false;
+                btn.innerHTML = "<span>🔄 ✨ Dynamic AI Tie-Breaker</span>";
+            }
+        }
+
+        // Shared device transition step triggered when next button is pressed
+        function prepareNextTurn() {
+            currentIndex++;
+            if (currentIndex < quizData.length) {
+                // Alternate player turns between 0 and 1
+                activePlayer = activePlayer === 0 ? 1 : 0;
+                // Force a Pass Device Screen so next player can physically grab it safely
+                showPassDeviceScreen();
+            } else {
+                showEndScreen();
+            }
+        }
+
+        function showEndScreen() {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('hidden');
+
+            // Set final stats inside the end score boxes
+            document.getElementById('p1-end-avatar').innerText = p1Avatar;
+            document.getElementById('p1-end-name').innerText = p1Name;
+            document.getElementById('p1-end-score').innerText = scores[0];
+
+            document.getElementById('p2-end-avatar').innerText = p2Avatar;
+            document.getElementById('p2-end-name').innerText = p2Name;
+            document.getElementById('p2-end-score').innerText = scores[1];
+
+            // Evaluate Winner
+            const titleEl = document.getElementById('winner-title');
+            const subtitleEl = document.getElementById('winner-subtitle');
+            const perfMsgEl = document.getElementById('performance-message');
+
+            if (scores[0] > scores[1]) {
+                titleEl.innerText = `🏆 ${p1Name} Wins!`;
+                titleEl.className = "heading-font text-3xl text-indigo-600 animate-bounce";
+                subtitleEl.innerText = `${p1Name} scored ${scores[0]} points and took first place!`;
+                perfMsgEl.innerText = `Amazing job ${p1Name}! Double high-fives all around! 🙌`;
+            } else if (scores[1] > scores[0]) {
+                titleEl.innerText = `🏆 ${p2Name} Wins!`;
+                titleEl.className = "heading-font text-3xl text-amber-600 animate-bounce";
+                subtitleEl.innerText = `${p2Name} scored ${scores[1]} points and took first place!`;
+                perfMsgEl.innerText = `Amazing job ${p2Name}! Double high-fives all around! 🙌`;
+            } else {
+                titleEl.innerText = `🤝 It's a Tie!`;
+                titleEl.className = "heading-font text-3xl text-emerald-600 animate-pulse";
+                subtitleEl.innerText = `Both players scored exactly ${scores[0]} points!`;
+                perfMsgEl.innerText = "Wow, what an even match! Click the 'Dynamic AI Tie-Breaker' button to break the tie!";
+            }
+        }
+
+        function restartQuiz() {
+            quizData = [...baseQuizData]; // Reset back to initial pool
+            currentIndex = 0;
+            scores = [0, 0];
+            activePlayer = 0;
+
+            // Go back to the registration screen
+            document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('setup-screen').classList.remove('hidden');
+        }
+
+        // Friendly UI Alert Banners
+        function showAlert(msg) {
+            const banner = document.getElementById('alert-banner');
+            document.getElementById('alert-banner-text').innerText = msg;
+            banner.classList.remove('hidden');
+            setTimeout(hideAlert, 6000);
+        }
+
+        function hideAlert() {
+            document.getElementById('alert-banner').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kuiz Nombor 1-10</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    // === KOMPONEN IKON SVG (Pengganti Lucide-React) ===
+    const Play = ({ size = 24, fill = "none", className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    );
+    const RotateCcw = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+    );
+    const Star = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    );
+    const CheckCircle2 = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+    );
+    const XCircle = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+    );
+    const Sparkles = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+    );
+    const Loader2 = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`animate-spin ${className}`}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+    );
+
+    // === KOD APLIKASI UTAMA ===
+    // Sila masukkan API Key Gemini anda di bawah
+    const apiKey = ""; 
+
+    function App() {
+      const [gameState, setGameState] = useState('start');
+      const [currentQ, setCurrentQ] = useState(0);
+      const [score, setScore] = useState(0);
+      const [showFeedback, setShowFeedback] = useState(false);
+      const [feedbackType, setFeedbackType] = useState(null);
+      const [wrongAttempts, setWrongAttempts] = useState([]);
+
+      const [themeInput, setThemeInput] = useState('');
+      const [isGenerating, setIsGenerating] = useState(false);
+      const [apiError, setApiError] = useState('');
+
+      const defaultQuizData = [
+        { id: 1, question: "Kira jumlah epal ini:", visual: "🍎 🍎 🍎", options: [2, 3, 4], correct: 3 },
+        { id: 2, question: "Yang manakah nombor LIMA?", visual: "LIMA", options: [3, 5, 7], correct: 5 },
+        { id: 3, question: "Kira jumlah belon ini:", visual: "🎈 🎈 🎈 🎈 🎈 🎈 🎈", options: [6, 7, 8], correct: 7 },
+        { id: 4, question: "Kira jumlah bintang ini:", visual: "⭐ ⭐ ⭐ ⭐", options: [2, 4, 5], correct: 4 },
+        { id: 5, question: "Yang manakah nombor LAPAN?", visual: "LAPAN", options: [8, 9, 10], correct: 8 }
+      ];
+
+      const [quizData, setQuizData] = useState(defaultQuizData);
+
+      const startGame = () => {
+        setGameState('playing');
+        setCurrentQ(0);
+        setScore(0);
+        setWrongAttempts([]);
+      };
+
+      const generateCustomQuiz = async () => {
+        if (!themeInput.trim()) return;
+        setIsGenerating(true);
+        setApiError('');
+        
+        const promptText = `Bina 5 soalan kuiz matematik mengira nombor 1 hingga 10 dalam Bahasa Melayu. Tema: ${themeInput}.
+        Visual mestilah menggunakan emoji yang sepadan dengan tema (contohnya jika tema kucing, gunakan "🐈 🐈 🐈"). Pastikan bilangan emoji mewakili jawapan sebenar.
+        Setiap soalan mesti mempunyai 3 pilihan jawapan (nombor dari 1-10), di mana satu daripadanya adalah jawapan yang betul.
+        Berikan arahan soalan yang mesra kanak-kanak Tahun 1.`;
+
+        const requestBody = {
+          contents: [{ parts: [{ text: promptText }] }],
+          generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: "ARRAY",
+              items: {
+                type: "OBJECT",
+                properties: {
+                  id: { type: "NUMBER" },
+                  question: { type: "STRING" },
+                  visual: { type: "STRING" },
+                  options: { type: "ARRAY", items: { type: "NUMBER" } },
+                  correct: { type: "NUMBER" }
+                },
+                required: ["id", "question", "visual", "options", "correct"]
+              }
+            }
+          }
+        };
+
+        const fetchWithRetry = async (url, options, retries = 5) => {
+          let delay = 1000;
+          for (let i = 0; i < retries; i++) {
+            try {
+              const res = await fetch(url, options);
+              if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+              return await res.json();
+            } catch (err) {
+              if (i === retries - 1) throw err;
+              await new Promise(resolve => setTimeout(resolve, delay));
+              delay *= 2;
+            }
+          }
+        };
+
+        try {
+          const result = await fetchWithRetry(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(requestBody)
+            }
+          );
+          
+          const generatedText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (generatedText) {
+            const newQuizData = JSON.parse(generatedText);
+            setQuizData(newQuizData);
+            startGame();
+          } else {
+            throw new Error("Tiada teks dijana");
+          }
+        } catch (error) {
+          setApiError("Gagal menjana soalan. Sila pastikan API key diisi dengan betul.");
+          console.error(error);
+        } finally {
+          setIsGenerating(false);
+        }
+      };
+
+      const handleAnswer = (selectedNumber) => {
+        if (showFeedback) return;
+
+        if (selectedNumber === quizData[currentQ].correct) {
+          setFeedbackType('correct');
+          setShowFeedback(true);
+          
+          if (wrongAttempts.length === 0) {
+            setScore((prev) => prev + 1);
+          }
+
+          setTimeout(() => {
+            setShowFeedback(false);
+            setWrongAttempts([]);
+            
+            if (currentQ < quizData.length - 1) {
+              setCurrentQ((prev) => prev + 1);
+            } else {
+              setGameState('finished');
+            }
+          }, 2000);
+          
+        } else {
+          setFeedbackType('wrong');
+          setShowFeedback(true);
+          setWrongAttempts((prev) => [...prev, selectedNumber]);
+          
+          setTimeout(() => {
+            setShowFeedback(false);
+          }, 1500);
+        }
+      };
+
+      return (
+        <div className="min-h-screen bg-blue-50 flex items-center justify-center p-4 font-sans text-slate-800">
+          <div className="max-w-2xl w-full bg-white rounded-3xl shadow-xl overflow-hidden border-4 border-blue-200">
+            
+            {/* === SKRIN MULA === */}
+            {gameState === 'start' && (
+              <div className="p-10 flex flex-col items-center justify-center text-center space-y-8">
+                <div className="flex justify-center space-x-2">
+                  <span className="text-5xl animate-bounce" style={{ animationDelay: '0ms' }}>🔢</span>
+                  <span className="text-5xl animate-bounce" style={{ animationDelay: '100ms' }}>🍎</span>
+                  <span className="text-5xl animate-bounce" style={{ animationDelay: '200ms' }}>⭐</span>
+                </div>
+                <h1 className="text-4xl md:text-5xl font-extrabold text-blue-600">
+                  Mari Belajar Nombor!
+                </h1>
+                <p className="text-xl md:text-2xl text-slate-500 font-medium">
+                  Kuiz Matematik Tahun 1 (1 hingga 10)
+                </p>
+                <button 
+                  onClick={startGame}
+                  className="mt-8 flex items-center gap-3 bg-green-500 hover:bg-green-600 text-white text-3xl font-bold py-5 px-10 rounded-full transition-transform transform hover:scale-105 active:scale-95 shadow-lg"
+                >
+                  <Play size={40} fill="currentColor" />
+                  Mula Main
+                </button>
+
+                {/* --- Zon Guru: Jana Soalan AI --- */}
+                <div className="mt-12 p-6 bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl w-full max-w-lg text-left">
+                  <h3 className="text-lg font-bold text-slate-700 flex items-center gap-2 mb-2">
+                    <Sparkles className="text-yellow-500" size={24} />
+                    Zon Guru: Jana Tema Khas ✨
+                  </h3>
+                  <p className="text-sm text-slate-500 mb-4">
+                    Masukkan tema kegemaran murid (cth: Dinosaur, Kereta, Makanan) untuk menjana kuiz baharu secara dinamik.
+                  </p>
+                  <div className="flex flex-col gap-3">
+                    <input 
+                      type="text" 
+                      placeholder="Masukkan tema..."
+                      value={themeInput}
+                      onChange={(e) => setThemeInput(e.target.value)}
+                      className="px-4 py-3 border-2 border-slate-200 rounded-xl text-lg focus:outline-none focus:border-blue-500"
+                      disabled={isGenerating}
+                    />
+                    <button
+                      onClick={generateCustomQuiz}
+                      disabled={isGenerating || !themeInput.trim()}
+                      className="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white font-bold py-3 px-6 rounded-xl transition-all"
+                    >
+                      {isGenerating ? (
+                        <>
+                          <Loader2 size={24} />
+                          Mencipta Soalan...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles size={24} />
+                          Jana Soalan & Main
+                        </>
+                      )}
+                    </button>
+                    {apiError && <p className="text-red-500 text-sm font-medium mt-1">{apiError}</p>}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* === SKRIN KUIZ === */}
+            {gameState === 'playing' && (
+              <div className="relative p-6 md:p-10">
+                <div className="flex justify-between items-center mb-8 bg-blue-100 p-4 rounded-2xl">
+                  <div className="text-2xl font-bold text-blue-700 flex items-center gap-2">
+                    Soalan <span className="bg-white px-4 py-1 rounded-full">{currentQ + 1} / 5</span>
+                  </div>
+                  <div className="flex gap-1">
+                    {quizData.map((_, index) => (
+                      <Star 
+                        key={index} 
+                        size={28} 
+                        className={`${index < currentQ ? 'text-yellow-400 fill-yellow-400' : 'text-blue-200'}`} 
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <div className="text-center mb-10">
+                  <h2 className="text-3xl md:text-4xl font-bold text-slate-700 mb-8">
+                    {quizData[currentQ].question}
+                  </h2>
+                  <div className="bg-slate-50 border-4 border-slate-100 rounded-3xl p-8 min-h-[160px] flex items-center justify-center">
+                    <p className="text-6xl md:text-7xl tracking-[0.2em] leading-tight font-black text-blue-500">
+                      {quizData[currentQ].visual}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-4 md:gap-8">
+                  {quizData[currentQ].options.map((option, index) => {
+                    const isWrong = wrongAttempts.includes(option);
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => handleAnswer(option)}
+                        disabled={isWrong || showFeedback}
+                        className={`
+                          relative flex items-center justify-center h-32 md:h-40 rounded-3xl text-5xl md:text-6xl font-black shadow-lg transition-all duration-300
+                          ${isWrong 
+                            ? 'bg-slate-100 text-slate-300 scale-95 opacity-50 cursor-not-allowed border-none' 
+                            : 'bg-white text-blue-600 border-4 border-blue-200 hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-2 active:scale-95'
+                          }
+                        `}
+                      >
+                        {option}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {showFeedback && (
+                  <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-3xl z-10 animate-in fade-in zoom-in duration-300">
+                    {feedbackType === 'correct' ? (
+                      <div className="flex flex-col items-center animate-bounce text-green-500">
+                        <CheckCircle2 size={120} className="mb-4" />
+                        <h2 className="text-5xl font-black">Bagus!</h2>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center animate-pulse text-red-400">
+                        <XCircle size={100} className="mb-4" />
+                        <h2 className="text-4xl font-black">Cuba Lagi!</h2>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* === SKRIN TAMAT === */}
+            {gameState === 'finished' && (
+              <div className="p-10 flex flex-col items-center justify-center text-center space-y-8 bg-gradient-to-b from-white to-blue-50">
+                <div className="text-yellow-400 flex gap-2">
+                  <Star size={60} className="fill-yellow-400 animate-bounce" style={{ animationDelay: '0ms' }}/>
+                  <Star size={80} className="fill-yellow-400 animate-bounce" style={{ animationDelay: '200ms' }}/>
+                  <Star size={60} className="fill-yellow-400 animate-bounce" style={{ animationDelay: '400ms' }}/>
+                </div>
+                
+                <h1 className="text-5xl md:text-6xl font-black text-blue-600">
+                  Hebat!
+                </h1>
+                
+                <div className="bg-white border-4 border-yellow-300 rounded-3xl p-8 w-full max-w-sm shadow-xl">
+                  <p className="text-2xl text-slate-500 font-bold mb-2">Bintang Anda:</p>
+                  <p className="text-6xl font-black text-green-500">
+                    {score} / 5
+                  </p>
+                </div>
+
+                <button 
+                  onClick={startGame}
+                  className="mt-4 flex items-center gap-3 bg-blue-500 hover:bg-blue-600 text-white text-3xl font-bold py-5 px-10 rounded-full transition-transform transform hover:scale-105 active:scale-95 shadow-lg"
+                >
+                  <RotateCcw size={36} />
+                  Main Semula
+                </button>
+
+                <button 
+                  onClick={() => {
+                    setGameState('start');
+                    setThemeInput('');
+                    setQuizData(defaultQuizData);
+                  }}
+                  className="mt-4 text-slate-500 hover:text-blue-600 font-bold underline transition-colors"
+                >
+                  Tukar Tema Soalan
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>

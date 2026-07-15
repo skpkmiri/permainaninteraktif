@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Berlumba Kumpul Itik (Tambah 1 Digit)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Corak pagar untuk sangkar itik */
+        .bg-fence {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTIwIDBMNDAgMjBMMjAgNDBMMCAyMHoiIGZpbGw9IiM4QjQ1MTMiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvc3ZnPg==');
+        }
+    </style>
+</head>
+<body class="font-sans antialiased">
+    <div id="root"></div>
+
+    <script>
+        // --- AUDIO SYSTEM (Web Audio API) ---
+        let audioCtx;
+
+        const initAudio = () => {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        };
+
+        const playSound = (type) => {
+            if (!audioCtx) return;
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'correct') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                
+                const osc2 = audioCtx.createOscillator();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(800, audioCtx.currentTime + 0.1);
+                osc2.connect(gain);
+                osc2.start(audioCtx.currentTime + 0.1);
+                osc2.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'win') {
+                osc.type = 'square';
+                [440, 554, 659, 880].forEach((freq, i) => {
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.15);
+                });
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.8);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.8);
+            }
+        };
+
+        // --- GAME LOGIC ---
+        const generateQuestion = () => {
+            return {
+                num1: Math.floor(Math.random() * 9) + 1, // 1 to 9
+                num2: Math.floor(Math.random() * 9) + 1  // 1 to 9
+            };
+        };
+
+        const initialPlayerState = (id, color) => ({
+            id,
+            name: '',
+            color,
+            score: 0,
+            qNum: 1,
+            question: generateQuestion(),
+            input: '',
+            finished: false
+        });
+
+        // --- STATE ---
+        let gameState = 'setup'; // setup, playing, results
+        let timeLeft = 60;
+        let timerInterval;
+        let players = [
+            initialPlayerState(1, 'bg-red-100 border-red-500 text-red-700'),
+            initialPlayerState(2, 'bg-blue-100 border-blue-500 text-blue-700'),
+            initialPlayerState(3, 'bg-green-100 border-green-500 text-green-700')
+        ];
+
+        // --- ACTIONS ---
+        const startGame = () => {
+            initAudio();
+            playSound('click');
+            
+            // Dapatkan nama dari input field
+            players = players.map((p, index) => {
+                const inputName = document.getElementById(`player-name-${p.id}`).value.trim();
+                return {
+                    ...p,
+                    name: inputName === '' ? `Pemain ${index + 1}` : inputName,
+                    score: 0,
+                    qNum: 1,
+                    question: generateQuestion(),
+                    input: '',
+                    finished: false
+                };
+            });
+            
+            timeLeft = 60;
+            gameState = 'playing';
+            
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                renderApp();
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+
+            renderApp();
+        };
+
+        const endGame = () => {
+            clearInterval(timerInterval);
+            playSound('win');
+            gameState = 'results';
+            renderApp();
+        };
+
+        const handleKeypad = (playerId, key) => {
+            playSound('click');
+            players = players.map((p) => {
+                if (p.id === playerId && !p.finished) {
+                    if (key === 'PADAM') {
+                        return { ...p, input: p.input.slice(0, -1) };
+                    } else if (p.input.length < 3) {
+                        return { ...p, input: p.input + key };
+                    }
+                }
+                return p;
+            });
+            renderApp();
+        };
+
+        const checkAnswer = (playerId) => {
+            players = players.map((p) => {
+                if (p.id === playerId && !p.finished) {
+                    const isCorrect = parseInt(p.input) === (p.question.num1 + p.question.num2);
+                    
+                    if (isCorrect) {
+                        playSound('correct');
+                        const isFinished = p.qNum >= 5; // 5 soalan sahaja
+                        return {
+                            ...p,
+                            score: p.score + 1,
+                            qNum: isFinished ? p.qNum : p.qNum + 1,
+                            question: isFinished ? p.question : generateQuestion(),
+                            input: '',
+                            finished: isFinished
+                        };
+                    } else {
+                        playSound('wrong');
+                        return { ...p, input: '' }; // Padam jawapan jika salah
+                    }
+                }
+                return p;
+            });
+
+            // Check jika semua dah siap
+            if (players.every(p => p.finished)) {
+                endGame();
+            } else {
+                renderApp();
+            }
+        };
+
+        const resetGame = () => {
+            playSound('click');
+            gameState = 'setup';
+            renderApp();
+        };
+
+        // --- RENDERERS ---
+        const getSetupHTML = () => {
+            let playersInputs = players.map((p, idx) => `
+                <div class="p-6 rounded-2xl border-4 ${p.color}">
+                    <label class="block text-xl font-bold mb-3">Nama Pemain ${idx + 1}</label>
+                    <input
+                        type="text"
+                        id="player-name-${p.id}"
+                        value="${p.name}"
+                        placeholder="Pemain ${idx + 1}"
+                        class="w-full text-center text-2xl p-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500"
+                        maxlength="12"
+                    />
+                </div>
+            `).join('');
+
+            return `
+                <div class="min-h-screen bg-blue-50 flex flex-col items-center justify-center p-8">
+                    <div class="bg-white p-10 rounded-3xl shadow-xl max-w-4xl w-full text-center border-8 border-yellow-400">
+                        <h1 class="text-5xl font-black text-blue-600 mb-4 tracking-wide">
+                            🦆 BERLUMBA KUMPUL ITIK! 🦆
+                        </h1>
+                        <p class="text-2xl text-gray-600 mb-8 font-bold">
+                            Operasi Tambah 1 Digit - 5 Soalan
+                        </p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                            ${playersInputs}
+                        </div>
+
+                        <button
+                            onclick="startGame()"
+                            class="bg-green-500 hover:bg-green-600 text-white text-4xl font-black py-4 px-16 rounded-full shadow-lg transform transition active:scale-95"
+                        >
+                            MULA PERMAINAN!
+                        </button>
+                    </div>
+                </div>
+            `;
+        };
+
+        const getPlayingHTML = () => {
+            const timerClass = timeLeft <= 10 
+                ? 'bg-red-500 text-white animate-pulse border-red-700' 
+                : 'bg-white border-yellow-800';
+
+            let columnsHTML = players.map(p => {
+                let ducks = Array.from({ length: p.score }).map((_, i) => 
+                    `<span class="text-4xl animate-bounce z-10" style="animation-delay: ${i * 0.1}s">🦆</span>`
+                ).join('');
+
+                const headerColor = p.color.replace('border-', 'bg-').replace('100', '200');
+
+                let gameArea = '';
+                if (p.finished) {
+                    gameArea = `
+                        <div class="flex-1 flex flex-col items-center justify-center text-center">
+                            <div class="text-6xl mb-4">🎉</div>
+                            <div class="text-3xl font-black text-green-600">SELESAI!</div>
+                            <div class="text-xl mt-2 font-bold text-gray-600">Tunggu rakan lain...</div>
+                        </div>
+                    `;
+                } else {
+                    let numpad = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => `
+                        <button onclick="handleKeypad(${p.id}, '${num}')" class="bg-gray-200 hover:bg-gray-300 text-gray-800 text-4xl font-bold py-4 rounded-xl shadow active:translate-y-1">${num}</button>
+                    `).join('');
+
+                    gameArea = `
+                        <div class="text-center font-bold text-gray-500 mb-2">Soalan ${p.qNum} / 5</div>
+                        <div class="text-center text-6xl font-black mb-4 tracking-wider text-gray-800">
+                            ${p.question.num1} + ${p.question.num2}
+                        </div>
+                        <div class="bg-gray-100 border-4 border-gray-300 h-20 rounded-2xl flex items-center justify-center text-5xl font-bold text-gray-800 mb-4 shadow-inner">
+                            ${p.input || '<span class="text-gray-300">?</span>'}
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            ${numpad}
+                            <button onclick="handleKeypad(${p.id}, 'PADAM')" class="bg-red-400 hover:bg-red-500 text-white text-xl font-bold py-4 rounded-xl shadow active:translate-y-1">PADAM</button>
+                            <button onclick="handleKeypad(${p.id}, '0')" class="bg-gray-200 hover:bg-gray-300 text-gray-800 text-4xl font-bold py-4 rounded-xl shadow active:translate-y-1">0</button>
+                            <button onclick="checkAnswer(${p.id})" class="bg-green-500 hover:bg-green-600 text-white text-xl font-bold py-4 rounded-xl shadow active:translate-y-1">JAWAB</button>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="flex flex-col rounded-3xl border-8 ${p.color} bg-white overflow-hidden shadow-lg h-full">
+                        <div class="p-3 text-center font-black text-2xl uppercase ${headerColor}">
+                            ${p.name}
+                        </div>
+                        <div class="bg-orange-100 border-b-8 border-orange-900 h-32 p-2 relative overflow-hidden flex flex-wrap content-start gap-1">
+                            <div class="absolute inset-0 opacity-20 bg-fence"></div>
+                            <div class="z-10 w-full font-bold text-orange-800 text-center mb-1 bg-white/50 rounded-full text-sm">
+                                Sangkar Itik: ${p.score}
+                            </div>
+                            ${ducks}
+                        </div>
+                        <div class="flex-1 flex flex-col p-4 justify-between">
+                            ${gameArea}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <div class="min-h-screen bg-gray-100 flex flex-col">
+                    <div class="bg-yellow-400 p-4 shadow-md flex justify-between items-center text-3xl font-black text-yellow-900 px-8">
+                        <div>🦆 Kumpul Itik!</div>
+                        <div class="px-6 py-2 rounded-full border-4 ${timerClass}">
+                            MASA: ${timeLeft}s
+                        </div>
+                    </div>
+                    <div class="flex-1 grid grid-cols-3 gap-4 p-4">
+                        ${columnsHTML}
+                    </div>
+                </div>
+            `;
+        };
+
+        const getResultsHTML = () => {
+            const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
+            const highestScore = sortedPlayers[0].score;
+            const winners = sortedPlayers.filter(p => p.score === highestScore && p.score > 0);
+
+            let resultsHTML = sortedPlayers.map((p, index) => {
+                const isWinner = winners.some(w => w.id === p.id);
+                const cardClass = isWinner ? 'bg-yellow-100 border-yellow-400 scale-105' : 'bg-gray-50 border-gray-200';
+                
+                let message = isWinner 
+                    ? `<p class="text-2xl text-green-700 font-bold">🌟 Syabas ${p.name}! Anda johan dengan ${p.score} ekor itik! Sangat Hebat! 🌟</p>`
+                    : `<p class="text-xl text-blue-600 font-bold">Bagus ${p.name}! Anda berjaya kumpul ${p.score} itik. Teruskan usaha, anda pasti boleh! 💪</p>`;
+
+                return `
+                    <div class="p-6 rounded-2xl flex items-center justify-between border-4 ${cardClass} transition-transform">
+                        <div class="flex items-center gap-4">
+                            <div class="text-4xl font-black text-gray-400 w-12 text-left">#${index + 1}</div>
+                            <div class="text-4xl font-black">${p.name}</div>
+                        </div>
+                        <div class="flex-1 px-8 text-left">
+                            ${message}
+                        </div>
+                        <div class="text-5xl font-black text-orange-500 bg-orange-100 px-6 py-3 rounded-xl border-2 border-orange-300">
+                            ${p.score} 🦆
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <div class="min-h-screen bg-green-50 flex flex-col items-center justify-center p-8">
+                    <div class="bg-white p-10 rounded-3xl shadow-2xl max-w-5xl w-full text-center border-8 border-green-400">
+                        <h1 class="text-6xl font-black text-green-600 mb-8">TAMAT! 🏁</h1>
+                        <div class="space-y-6 mb-12">
+                            ${resultsHTML}
+                        </div>
+                        <button
+                            onclick="resetGame()"
+                            class="bg-blue-500 hover:bg-blue-600 text-white text-3xl font-black py-5 px-16 rounded-full shadow-xl transform transition active:scale-95"
+                        >
+                            MAIN SEMULA
+                        </button>
+                    </div>
+                </div>
+            `;
+        };
+
+        const renderApp = () => {
+            const root = document.getElementById('root');
+            if (gameState === 'setup') {
+                root.innerHTML = getSetupHTML();
+            } else if (gameState === 'playing') {
+                root.innerHTML = getPlayingHTML();
+            } else if (gameState === 'results') {
+                root.innerHTML = getResultsHTML();
+            }
+        };
+
+        // Render mula-mula
+        window.onload = renderApp;
+    </script>
+</body>
+</html>

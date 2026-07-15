@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cahaya Quest: Journey of Independence</title>
+    <!-- Tailwind CSS for modern layouts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM Core -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel for inline JSX compilation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- FontAwesome for accessible icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Custom accessibility overrides */
+        body {
+            background-color: #000000;
+            color: #FFFF00;
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Strong outlines for active items to assist B2 vision category */
+        .accessible-focus:focus-visible, .interactive-item:focus {
+            outline: 6px solid #00FFFF !important;
+            outline-offset: 4px !important;
+            box-shadow: 0 0 0 10px #000000, 0 0 0 16px #00FFFF !important;
+        }
+
+        /* Pulsing elements for clear vision scanning */
+        .pulse-marker {
+            animation: accessiblePulse 1.8s infinite ease-in-out;
+        }
+
+        @keyframes accessiblePulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.8); }
+            70% { transform: scale(1.08); box-shadow: 0 0 0 15px rgba(0, 255, 255, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 255, 255, 0); }
+        }
+
+        /* Custom scrollbar to keep layout clean */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000000;
+            border-left: 2px solid #FFFF00;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #FFFF00;
+            border: 2px solid #000000;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body class="selection:bg-cyan-500 selection:text-black">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback, useRef, useMemo } = React;
+
+        // --- AUDIO ENGINE CLASS ---
+        // Generates synthesizer tones and controls Text-To-Speech (TTS)
+        class GameAudioManager {
+            constructor() {
+                this.ctx = null;
+                this.synth = window.speechSynthesis;
+                this.isMuted = false;
+                this.volume = 0.8;
+                this.speechRate = 0.95;
+                this.speechPitch = 1.0;
+                this.voiceLanguage = 'ms-MY'; // Optimized for Malaysian Syllabus (KAIKuP)
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            playTone(freq, type = 'sine', duration = 0.15, gainVal = 0.15) {
+                if (this.isMuted || !this.ctx) return;
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gainNode = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    
+                    gainNode.gain.setValueAtTime(gainVal * this.volume, this.ctx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+                    
+                    osc.connect(gainNode);
+                    gainNode.connect(this.ctx.destination);
+                    
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch (e) {
+                    console.warn("Audio Context Error: ", e);
+                }
+            }
+
+            speak(text) {
+                if (!this.synth) return;
+                this.synth.cancel(); // Always terminate ongoing audio to clear speech queue
+                if (this.isMuted) return;
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = this.speechRate;
+                utterance.pitch = this.speechPitch;
+                
+                // Try to find a Malay/English friendly voice
+                const voices = this.synth.getVoices();
+                const msVoice = voices.find(v => v.lang.includes('MS') || v.lang.includes('ms') || v.lang.includes('ID') || v.lang.includes('id'));
+                if (msVoice) {
+                    utterance.voice = msVoice;
+                }
+                this.synth.speak(utterance);
+            }
+
+            // High impact audio feedback cues
+            playMove() { this.playTone(320, 'sine', 0.08, 0.1); }
+            playBump() { this.playTone(140, 'triangle', 0.25, 0.25); }
+            playInteract() { this.playTone(520, 'square', 0.12, 0.12); }
+            playSuccess() {
+                this.playTone(440, 'sine', 0.1, 0.15);
+                setTimeout(() => this.playTone(554, 'sine', 0.1, 0.15), 100);
+                setTimeout(() => this.playTone(659, 'sine', 0.1, 0.15), 200);
+                setTimeout(() => this.playTone(880, 'sine', 0.35, 0.2), 300);
+            }
+            playLevelUp() {
+                const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    setTimeout(() => {
+                        this.playTone(freq, 'sine', 0.25, 0.18);
+                    }, idx * 120);
+                });
+            }
+            playBeepScan(distance) {
+                // Higher pitch + faster delay as user gets closer to objective
+                const pitch = Math.max(200, 1000 - (distance * 130));
+                this.playTone(pitch, 'sawtooth', 0.1, 0.15);
+            }
+            playWarning() {
+                this.playTone(180, 'sawtooth', 0.15, 0.25);
+                setTimeout(() => this.playTone(180, 'sawtooth', 0.15, 0.25), 180);
+            }
+            playCorrect() {
+                this.playTone(600, 'sine', 0.15, 0.15);
+                setTimeout(() => this.playTone(900, 'sine', 0.2, 0.15), 120);
+            }
+            playWrong() {
+                this.playTone(220, 'sawtooth', 0.3, 0.2);
+            }
+        }
+
+        // Global single-instance sound controller
+        const audio = new GameAudioManager();
+
+        // --- MAP DATASET AND COORDINATES ---
+        const GRID_SIZE = 6;
+
+        // Custom high-contrast theme definitions for Low Vision (B2)
+        const THEMES = {
+            YELLOW_BLACK: { bg: 'bg-black', text: 'text-yellow-400', border: 'border-yellow-400', fill: '#FFFF00', accent: 'text-cyan-400', accentBorder: 'border-cyan-400', gridBg: 'bg-stone-950' },
+            CYAN_BLACK: { bg: 'bg-black', text: 'text-cyan-400', border: 'border-cyan-400', fill: '#00FFFF', accent: 'text-yellow-400', accentBorder: 'border-yellow-400', gridBg: 'bg-slate-950' },
+            WHITE_BLACK: { bg: 'bg-black', text: 'text-white', border: 'border-white', fill: '#FFFFFF', accent: 'text-lime-400', accentBorder: 'border-lime-400', gridBg: 'bg-zinc-950' },
+        };
+
+        // --- CORE REACT APP ENGINE ---
+        function App() {
+            const [currentTheme, setCurrentTheme] = useState('YELLOW_BLACK');
+            const [fontSizeMultiplier, setFontSizeMultiplier] = useState(1.1); // Scalable size for B2 readers
+            const [gameState, setGameState] = useState('SPLASH'); // SPLASH, INTRO, PORTAL, GAMEPLAY, CERTIFICATE
+            const [currentMissionIndex, setCurrentMissionIndex] = useState(0);
+            const [playerPos, setPlayerPos] = useState({ x: 0, y: 3 });
+            
+            // Mission Progress Variables
+            const [missionStep, setMissionStep] = useState(0);
+            const [subtasksCompleted, setSubtasksCompleted] = useState([]);
+            const [inputState, setInputState] = useState(''); // text input storage for Braille/ICT tasks
+            const [toastMessage, setToastMessage] = useState('');
+            const [toastType, setToastType] = useState('info'); // info, success, warning
+            
+            // Player Profile / RPG Stats
+            const [xp, setXp] = useState(0);
+            const [level, setLevel] = useState(1);
+            const [badges, setBadges] = useState([]);
+            const [skills, setSkills] = useState({
+                listening: 10,
+                orientation: 10,
+                dailyLiving: 10,
+                braille: 10,
+                ict: 10,
+                confidence: 10
+            });
+
+            // UI controls
+            const [isVoiceActive, setIsVoiceActive] = useState(true);
+            const [showControlsModal, setShowControlsModal] = useState(false);
+            const [showStatsModal, setShowStatsModal] = useState(false);
+            const [speechSpeed, setSpeechSpeed] = useState(0.9);
+
+            const activeColors = THEMES[currentTheme];
+
+            // 7 COMPLETE MISSION PLAN
+            const MISSION_DATA = [
+                {
+                    title: "Misi 1: Cabaran Adab Makan",
+                    locationName: "Dewan Makan Bandar Cahaya",
+                    focusArea: "Kemahiran Hidup Harian (Daily Living Skills)",
+                    description: "Pelajari adab sebelum, semasa, dan selepas makan. Basuh tangan, amalkan postur tegak, kenal pasti peralatan serta bersihkan kawasan makan.",
+                    gridSetup: {
+                        obstacles: [{x: 2, y: 1}, {x: 2, y: 2}, {x: 2, y: 3}],
+                        interactive: [
+                            { x: 1, y: 2, label: "Sinki Basuh Tangan", type: "sink", solvedMsg: "Syabas! Tangan dibersihkan menggunakan sabun dengan betul sebelum makan.", stepRequired: 0 },
+                            { x: 3, y: 1, label: "Kerusi Dewan Makan", type: "chair", solvedMsg: "Hebat! Duduk dengan postur tegak, tangan berada di atas meja makan.", stepRequired: 1 },
+                            { x: 3, y: 3, label: "Alat Pembersihan Meja", type: "cloth", solvedMsg: "Bagus! Anda telah mengelap meja dan mengasingkan sisa makanan ke tong sampah.", stepRequired: 2 }
+                        ]
+                    },
+                    steps: [
+                        "Langkah 1: Cari Sinki di sebelah kiri meja makan untuk membasuh tangan terlebih dahulu.",
+                        "Langkah 2: Cari Kerusi Makan untuk duduk dengan postur yang betul dan tegak.",
+                        "Langkah 3: Setelah selesai makan, cari Kain Pengelap untuk membersihkan meja makan."
+                    ],
+                    xpReward: 120,
+                    badgeReward: { id: 'badge_living', name: "Lencana Hidup Berdikari", icon: "fa-utensils", color: "text-amber-400" },
+                    statBoost: { dailyLiving: 15, confidence: 10 }
+                },
+                {
+                    title: "Misi 2: Pencarian Sistem Muka Jam",
+                    locationName: "Meja Bulat Dewan Makan",
+                    focusArea: "Orientasi & Mobiliti (Clock-Face positioning)",
+                    description: "Gunakan arah panduan sistem muka jam untuk mencari kedudukan makanan dan peralatan di atas meja bulat. Sangat penting bagi individu penglihatan terhad!",
+                    gridSetup: {
+                        obstacles: [{x: 2, y: 2}], // Meja tengah
+                        interactive: [
+                            { x: 4, y: 2, label: "Cawan Kopi (Arah Jam 3)", type: "cup", solvedMsg: "Bagus! Anda menjumpai Cawan Kopi pada pukul 3.", stepRequired: 0 },
+                            { x: 2, y: 4, label: "Pinggan Makanan (Arah Jam 6)", type: "food", solvedMsg: "Sempurna! Anda menemui Pinggan Nasi Lemak pada kedudukan pukul 6.", stepRequired: 1 },
+                            { x: 0, y: 2, label: "Sudu & Garfu (Arah Jam 9)", type: "cutlery", solvedMsg: "Terbaik! Anda mengesan kedudukan Sudu di sebelah kiri (pukul 9).", stepRequired: 2 }
+                        ]
+                    },
+                    steps: [
+                        "Langkah 1: Meja Bulat berada di tengah grid. Cari CAWAN yang terletak di kedudukan Pukul 3 (sebelah kanan meja).",
+                        "Langkah 2: Seterusnya, kesan kedudukan MAKANAN UTAMA yang terletak di Pukul 6 (di bawah meja bulat).",
+                        "Langkah 3: Seterusnya, cari SUDU & GARFU yang terletak di kedudukan Pukul 9 (sebelah kiri meja bulat)."
+                    ],
+                    xpReward: 150,
+                    badgeReward: { id: 'badge_orientation', name: "Lencana Orientasi Jam", icon: "fa-clock", color: "text-rose-400" },
+                    statBoost: { orientation: 20, listening: 10 }
+                },
+                {
+                    title: "Misi 3: Latihan Pratongkat Sekolah",
+                    locationName: "Koridor Utama Sekolah",
+                    focusArea: "Kemahiran Pratongkat & Mobiliti",
+                    description: "Praktis teknik bergerak rapat pada dinding sekolah (trailing), mengesan halangan jatuh dengan tapak kaki/tangan, dan teknik masuk kereta dengan selamat.",
+                    gridSetup: {
+                        obstacles: [{x: 2, y: 2}, {x: 3, y: 2}, {x: 4, y: 5}], // Kotak halangan koridor
+                        interactive: [
+                            { x: 1, y: 1, label: "Dinding Pegangan Koridor", type: "wall", solvedMsg: "Sempurna! Anda memegang dinding menggunakan belakang jari untuk teknik trailing.", stepRequired: 0 },
+                            { x: 4, y: 2, label: "Barang Jatuh (Kunci)", type: "key", solvedMsg: "Syabas! Menggunakan teknik melutut secara selamat bagi mencari barang yang terjatuh di lantai.", stepRequired: 1 },
+                            { x: 4, y: 4, label: "Pintu Kereta Guru", type: "car", solvedMsg: "Hebat! Anda memegang bumbung kereta sebagai pelindung kepala sebelum melangkah masuk.", stepRequired: 2 }
+                        ]
+                    },
+                    steps: [
+                        "Langkah 1: Cari Dinding Koridor di kiri atas untuk melalukan teknik susur jari (trailing).",
+                        "Langkah 2: Ada barang terjatuh berhampiran penghadang tengah. Kesan KUNCI di lantai (Koordinat X:4, Y:2).",
+                        "Langkah 3: Cari pintu KERETA sekolah untuk mengamalkan simulasi keluar masuk kenderaan secara selamat."
+                    ],
+                    xpReward: 160,
+                    badgeReward: { id: 'badge_cane', name: "Lencana Wira Pratongkat", icon: "fa-blind", color: "text-emerald-400" },
+                    statBoost: { orientation: 15, dailyLiving: 10 }
+                },
+                {
+                    title: "Misi 4: Wira Keselamatan Kecemasan",
+                    locationName: "Zon Rumah Cahaya",
+                    focusArea: "Keselamatan Diri & Talian Bantuan",
+                    description: "Pemain perlu mengesan laluan kecemasan yang bebas halangan, mengelak punca api dapur gas, dan mendail talian kecemasan 999 dengan betul.",
+                    gridSetup: {
+                        obstacles: [{x: 1, y: 4}, {x: 2, y: 4}], // Bahaya kebakaran
+                        interactive: [
+                            { x: 1, y: 1, label: "Dapur Gas (Bahaya Api)", type: "fire", solvedMsg: "Bagus! Anda berjaya mengelak hazard haba tinggi dapur gas.", stepRequired: 0 },
+                            { x: 4, y: 1, label: "Peti Pertolongan Cemas", type: "firstaid", solvedMsg: "Bagus! Peti ubat dijumpai untuk rawatan kecemasan ringan.", stepRequired: 1 },
+                            { x: 4, y: 4, label: "Telefon Kecemasan (Dail 999)", type: "phone", solvedMsg: "Luar biasa! Panggilan 999 dilakukan dengan membacakan nama dan lokasi kecemasan dengan tenang.", stepRequired: 2 }
+                        ]
+                    },
+                    steps: [
+                        "Langkah 1: Elakkan punca bahaya. Pergi ke DAPUR GAS (X:1, Y:1) untuk memastikan api ditutup dengan selamat.",
+                        "Langkah 2: Cari PETI PERTOLONGAN CEMAS di sudut bilik (X:4, Y:1).",
+                        "Langkah 3: Bergerak ke TELEFON RUMAH (X:4, Y:4) untuk simulasi melaporkan kes kecemasan kepada 999."
+                    ],
+                    xpReward: 140,
+                    badgeReward: { id: 'badge_safety', name: "Lencana Wira Selamat", icon: "fa-shield-halved", color: "text-cyan-400" },
+                    statBoost: { dailyLiving: 10, confidence: 20 }
+                },
+                {
+                    title: "Misi 5: Bilik Kod Braille",
+                    locationName: "Bilik Khas Pendidikan Khas",
+                    focusArea: "Pengenalan Kod & Simbol Braille",
+                    description: "Membina kefahaman menyahkod kod Braille 6-Titik. Selesaikan padanan simbol tanda baca, huruf besar, dan buka pintu kebal keselamatan sekolah.",
+                    gridSetup: {
+                        obstacles: [{x: 1, y: 2}, {x: 3, y: 2}, {x: 4, y: 2}],
+                        interactive: [
+                            { x: 1, y: 1, label: "Mesin Braille Perkins", type: "perkins", solvedMsg: "Bagus! Memahami fungsi kekunci 1 hingga 6 pada mesin perkins.", stepRequired: 0 },
+                            { x: 2, y: 3, label: "Panel Padanan Huruf Braille", type: "braillematch", solvedMsg: "Betul! Titik 1-2-4 mewakili huruf F dalam Braille.", stepRequired: 1 },
+                            { x: 5, y: 4, label: "Pintu Kebal Kod Rahsia", type: "brailledoor", solvedMsg: "Kod dipadankan! Anda berjaya menyahkod pintu dengan kombinasi Braille.", stepRequired: 2 }
+                        ]
+                    },
+                    steps: [
+                        "Langkah 1: Periksa MESIN BRAILLE PERKINS (X:1, Y:1) untuk membiasakan diri dengan susunan siri kekunci.",
+                        "Langkah 2: Pergi ke PANEL PADANAN (X:2, Y:3) untuk menjawab teka-teki gabungan titik Braille.",
+                        "Langkah 3: Masukkan kod penyelesaian di PINTU KEBAL (X:5, Y:4) untuk menyelamatkan buku rujukan Braille."
+                    ],
+                    xpReward: 180,
+                    badgeReward: { id: 'badge_braille', name: "Lencana Sarjana Braille", icon: "fa-keyboard", color: "text-purple-400" },
+                    statBoost: { braille: 25, listening: 10 }
+                },
+                {
+                    title: "Misi 6: Pengembara Peta Taktil",
+                    locationName: "Bilik Bahan Grafik Taktil",
+                    focusArea: "Pembacaan Grafik & Gambar Taktil",
+                    description: "Teroka peta timbul berkontras tinggi. Bezakan simbol sempadan, laluan pejalan kaki bertekstur, tapak berkumpul kecemasan, dan objek fizikal sebenar.",
+                    gridSetup: {
+                        obstacles: [{x: 2, y: 0}, {x: 2, y: 1}, {x: 2, y: 4}, {x: 2, y: 5}], // Sungai penghalang tengah
+                        interactive: [
+                            { x: 1, y: 3, label: "Sempadan Peta Taktil (Garis Timbul)", type: "borderline", solvedMsg: "Menakjubkan! Menjejaki sempadan kawasan menggunakan hujung jari telunjuk.", stepRequired: 0 },
+                            { x: 3, y: 3, label: "Laluan Pejalan Kaki (Guiding Block)", type: "guideblock", solvedMsg: "Bagus! Mengikut siri jubin bertekstur garisan (go straight) untuk navigasi.", stepRequired: 1 },
+                            { x: 5, y: 2, label: "Simbol Segitiga (Tapak Berkumpul)", type: "assembly", solvedMsg: "Selesai! Berjaya menemui tapak berkumpul kecemasan menerusi kunci peta taktil.", stepRequired: 2 }
+                        ]
+                    },
+                    steps: [
+                        "Langkah 1: Kenal pasti SEMPADAN PETA (X:1, Y:3) untuk mengelakkan tersesat keluar dari sempadan selamat.",
+                        "Langkah 2: Jejaki LALUAN PEJALAN KAKI berjubin penunjuk arah (X:3, Y:3).",
+                        "Langkah 3: Cari SIMBOL SEGITIGA (X:5, Y:2) sebagai zon berkumpul paling selamat."
+                    ],
+                    xpReward: 170,
+                    badgeReward: { id: 'badge_tactile', name: "Lencana Pakar Taktil", icon: "fa-map", color: "text-indigo-400" },
+                    statBoost: { orientation: 15, braille: 10 }
+                },
+                {
+                    title: "Misi 7: Makmal Siber ICT",
+                    locationName: "Makmal ICT Sekolah",
+                    focusArea: "Kemahiran Asas ICT & Perisian Transliterasi",
+                    description: "Buka dokumen teks, tetapkan jajar halaman, format saiz teks besar, gunakan pintasan papan kekunci screen reader (Insert+A), dan navigasi laman web carian.",
+                    gridSetup: {
+                        obstacles: [{x: 0, y: 1}, {x: 1, y: 1}, {x: 4, y: 1}, {x: 5, y: 1}], // Stesen komputer lain
+                        interactive: [
+                            { x: 2, y: 1, label: "Suis Utama Komputer", type: "switch", solvedMsg: "Berjaya! Komputer dihidupkan dengan sistem suara pembaca skrin aktif.", stepRequired: 0 },
+                            { x: 3, y: 3, label: "Papan Kekunci (Simulasi Pintasan)", type: "keyboard", solvedMsg: "Luar biasa! Menguasai gabungan butang Alt+Backspace & Insert+A untuk membaca teks.", stepRequired: 1 },
+                            { x: 5, y: 3, label: "Modul Carian Web (DBP PRPM)", type: "web", solvedMsg: "Tahniah! Berjaya menavigasi portal rujukan PRPM Dewan Bahasa dan Pustaka dengan pembaca skrin.", stepRequired: 2 }
+                        ]
+                    },
+                    steps: [
+                        "Langkah 1: Aktifkan SUIS UTAMA KOMPUTER (X:2, Y:1) untuk memulakan perisian suara pembaca skrin.",
+                        "Langkah 2: Tekan PAPAN KEKUNCI (X:3, Y:3) untuk mempelajari kombinasi kekunci penting.",
+                        "Langkah 3: Layari MODUL CARIAN WEB (X:5, Y:3) untuk mengakses maklumat carian kata bahasa melayu."
+                    ],
+                    xpReward: 200,
+                    badgeReward: { id: 'badge_ict', name: "Lencana Wira Siber ICT", icon: "fa-desktop", color: "text-blue-400" },
+                    statBoost: { ict: 30, confidence: 15 }
+                }
+            ];
+
+            const currentMission = MISSION_DATA[currentMissionIndex];
+
+            // Trigger speech when state changes
+            const triggerNarration = useCallback((text) => {
+                if (isVoiceActive) {
+                    audio.speak(text);
+                }
+            }, [isVoiceActive]);
+
+            // Set up game initial screen state
+            useEffect(() => {
+                audio.init();
+                triggerNarration("Selamat Datang ke Cahaya Quest: Journey of Independence. Permainan RPG Berkontras Tinggi bagi membina kemahiran berdikari murid ketidakupayaan penglihatan. Tekan butang 'Mula Pengembaraan' di bawah untuk bermula.");
+            }, []);
+
+            // Toast feedback function
+            const showToast = (msg, type = 'info') => {
+                setToastMessage(msg);
+                setToastType(type);
+                if (type === 'success') audio.playCorrect();
+                if (type === 'warning') audio.playWrong();
+                
+                // Clear toast after 4 seconds
+                setTimeout(() => {
+                    setToastMessage('');
+                }, 4000);
+            };
+
+            // Setup level ups
+            const addXP = (amount) => {
+                setXp(prev => {
+                    const newXp = prev + amount;
+                    const nextLevelThreshold = level * 150;
+                    if (newXp >= nextLevelThreshold) {
+                        setLevel(l => l + 1);
+                        audio.playLevelUp();
+                        showToast(`TAHNIAH! Anda naik ke Peringkat ${level + 1}!`, 'success');
+                        triggerNarration(`Tahniah! Anda telah naik tahap ke Peringkat ${level + 1}. Teruskan usaha anda!`);
+                        return newXp - nextLevelThreshold;
+                    }
+                    return newXp;
+                });
+            };
+
+            // Custom sound scanner (Audio Radar) to locate targeted items (Pratongkat training sound feedback)
+            const playRadarScan = () => {
+                const targetObj = currentMission.gridSetup.interactive.find(item => item.stepRequired === missionStep);
+                if (!targetObj) return;
+
+                const dx = targetObj.x - playerPos.x;
+                const dy = targetObj.y - playerPos.y;
+                const distance = Math.sqrt(dx*dx + dy*dy);
+
+                audio.playBeepScan(distance);
+
+                // Speak distance & clock relative location
+                let directionText = "";
+                if (dy < 0) directionText += "Utara (Atas) ";
+                if (dy > 0) directionText += "Selatan (Bawah) ";
+                if (dx < 0) directionText += "Barat (Kiri) ";
+                if (dx > 0) directionText += "Timur (Kanan) ";
+
+                const distRounded = Math.round(distance);
+                const scanSpeech = `Sasaran berada sejauh ${distRounded} meter ke arah ${directionText || 'kedudukan anda'}.`;
+                showToast(scanSpeech, 'info');
+                triggerNarration(scanSpeech);
+            };
+
+            // Handle player movement inside map grid
+            const movePlayer = (dx, dy) => {
+                audio.init();
+                const newX = playerPos.x + dx;
+                const newY = playerPos.y + dy;
+
+                // Border check
+                if (newX < 0 || newX >= GRID_SIZE || newY < 0 || newY >= GRID_SIZE) {
+                    audio.playBump();
+                    showToast("Sempadan peta dikesan! Anda tidak boleh melepasi sempadan ini.", "warning");
+                    triggerNarration("Sempadan dikesan!");
+                    return;
+                }
+
+                // Obstacle Collision Check
+                const isObstacle = currentMission.gridSetup.obstacles.some(obs => obs.x === newX && obs.y === newY);
+                if (isObstacle) {
+                    audio.playWarning();
+                    showToast("Halangan di hadapan! Ambil laluan alternatif.", "warning");
+                    triggerNarration("Amaran. Terdapat halangan fizikal di hadapan anda.");
+                    return;
+                }
+
+                // Movement successful
+                setPlayerPos({ x: newX, y: newY });
+                audio.playMove();
+
+                // Check proximity with targeted item of current step
+                const currentStepTarget = currentMission.gridSetup.interactive.find(item => item.stepRequired === missionStep);
+                if (currentStepTarget && Math.abs(currentStepTarget.x - newX) <= 1 && Math.abs(currentStepTarget.y - newY) <= 1) {
+                    // Very close! Notify with sound beep
+                    audio.playTone(880, 'sine', 0.05, 0.1);
+                }
+            };
+
+            // Interact with targets
+            const performInteraction = () => {
+                audio.init();
+                // Check if on any interactive items
+                const targetObj = currentMission.gridSetup.interactive.find(item => item.x === playerPos.x && item.y === playerPos.y);
+                
+                if (!targetObj) {
+                    audio.playBump();
+                    showToast("Tiada barang interaksi di koordinat ini. Gunakan butang Audio Scan (F) untuk mencari.", "info");
+                    triggerNarration("Tiada apa-apa untuk disentuh di sini.");
+                    return;
+                }
+
+                // Correct target for current step?
+                if (targetObj.stepRequired === missionStep) {
+                    audio.playInteract();
+                    
+                    // Special Challenge handling for Braille and ICT missions
+                    if (targetObj.type === 'braillematch') {
+                        // Open interactive input challenge
+                        setInputState('');
+                        triggerNarration("Soalan: Nyatakan huruf rumi bagi kombinasi titik Braille satu, dua, dan empat? Masukkan jawapan anda pada kotak teks.");
+                        setMissionStep(99); // temporary pause for question modal
+                        return;
+                    }
+                    if (targetObj.type === 'keyboard') {
+                        setInputState('');
+                        triggerNarration("Pintasan papan kekunci untuk menghentikan bacaan pembaca skrin sementara ialah Ctrl. Pintasan memadam satu kosa kata ialah Alt + Backspace. Tekan kombinasi butang mana-mana atau taip Ctrl untuk teruskan.");
+                        setMissionStep(98);
+                        return;
+                    }
+
+                    // Proceed with normal step completion
+                    completeStep(targetObj.solvedMsg);
+
+                } else {
+                    audio.playWarning();
+                    showToast(`Sila selesaikan: ${currentMission.steps[missionStep]} terlebih dahulu!`, 'warning');
+                    triggerNarration(`Sila buat tugasan lain dulu. Sekarang anda perlu menyelesaikan ${currentMission.steps[missionStep]}`);
+                }
+            };
+
+            const completeStep = (successMsg) => {
+                showToast(successMsg, 'success');
+                triggerNarration(successMsg);
+                
+                const nextStep = missionStep + 1;
+                if (nextStep < currentMission.steps.length) {
+                    setMissionStep(nextStep);
+                    // Announce next task
+                    setTimeout(() => {
+                        triggerNarration(currentMission.steps[nextStep]);
+                    }, 2500);
+                } else {
+                    // All steps of this mission completed!
+                    handleMissionCompleted();
+                }
+            };
+
+            // Finalizing mission completion
+            const handleMissionCompleted = () => {
+                audio.playSuccess();
+                const updatedBadges = [...badges];
+                if (!badges.some(b => b.id === currentMission.badgeReward.id)) {
+                    updatedBadges.push(currentMission.badgeReward);
+                }
+                
+                setBadges(updatedBadges);
+                addXP(currentMission.xpReward);
+
+                // Boost stats
+                setSkills(prev => {
+                    const nextSkills = { ...prev };
+                    Object.entries(currentMission.statBoost).forEach(([stat, amount]) => {
+                        nextSkills[stat] = Math.min(100, (nextSkills[stat] || 0) + amount);
+                    });
+                    return nextSkills;
+                });
+
+                setGameState('PORTAL'); // return to mission hub portal
+                triggerNarration(`Tahniah! Misi ${currentMissionIndex + 1} Selesai! Anda dianugerahkan ${currentMission.badgeReward.name} dan ${currentMission.xpReward} mata pengalaman. Sila pilih misi pengembaraan seterusnya.`);
+            };
+
+            // Question validations
+            const submitBrailleAnswer = () => {
+                if (inputState.trim().toLowerCase() === 'f') {
+                    setMissionStep(1); // Restore and complete step
+                    completeStep("Tepat sekali! Titik 1-2-4 ialah huruf F dalam Braille.");
+                } else {
+                    audio.playWrong();
+                    triggerNarration("Jawapan kurang tepat. Gabungan Titik 1-2-4 menghasilkan bentuk huruf F. Sila cuba lagi.");
+                    showToast("Jawapan salah. Sila masukkan huruf rumi yang betul.", "warning");
+                }
+            };
+
+            const submitIctAnswer = () => {
+                setMissionStep(1); // Restore and complete
+                completeStep("Hebat! Anda berjaya mensimulasikan penggunaan kekunci pintasan ICT.");
+            };
+
+            // Accessibility: Keyboard listener hook
+            useEffect(() => {
+                const handleKeyDown = (e) => {
+                    if (gameState !== 'GAMEPLAY') return;
+                    
+                    const key = e.key.toLowerCase();
+                    if (key === 'w' || e.key === 'ArrowUp') movePlayer(0, -1);
+                    else if (key === 's' || e.key === 'ArrowDown') movePlayer(0, 1);
+                    else if (key === 'a' || e.key === 'ArrowLeft') movePlayer(-1, 0);
+                    else if (key === 'd' || e.key === 'ArrowRight') movePlayer(1, 0);
+                    else if (e.key === ' ' || key === 'enter') performInteraction();
+                    else if (key === 'r') triggerNarration(currentMission.steps[missionStep] || currentMission.description);
+                    else if (key === 'f') playRadarScan();
+                };
+
+                window.addEventListener('keydown', handleKeyDown);
+                return () => window.removeEventListener('keydown', handleKeyDown);
+            }, [gameState, playerPos, missionStep, currentMissionIndex]);
+
+            // Handle speak rate change
+            const handleSpeechRateChange = (newRate) => {
+                setSpeechSpeed(newRate);
+                audio.speechRate = newRate;
+                audio.speak("Kelajuan suara ditetapkan.");
+            };
+
+            return (
+                <div className={`min-h-screen ${activeColors.bg} ${activeColors.text} flex flex-col p-4 md:p-6 transition-colors duration-300`} style={{ fontSize: `${fontSizeMultiplier * 100}%` }}>
+                    
+                    {/* ACCESSIBLE HEADER PANEL */}
+                    <header className={`border-b-4 ${activeColors.border} pb-4 mb-4 flex flex-wrap justify-between items-center gap-4`}>
+                        <div className="flex items-center gap-3">
+                            <span className="p-2 bg-yellow-400 text-black font-extrabold text-2xl rounded" aria-hidden="true">CY</span>
+                            <div>
+                                <h1 className="text-3xl font-black tracking-wide uppercase">Cahaya Quest</h1>
+                                <p className="text-sm font-semibold tracking-wider text-cyan-400">Kemahiran Asas Individu Ketidakupayaan Penglihatan (KAIKuP)</p>
+                            </div>
+                        </div>
+
+                        {/* Accessibility Controls Bar */}
+                        <div className="flex flex-wrap items-center gap-3">
+                            {/* Toggle Theme Option */}
+                            <button 
+                                onClick={() => {
+                                    audio.playInteract();
+                                    const themes = Object.keys(THEMES);
+                                    const nextIdx = (themes.indexOf(currentTheme) + 1) % themes.length;
+                                    setCurrentTheme(themes[nextIdx]);
+                                    triggerNarration(`Tukar tema warna kontras tinggi kepada ${themes[nextIdx].replace('_', ' ')}`);
+                                }}
+                                className={`px-4 py-2 border-4 ${activeColors.border} bg-black font-extrabold text-lg rounded interactive-item`}
+                                title="Tukar Tema Warna Kontras Tinggi"
+                            >
+                                <i className="fa-solid fa-circle-half-stroke mr-2"></i> Tema Warna
+                            </button>
+
+                            {/* Font Resize Utility */}
+                            <button 
+                                onClick={() => {
+                                    audio.playInteract();
+                                    const nextScale = fontSizeMultiplier >= 1.4 ? 1.0 : fontSizeMultiplier + 0.1;
+                                    setFontSizeMultiplier(nextScale);
+                                    triggerNarration(`Ubah saiz teks kepada ${Math.round(nextScale * 100)} peratus`);
+                                }}
+                                className={`px-4 py-2 border-4 ${activeColors.border} bg-black font-extrabold text-lg rounded interactive-item`}
+                                title="Ubah Saiz Huruf Tulisan"
+                            >
+                                <i className="fa-solid fa-magnifying-glass-plus mr-2"></i> Saiz Teks ({Math.round(fontSizeMultiplier * 100)}%)
+                            </button>
+
+                            {/* TTS Switch */}
+                            <button 
+                                onClick={() => {
+                                    audio.playInteract();
+                                    const val = !isVoiceActive;
+                                    setIsVoiceActive(val);
+                                    audio.isMuted = !val;
+                                    if (val) {
+                                        setTimeout(() => audio.speak("Narasi suara diaktifkan."), 200);
+                                    }
+                                }}
+                                className={`px-4 py-2 border-4 ${isVoiceActive ? activeColors.border : 'border-red-600'} bg-black font-extrabold text-lg rounded flex items-center gap-2 interactive-item`}
+                                title="Buka/Tutup Pembaca Skrin Suara"
+                            >
+                                <i className={`fa-solid ${isVoiceActive ? 'fa-volume-high text-green-400' : 'fa-volume-xmark text-red-500'}`}></i>
+                                <span>Suara: {isVoiceActive ? 'AKTIF' : 'SENYAP'}</span>
+                            </button>
+
+                            {/* Tutorial Guide Toggle */}
+                            <button 
+                                onClick={() => { audio.playInteract(); setShowControlsModal(true); triggerNarration("Membuka manual panduan kawalan papan kekunci permainan."); }}
+                                className={`px-4 py-2 border-4 ${activeColors.border} bg-cyan-950 font-bold text-lg rounded interactive-item text-white`}
+                            >
+                                <i className="fa-solid fa-keyboard mr-2"></i> Panduan
+                            </button>
+                        </div>
+                    </header>
+
+                    {/* TOAST NOTIFICATION CONTAINER (HIGHLY VISIBLE) */}
+                    {toastMessage && (
+                        <div className={`p-4 mb-4 border-l-8 text-black font-bold text-xl rounded flex items-center justify-between ${
+                            toastType === 'success' ? 'bg-green-400 border-green-700' : 
+                            toastType === 'warning' ? 'bg-red-400 border-red-700' : 'bg-yellow-400 border-yellow-700'
+                        }`}>
+                            <div className="flex items-center gap-3">
+                                <i className={`fa-solid ${toastType === 'success' ? 'fa-circle-check' : toastType === 'warning' ? 'fa-triangle-exclamation' : 'fa-circle-info'} text-2xl`}></i>
+                                <span>{toastMessage}</span>
+                            </div>
+                            <button onClick={() => setToastMessage('')} className="p-1 text-black font-black hover:bg-black/10 rounded">X</button>
+                        </div>
+                    )}
+
+                    {/* MAIN GAMEPLAY PANEL ROUTER */}
+                    <main className="flex-grow flex flex-col justify-center">
+
+                        {/* 1. SPLASH SCREEN (LAUNCH LANDING PAGE) */}
+                        {gameState === 'SPLASH' && (
+                            <div className="text-center py-12 max-w-4xl mx-auto flex flex-col items-center">
+                                <div className="w-32 h-32 bg-yellow-400 text-black rounded-full flex items-center justify-center text-6xl font-black mb-6 border-4 border-cyan-400 pulse-marker">
+                                    <i className="fa-solid fa-sun animate-spin text-amber-500" style={{ animationDuration: '8s' }}></i>
+                                </div>
+                                
+                                <h2 className="text-5xl font-black mb-4 uppercase tracking-wider text-yellow-400">Bandar Cahaya Menanti Anda</h2>
+                                
+                                <p className="text-2xl leading-relaxed mb-8 max-w-2xl text-slate-200">
+                                    Selamat datang Wira! Bantu menguatkan kembali <strong className="text-cyan-400">"Guiding Light"</strong> di Bandar Cahaya dengan mempelajari kemahiran hidup berdikari dari Buku Teks KAIKuP Tahun 4.
+                                </p>
+
+                                <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+                                    <button 
+                                        onClick={() => {
+                                            audio.playInteract();
+                                            setGameState('INTRO');
+                                            triggerNarration("Permulaan Cerita: Anda memasuki Bandar Cahaya, bandar yang amat damai dan mesra penglihatan. Walau bagaimanapun, Cahaya Panduan Bandar kini semakin malap. Demi menyalakan semula lampu pelindung ini, anda perlu mempelajari tujuh kemahiran asas hidup berdikari. Bersediakah anda?");
+                                        }}
+                                        className="px-8 py-5 bg-yellow-400 text-black hover:bg-yellow-300 font-extrabold text-3xl rounded-xl border-4 border-white transition-all transform hover:scale-105 interactive-item"
+                                    >
+                                        Mula Pengembaraan <i className="fa-solid fa-arrow-right ml-2"></i>
+                                    </button>
+                                </div>
+
+                                <div className="mt-8 p-4 bg-zinc-900 border-2 border-stone-700 rounded-lg text-sm text-stone-400">
+                                    <p className="font-bold"><i className="fa-solid fa-circle-exclamation mr-1"></i> Tip Kebolehaksesan B2:</p>
+                                    <p>Permainan ini mempunyai panduan suara penuh. Sila aktifkan pembesar suara anda untuk mendengar maklum balas jarak dan arahan.</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 2. GAME INTRO STORY SCREEN */}
+                        {gameState === 'INTRO' && (
+                            <div className="max-w-3xl mx-auto bg-stone-900 border-4 border-yellow-400 p-8 rounded-2xl">
+                                <h3 className="text-3xl font-black mb-4 text-cyan-400 uppercase border-b-2 border-yellow-400 pb-2">Asal Usul Bandar Cahaya</h3>
+                                <p className="text-xl leading-relaxed mb-6">
+                                    Satu ketika dahulu, Bandar Cahaya dipayungi dengan cahaya sakti yang membolehkan semua orang bergerak bebas dan hidup berdikari dengan gembira tanpa sebarang ketakutan.
+                                </p>
+                                <p className="text-xl leading-relaxed mb-6">
+                                    Malangnya, cahaya tersebut kian redup. Untuk mengembalikan kegemilangannya, anda dilantik menjadi <span className="text-yellow-400 font-bold">Wira Cahaya</span>. Selesaikan tugasan praktikal harian untuk membina keyakinan diri dan mendapatkan lencana berharga!
+                                </p>
+                                
+                                <div className="bg-black p-4 border-2 border-dashed border-cyan-400 rounded-lg mb-6">
+                                    <h4 className="text-lg font-bold text-yellow-400 mb-2">Statistik Asal Hero:</h4>
+                                    <div className="grid grid-cols-2 gap-2 text-md">
+                                        <div><i className="fa-solid fa-star text-yellow-400 mr-2"></i> Tahap Semasa: <span className="font-bold text-white">Level {level}</span></div>
+                                        <div><i className="fa-solid fa-shield text-cyan-400 mr-2"></i> Badge Dikumpul: <span className="font-bold text-white">{badges.length} / 7</span></div>
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-end">
+                                    <button 
+                                        onClick={() => {
+                                            audio.playInteract();
+                                            setGameState('PORTAL');
+                                            triggerNarration("Selamat datang ke Hab Misi Utama. Terdapat tujuh bilik pembelajaran praktikal. Sila klik atau pilih mana-mana bilik misi di bawah untuk memulakan latihan.");
+                                        }}
+                                        className="px-6 py-4 bg-cyan-400 text-black font-extrabold text-2xl rounded-lg border-2 border-white interactive-item hover:bg-cyan-300"
+                                    >
+                                        Masuk Hab Misi <i className="fa-solid fa-door-open ml-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 3. MISSION PORTAL HUB */}
+                        {gameState === 'PORTAL' && (
+                            <div className="max-w-6xl mx-auto w-full">
+                                <div className="text-center mb-6">
+                                    <h2 className="text-3xl font-black tracking-wide uppercase text-yellow-400">Hab Pengembaraan Wira Cahaya</h2>
+                                    <p className="text-xl text-stone-300 mt-2">Sila pilih zon latihan untuk menyelesaikan misi buku teks KAIKuP Anda.</p>
+                                </div>
+
+                                {/* RPG Stats Dashboard inline */}
+                                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                                    <div className="bg-zinc-900 border-2 border-yellow-400 p-4 rounded-xl flex items-center gap-4">
+                                        <div className="p-3 bg-yellow-400 text-black text-2xl rounded-full"><i className="fa-solid fa-trophy"></i></div>
+                                        <div>
+                                            <p className="text-sm text-stone-400 uppercase font-bold">Peringkat Wira</p>
+                                            <p className="text-2xl font-black text-white">LEVEL {level}</p>
+                                            <p className="text-xs text-yellow-400 font-bold">{xp} / {level * 150} XP untuk naik tahap</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-zinc-900 border-2 border-cyan-400 p-4 rounded-xl flex items-center gap-4">
+                                        <div className="p-3 bg-cyan-400 text-black text-2xl rounded-full"><i className="fa-solid fa-award"></i></div>
+                                        <div>
+                                            <p className="text-sm text-stone-400 uppercase font-bold">Lencana Berdikari</p>
+                                            <p className="text-2xl font-black text-white">{badges.length} / 7 Lencana</p>
+                                            <p className="text-xs text-cyan-400 font-bold">Kumpul kesemua untuk jadi Wira Cahaya</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-zinc-900 border-2 border-white p-4 rounded-xl flex items-center gap-4 md:col-span-2">
+                                        <div className="flex-1">
+                                            <p className="text-sm font-bold text-yellow-400 mb-1">Kemajuan KAIKuP:</p>
+                                            <div className="w-full bg-black h-4 rounded-full border border-stone-700 overflow-hidden">
+                                                <div className="bg-yellow-400 h-full transition-all duration-500" style={{ width: `${(badges.length / 7) * 100}%` }}></div>
+                                            </div>
+                                            <div className="flex justify-between text-xs mt-1 text-stone-400 font-bold">
+                                                <span>{Math.round((badges.length / 7) * 100)}% Lengkap</span>
+                                                <span>{7 - badges.length} Misi Tinggal</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Mission Grid Selector */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {MISSION_DATA.map((mission, idx) => {
+                                        const isCompleted = badges.some(b => b.id === mission.badgeReward.id);
+                                        return (
+                                            <div 
+                                                key={idx} 
+                                                className={`border-4 rounded-xl p-5 bg-stone-950 flex flex-col justify-between transition-transform transform hover:-translate-y-1 ${
+                                                    isCompleted ? 'border-green-500 opacity-90' : 'border-yellow-400'
+                                                }`}
+                                            >
+                                                <div>
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <span className="text-xs font-black tracking-wider uppercase px-2 py-1 bg-stone-800 text-cyan-400 rounded">Misi {idx + 1}</span>
+                                                        {isCompleted && (
+                                                            <span className="text-xs font-black text-green-400 uppercase flex items-center gap-1">
+                                                                <i className="fa-solid fa-circle-check"></i> Selesai
+                                                            </span>
+                                                        )}
+                                                    </div>
+
+                                                    <h3 className="text-2xl font-bold text-white mb-1">{mission.title}</h3>
+                                                    <p className="text-xs text-yellow-400 font-bold mb-3 flex items-center gap-1">
+                                                        <i className="fa-solid fa-location-dot"></i> {mission.locationName}
+                                                    </p>
+                                                    
+                                                    <p className="text-sm text-stone-300 mb-4 line-clamp-3 leading-relaxed">{mission.description}</p>
+                                                </div>
+
+                                                <div className="border-t border-stone-800 pt-3 mt-3">
+                                                    <div className="flex justify-between items-center mb-4">
+                                                        <div className="flex items-center gap-2">
+                                                            <i className={`fa-solid ${mission.badgeReward.icon} ${mission.badgeReward.color} text-2xl`}></i>
+                                                            <span className="text-xs font-bold text-stone-400">{mission.badgeReward.name}</span>
+                                                        </div>
+                                                        <span className="text-xs font-bold bg-yellow-450 text-black px-2 py-0.5 rounded font-black">+{mission.xpReward} XP</span>
+                                                    </div>
+
+                                                    <button 
+                                                        onClick={() => {
+                                                            audio.playInteract();
+                                                            setCurrentMissionIndex(idx);
+                                                            setMissionStep(0);
+                                                            setPlayerPos({ x: 0, y: 3 });
+                                                            setGameState('GAMEPLAY');
+                                                            triggerNarration(`Memulakan ${mission.title}. ${mission.description}. Tugasan pertama anda ialah: ${mission.steps[0]}`);
+                                                        }}
+                                                        className={`w-full py-3 rounded-lg font-black text-xl border-2 border-white transition-colors interactive-item uppercase ${
+                                                            isCompleted ? 'bg-green-600 text-white hover:bg-green-500' : 'bg-yellow-400 text-black hover:bg-yellow-300'
+                                                        }`}
+                                                    >
+                                                        {isCompleted ? 'Main Semula Misi' : 'Mulakan Misi'}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+
+                                {/* Bottom triggers */}
+                                <div className="mt-8 flex justify-center gap-4">
+                                    {badges.length === 7 && (
+                                        <button 
+                                            onClick={() => {
+                                                audio.playLevelUp();
+                                                setGameState('CERTIFICATE');
+                                                triggerNarration("Luar biasa! Anda berjaya mengumpul kesemua lencana kemerdekaan diri. Sila lihat dan terima sijil kelulusan Wira Cahaya.");
+                                            }}
+                                            className="px-8 py-5 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-extrabold text-3xl rounded-xl border-4 border-white pulse-marker interactive-item"
+                                        >
+                                            <i className="fa-solid fa-graduation-cap mr-2 animate-bounce"></i> TERIMA SIJIL WIRA CAHAYA
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 4. GAMEPLAY GRID & CONTROLS SCREEN */}
+                        {gameState === 'GAMEPLAY' && (
+                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full max-w-6xl mx-auto">
+                                
+                                {/* LEFT CONTROL PANEL (INSTRUCTIONS & STATS) - Column: 5 */}
+                                <div className="lg:col-span-5 flex flex-col gap-4">
+                                    
+                                    {/* Mission Status Widget */}
+                                    <div className="bg-zinc-900 border-4 border-yellow-400 p-5 rounded-2xl">
+                                        <span className="text-xs font-black bg-yellow-400 text-black px-2 py-1 rounded">MISI AKTIF</span>
+                                        <h2 className="text-2xl font-black text-white mt-2">{currentMission.title}</h2>
+                                        <p className="text-sm text-cyan-400 font-bold mb-4">{currentMission.focusArea}</p>
+
+                                        {/* Task Steps Indicator */}
+                                        <div className="space-y-3">
+                                            <p className="text-md font-bold text-stone-300 border-b border-stone-800 pb-2">Langkah Pengembaraan:</p>
+                                            {currentMission.steps.map((step, sIdx) => {
+                                                const isCurrent = sIdx === missionStep;
+                                                const isDone = sIdx < missionStep;
+                                                return (
+                                                    <div 
+                                                        key={sIdx} 
+                                                        onClick={() => {
+                                                            if (isCurrent) {
+                                                                triggerNarration(step);
+                                                            }
+                                                        }}
+                                                        className={`p-3 rounded-lg border-2 flex items-start gap-3 cursor-pointer ${
+                                                            isCurrent ? `border-cyan-400 bg-cyan-950/20 font-bold ${activeColors.text}` : 
+                                                            isDone ? 'border-green-600 bg-stone-900/40 text-stone-500 line-through' : 'border-stone-800 text-stone-600'
+                                                        }`}
+                                                    >
+                                                        <div className="mt-1">
+                                                            {isDone ? <i className="fa-solid fa-circle-check text-green-500"></i> : 
+                                                             isCurrent ? <i className="fa-solid fa-circle-play text-cyan-400 animate-pulse"></i> : 
+                                                             <i className="fa-solid fa-circle text-stone-700"></i>}
+                                                        </div>
+                                                        <span className="text-base">{step}</span>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    {/* Accessibility Screen Reader Controller & Hotkeys Panel */}
+                                    <div className="bg-black border-4 border-cyan-400 p-5 rounded-2xl flex flex-col gap-3">
+                                        <h3 className="text-xl font-bold text-white border-b border-stone-800 pb-1">Tindakan Cepat Pembantu Suara</h3>
+                                        
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <button 
+                                                onClick={() => {
+                                                    audio.playInteract();
+                                                    triggerNarration(currentMission.steps[missionStep] || currentMission.description);
+                                                }}
+                                                className="p-3 bg-cyan-950 text-white border-2 border-cyan-400 rounded-lg text-lg font-black hover:bg-cyan-900 flex items-center justify-center gap-2 interactive-item"
+                                                title="Sebutkan semula langkah arahan semasa"
+                                            >
+                                                <i className="fa-solid fa-volume-high"></i> Arahan Ulang (R)
+                                            </button>
+
+                                            <button 
+                                                onClick={() => {
+                                                    audio.playInteract();
+                                                    playRadarScan();
+                                                }}
+                                                className="p-3 bg-stone-900 text-yellow-400 border-2 border-yellow-400 rounded-lg text-lg font-black hover:bg-stone-850 flex items-center justify-center gap-2 interactive-item"
+                                                title="Gunakan sonar audio untuk mengesan kedudukan item"
+                                            >
+                                                <i className="fa-solid fa-satellite-dish animate-pulse"></i> Scan Radar (F)
+                                            </button>
+                                        </div>
+
+                                        {/* Audio Speech Speed Slider */}
+                                        <div className="mt-2">
+                                            <label className="text-sm font-bold text-stone-300 block mb-1">Kelajuan Narasi Suara:</label>
+                                            <div className="flex items-center gap-3">
+                                                <input 
+                                                    type="range" 
+                                                    min="0.6" 
+                                                    max="1.4" 
+                                                    step="0.1" 
+                                                    value={speechSpeed} 
+                                                    onChange={(e) => handleSpeechRateChange(parseFloat(e.target.value))}
+                                                    className="flex-grow accent-yellow-400 cursor-pointer h-2 bg-stone-800 rounded-lg"
+                                                    aria-label="Ubah kelajuan pembaca suara"
+                                                />
+                                                <span className="font-bold text-yellow-400 w-12 text-center text-lg">{Math.round(speechSpeed * 100)}%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Navigation Return Portal Trigger */}
+                                    <button 
+                                        onClick={() => {
+                                            audio.playInteract();
+                                            setGameState('PORTAL');
+                                            triggerNarration("Kembali ke menu pemilihan misi utama.");
+                                        }}
+                                        className="py-4 border-4 border-stone-600 bg-stone-900 hover:bg-stone-800 text-stone-400 font-extrabold text-xl rounded-xl interactive-item uppercase"
+                                    >
+                                        <i className="fa-solid fa-circle-arrow-left mr-2"></i> Keluar Ke Hab Misi
+                                    </button>
+                                </div>
+
+                                {/* RIGHT PANEL (3D VISUAL MAP GRID) - Column: 7 */}
+                                <div className="lg:col-span-7 flex flex-col gap-4">
+                                    
+                                    {/* High Contrast Visual Map Area */}
+                                    <div className="bg-stone-950 border-4 border-yellow-400 p-4 rounded-3xl flex flex-col items-center">
+                                        <div className="w-full flex justify-between items-center mb-3 px-2">
+                                            <span className="text-lg font-black text-white uppercase tracking-wider">Layar Peta Bandar Cahaya (Simulasi 3D)</span>
+                                            <span className="text-md font-bold text-cyan-400"><i className="fa-solid fa-gamepad"></i> Gunakan Kekunci WASD / ARAH</span>
+                                        </div>
+
+                                        {/* GRID IMPLEMENTATION FOR B2 ACCESSIBILITY */}
+                                        <div className="grid grid-cols-6 gap-2 bg-black p-4 rounded-2xl border-4 border-stone-800 w-full max-w-[500px] aspect-square relative">
+                                            {Array.from({ length: GRID_SIZE }).map((_, y) => 
+                                                Array.from({ length: GRID_SIZE }).map((_, x) => {
+                                                    const isPlayer = playerPos.x === x && playerPos.y === y;
+                                                    
+                                                    // Obstacle
+                                                    const isObstacle = currentMission.gridSetup.obstacles.some(obs => obs.x === x && obs.y === y);
+                                                    
+                                                    // Interactive targets
+                                                    const targetItem = currentMission.gridSetup.interactive.find(item => item.x === x && item.y === y);
+                                                    const isTargetActive = targetItem && targetItem.stepRequired === missionStep;
+                                                    const isTargetPreviousOrNext = targetItem && targetItem.stepRequired !== missionStep;
+
+                                                    return (
+                                                        <div 
+                                                            key={`${x}-${y}`}
+                                                            onClick={() => {
+                                                                // Teleport player directly if touch is preferred
+                                                                if (!isObstacle) {
+                                                                    setPlayerPos({ x, y });
+                                                                    audio.playMove();
+                                                                } else {
+                                                                    audio.playWarning();
+                                                                }
+                                                            }}
+                                                            className={`aspect-square rounded-xl flex items-center justify-center font-black text-2xl border-4 cursor-pointer relative grid-cell transition-all ${
+                                                                isPlayer ? 'bg-yellow-400 text-black border-white pulse-marker ring-4 ring-cyan-400 z-10' :
+                                                                isObstacle ? 'bg-red-950 text-red-500 border-red-600' :
+                                                                isTargetActive ? 'bg-cyan-950 text-cyan-400 border-cyan-400 animate-pulse' :
+                                                                isTargetPreviousOrNext ? 'bg-stone-900 text-stone-500 border-stone-700' :
+                                                                'bg-stone-950 text-stone-800 border-stone-900 hover:border-stone-800'
+                                                            }`}
+                                                            title={`Petak ${x + 1}, ${y + 1}`}
+                                                        >
+                                                            {isPlayer && (
+                                                                <div className="flex flex-col items-center">
+                                                                    <i className="fa-solid fa-user-astronaut text-3xl"></i>
+                                                                    <span className="text-[10px] uppercase font-black tracking-tight leading-none">HERO</span>
+                                                                </div>
+                                                            )}
+                                                            {!isPlayer && isObstacle && (
+                                                                <div className="flex flex-col items-center">
+                                                                    <i className="fa-solid fa-triangle-exclamation text-2xl text-red-500"></i>
+                                                                    <span className="text-[8px] uppercase tracking-tight leading-none text-red-500">HALANG</span>
+                                                                </div>
+                                                            )}
+                                                            {!isPlayer && !isObstacle && isTargetActive && (
+                                                                <div className="flex flex-col items-center text-center">
+                                                                    <i className="fa-solid fa-star text-2xl text-cyan-400 animate-bounce"></i>
+                                                                    <span className="text-[9px] uppercase tracking-tight leading-none text-cyan-400">{targetItem.label.split(' ')[0]}</span>
+                                                                </div>
+                                                            )}
+                                                            {!isPlayer && !isObstacle && isTargetPreviousOrNext && (
+                                                                <div className="flex flex-col items-center text-center opacity-40">
+                                                                    <i className="fa-solid fa-circle-dot text-lg text-stone-600"></i>
+                                                                    <span className="text-[8px] uppercase tracking-tight leading-none text-stone-600">{targetItem.label.split(' ')[0]}</span>
+                                                                </div>
+                                                            )}
+                                                            
+                                                            {/* Label coordination */}
+                                                            <span className="absolute bottom-1 right-1 text-[8px] text-stone-600 pointer-events-none">{x},{y}</span>
+                                                        </div>
+                                                    );
+                                                })
+                                            )}
+                                        </div>
+
+                                        {/* Tactile On-Screen Direction Pad for Touch/Click support */}
+                                        <div className="w-full mt-4 flex flex-col items-center">
+                                            <p className="text-sm font-bold text-stone-400 mb-2 uppercase">Pengawal Sentuhan Skrin & Klik:</p>
+                                            
+                                            <div className="grid grid-cols-3 gap-3 w-full max-w-[340px]">
+                                                <div></div>
+                                                <button 
+                                                    onClick={() => movePlayer(0, -1)} 
+                                                    className="p-4 bg-zinc-900 border-4 border-yellow-400 text-yellow-400 rounded-xl text-2xl font-black hover:bg-stone-850 active:scale-95 interactive-item flex flex-col items-center"
+                                                    title="Gerak Atas (W)"
+                                                >
+                                                    <i className="fa-solid fa-chevron-up"></i>
+                                                    <span className="text-xs uppercase font-extrabold mt-1">ATAS</span>
+                                                </button>
+                                                <div></div>
+
+                                                <button 
+                                                    onClick={() => movePlayer(-1, 0)} 
+                                                    className="p-4 bg-zinc-900 border-4 border-yellow-400 text-yellow-400 rounded-xl text-2xl font-black hover:bg-stone-850 active:scale-95 interactive-item flex flex-col items-center"
+                                                    title="Gerak Kiri (A)"
+                                                >
+                                                    <i className="fa-solid fa-chevron-left"></i>
+                                                    <span className="text-xs uppercase font-extrabold mt-1">KIRI</span>
+                                                </button>
+                                                
+                                                <button 
+                                                    onClick={performInteraction} 
+                                                    className="p-4 bg-cyan-400 border-4 border-white text-black rounded-xl text-xl font-black hover:bg-cyan-300 active:scale-95 interactive-item flex flex-col items-center justify-center pulse-marker"
+                                                    title="Sentuh & Interaksi (Space / Enter)"
+                                                >
+                                                    <i className="fa-solid fa-hand-pointer text-2xl"></i>
+                                                    <span className="text-xs uppercase font-black mt-1">SENTUH</span>
+                                                </button>
+                                                
+                                                <button 
+                                                    onClick={() => movePlayer(1, 0)} 
+                                                    className="p-4 bg-zinc-900 border-4 border-yellow-400 text-yellow-400 rounded-xl text-2xl font-black hover:bg-stone-850 active:scale-95 interactive-item flex flex-col items-center"
+                                                    title="Gerak Kanan (D)"
+                                                >
+                                                    <i className="fa-solid fa-chevron-right"></i>
+                                                    <span className="text-xs uppercase font-extrabold mt-1">KANAN</span>
+                                                </button>
+
+                                                <div></div>
+                                                <button 
+                                                    onClick={() => movePlayer(0, 1)} 
+                                                    className="p-4 bg-zinc-900 border-4 border-yellow-400 text-yellow-400 rounded-xl text-2xl font-black hover:bg-stone-850 active:scale-95 interactive-item flex flex-col items-center"
+                                                    title="Gerak Bawah (S)"
+                                                >
+                                                    <i className="fa-solid fa-chevron-down"></i>
+                                                    <span className="text-xs uppercase font-extrabold mt-1">BAWAH</span>
+                                                </button>
+                                                <div></div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                {/* QUESTION INTERACTIVE CHALLENGE MODAL (FOR BRAILLE & ICT INTERACTION) */}
+                                {missionStep === 99 && (
+                                    <div className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4">
+                                        <div className="bg-stone-900 border-8 border-purple-500 p-8 rounded-3xl max-w-xl w-full text-center">
+                                            <div className="text-purple-400 text-5xl mb-4"><i className="fa-solid fa-keyboard"></i></div>
+                                            <h3 className="text-3xl font-black text-white mb-2 uppercase">CABARAN NYAHKOD BRAILLE</h3>
+                                            <p className="text-xl text-yellow-400 font-bold mb-6">Mesej Isyarat: Titik 1-2-4 mewakili Huruf Rumi apakah?</p>
+                                            
+                                            {/* Tactile representation of Braille Cell for B2 learners */}
+                                            <div className="flex justify-center gap-6 mb-8 bg-black p-6 rounded-xl border-4 border-stone-700 max-w-xs mx-auto">
+                                                <div className="flex flex-col gap-4">
+                                                    <span className="w-10 h-10 rounded-full bg-cyan-400 border-4 border-white flex items-center justify-center text-black font-bold">1</span>
+                                                    <span className="w-10 h-10 rounded-full bg-cyan-400 border-4 border-white flex items-center justify-center text-black font-bold">2</span>
+                                                    <span className="w-10 h-10 rounded-full bg-stone-800 border-2 border-stone-600 flex items-center justify-center text-stone-500 font-bold">3</span>
+                                                </div>
+                                                <div className="flex flex-col gap-4">
+                                                    <span className="w-10 h-10 rounded-full bg-cyan-400 border-4 border-white flex items-center justify-center text-black font-bold">4</span>
+                                                    <span className="w-10 h-10 rounded-full bg-stone-800 border-2 border-stone-600 flex items-center justify-center text-stone-500 font-bold">5</span>
+                                                    <span className="w-10 h-10 rounded-full bg-stone-800 border-2 border-stone-600 flex items-center justify-center text-stone-500 font-bold">6</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="mb-6">
+                                                <label className="block text-sm font-bold text-stone-400 uppercase mb-2">Taip Jawapan Huruf Tunggal Rumi:</label>
+                                                <input 
+                                                    type="text" 
+                                                    maxLength="1"
+                                                    value={inputState} 
+                                                    onChange={(e) => setInputState(e.target.value.toUpperCase())}
+                                                    className="w-24 p-4 text-center text-4xl bg-black border-4 border-white text-yellow-400 rounded-xl uppercase font-black focus:outline-none focus:border-cyan-400"
+                                                    placeholder="A"
+                                                    autoFocus
+                                                />
+                                            </div>
+
+                                            <div className="flex gap-4">
+                                                <button 
+                                                    onClick={() => { setMissionStep(1); setGameState('GAMEPLAY'); }}
+                                                    className="w-1/2 py-3 bg-stone-800 text-stone-400 font-bold text-lg rounded border-2 border-stone-700 interactive-item"
+                                                >
+                                                    Kembali
+                                                </button>
+                                                <button 
+                                                    onClick={submitBrailleAnswer}
+                                                    className="w-1/2 py-3 bg-purple-600 text-white font-black text-xl rounded border-2 border-white interactive-item hover:bg-purple-500"
+                                                >
+                                                    Hantar Jawapan
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {missionStep === 98 && (
+                                    <div className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4">
+                                        <div className="bg-stone-900 border-8 border-blue-500 p-8 rounded-3xl max-w-xl w-full text-center">
+                                            <div className="text-blue-400 text-5xl mb-4"><i className="fa-solid fa-laptop-code"></i></div>
+                                            <h3 className="text-3xl font-black text-white mb-2 uppercase">PINTASAN KEKUNCI SCREEN READER</h3>
+                                            
+                                            <p className="text-lg text-yellow-400 font-bold mb-6">
+                                                Buku Teks m/s 137: Bantu ibu kucing mencari anaknya. Nyatakan fungsi bagi butang pintasan berikut:
+                                            </p>
+
+                                            <div className="space-y-3 mb-6 text-left max-w-md mx-auto">
+                                                <div className="bg-black p-3 rounded border border-stone-800">
+                                                    <span className="font-mono bg-blue-900 px-2 py-0.5 rounded text-white text-xs mr-2">Alt + Backspace</span>
+                                                    <span className="text-sm font-bold text-stone-300">Memadam satu perkataan sebelum cursor.</span>
+                                                </div>
+                                                <div className="bg-black p-3 rounded border border-stone-800">
+                                                    <span className="font-mono bg-blue-900 px-2 py-0.5 rounded text-white text-xs mr-2">Insert + A</span>
+                                                    <span className="text-sm font-bold text-stone-300">Membaca keseluruhan dokumen aktif.</span>
+                                                </div>
+                                                <div className="bg-black p-3 rounded border border-stone-800">
+                                                    <span className="font-mono bg-blue-900 px-2 py-0.5 rounded text-white text-xs mr-2">Ctrl</span>
+                                                    <span className="text-sm font-bold text-stone-300">Menghentikan pertuturan suara pembaca skrin dengan segera.</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="mb-6">
+                                                <label className="block text-sm font-bold text-stone-400 uppercase mb-2">Taip 'MULA' untuk selesaikan praktis:</label>
+                                                <input 
+                                                    type="text" 
+                                                    value={inputState} 
+                                                    onChange={(e) => setInputState(e.target.value.toUpperCase())}
+                                                    className="w-full p-4 text-center text-2xl bg-black border-4 border-white text-yellow-400 rounded-xl uppercase font-black focus:outline-none focus:border-cyan-400"
+                                                    placeholder="Tulis MULA"
+                                                    autoFocus
+                                                />
+                                            </div>
+
+                                            <div className="flex gap-4">
+                                                <button 
+                                                    onClick={() => { setMissionStep(1); setGameState('GAMEPLAY'); }}
+                                                    className="w-1/2 py-3 bg-stone-800 text-stone-400 font-bold text-lg rounded border-2 border-stone-700 interactive-item"
+                                                >
+                                                    Kembali
+                                                </button>
+                                                <button 
+                                                    onClick={submitIctAnswer}
+                                                    className="w-1/2 py-3 bg-blue-600 text-white font-black text-xl rounded border-2 border-white interactive-item hover:bg-blue-500"
+                                                >
+                                                    Simulasi Kekunci
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                            </div>
+                        )}
+
+                        {/* 5. INDEPENDENCE CERTIFICATE / GAME COMPLETION */}
+                        {gameState === 'CERTIFICATE' && (
+                            <div className="max-w-4xl mx-auto bg-black border-8 border-double border-yellow-400 p-8 rounded-3xl text-center relative">
+                                <div className="absolute top-4 left-4 text-yellow-400 text-4xl"><i className="fa-solid fa-award"></i></div>
+                                <div className="absolute top-4 right-4 text-yellow-400 text-4xl"><i className="fa-solid fa-award"></i></div>
+
+                                <h2 className="text-4xl font-black text-yellow-400 uppercase tracking-widest mb-2">SIJIL KELULUSAN WIRA CAHAYA</h2>
+                                <h3 className="text-2xl font-bold text-white mb-6 uppercase border-b-2 border-yellow-400 pb-2">SIJIL KEMERDEKAAN KEMAHIRAN HIDUP BERDIKARI</h3>
+                                
+                                <p className="text-xl text-stone-300 leading-relaxed max-w-2xl mx-auto mb-8">
+                                    Dengan ini dianugerahkan gelaran terhormat <span className="text-yellow-400 font-extrabold text-2xl">WIRA CAHAYA</span> kepada pemain atas kejayaan luar biasa menyelesaikan kesemua 7 Bilik Pembelajaran Praktikal KAIKuP.
+                                </p>
+
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8 justify-center">
+                                    {badges.map((b, bIdx) => (
+                                        <div key={bIdx} className="p-4 bg-zinc-900 border-2 border-cyan-400 rounded-xl flex flex-col items-center">
+                                            <i className={`fa-solid ${b.icon} ${b.color} text-4xl mb-2`}></i>
+                                            <span className="text-xs font-bold text-white uppercase text-center leading-tight">{b.name}</span>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="bg-stone-900 p-6 rounded-2xl border-4 border-cyan-400 max-w-md mx-auto mb-8">
+                                    <h4 className="text-lg font-bold text-yellow-400 mb-2">Statistik Wira Agung Anda:</h4>
+                                    <div className="grid grid-cols-2 gap-3 text-sm text-left">
+                                        <div><i className="fa-solid fa-ear-deaf text-cyan-400 mr-2"></i> Listening: <span className="font-black text-white">{skills.listening}</span></div>
+                                        <div><i className="fa-solid fa-compass text-cyan-400 mr-2"></i> Orientation: <span className="font-black text-white">{skills.orientation}</span></div>
+                                        <div><i className="fa-solid fa-heart text-cyan-400 mr-2"></i> Daily Living: <span className="font-black text-white">{skills.dailyLiving}</span></div>
+                                        <div><i className="fa-solid fa-spell-check text-cyan-400 mr-2"></i> Braille: <span className="font-black text-white">{skills.braille}</span></div>
+                                        <div><i className="fa-solid fa-desktop text-cyan-400 mr-2"></i> ICT Master: <span className="font-black text-white">{skills.ict}</span></div>
+                                        <div><i className="fa-solid fa-medal text-cyan-400 mr-2"></i> Confidence: <span className="font-black text-white">{skills.confidence}</span></div>
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                                    <button 
+                                        onClick={() => {
+                                            audio.playInteract();
+                                            setGameState('PORTAL');
+                                            triggerNarration("Kembali ke hab misi pengembaraan utama.");
+                                        }}
+                                        className="px-6 py-4 bg-stone-900 hover:bg-stone-850 text-yellow-400 border-4 border-yellow-400 font-extrabold text-xl rounded-xl interactive-item uppercase"
+                                    >
+                                        Ulang Pengembaraan
+                                    </button>
+                                    <button 
+                                        onClick={() => {
+                                            audio.playInteract();
+                                            window.print();
+                                        }}
+                                        className="px-6 py-4 bg-yellow-400 hover:bg-yellow-300 text-black border-4 border-white font-extrabold text-xl rounded-xl interactive-item uppercase"
+                                    >
+                                        Cetak Sijil Anda <i className="fa-solid fa-print ml-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                    </main>
+
+                    {/* KEYBOARD CONTROLS MODAL GUIDE */}
+                    {showControlsModal && (
+                        <div className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4">
+                            <div className="bg-stone-900 border-8 border-yellow-400 p-8 rounded-3xl max-w-2xl w-full">
+                                <h3 className="text-3xl font-black text-yellow-400 mb-4 border-b border-stone-800 pb-2 uppercase text-center">MANUAL PANDUAN KAWALAN WIRA</h3>
+                                
+                                <div className="space-y-4 mb-6">
+                                    <div className="flex items-center justify-between border-b border-stone-800 pb-2">
+                                        <span className="font-bold text-lg text-white">Navigasi Bergerak (Wira)</span>
+                                        <span className="font-mono bg-cyan-950 px-3 py-1 rounded text-cyan-400 text-md font-bold">W, A, S, D / Arrow Keys</span>
+                                    </div>
+                                    <div className="flex items-center justify-between border-b border-stone-800 pb-2">
+                                        <span className="font-bold text-lg text-white">Sentuh & Interaksi Objek</span>
+                                        <span className="font-mono bg-cyan-950 px-3 py-1 rounded text-cyan-400 text-md font-bold">Spacebar / Enter</span>
+                                    </div>
+                                    <div className="flex items-center justify-between border-b border-stone-800 pb-2">
+                                        <span className="font-bold text-lg text-white">Ulang Narasi Pembaca Skrin</span>
+                                        <span className="font-mono bg-cyan-950 px-3 py-1 rounded text-cyan-400 text-md font-bold">Kekunci [ R ]</span>
+                                    </div>
+                                    <div className="flex items-center justify-between border-b border-stone-800 pb-2">
+                                        <span className="font-bold text-lg text-white">Aktifkan Radar Scanner Jarak</span>
+                                        <span className="font-mono bg-cyan-950 px-3 py-1 rounded text-cyan-400 text-md font-bold">Kekunci [ F ]</span>
+                                    </div>
+                                </div>
+
+                                <div className="bg-black p-4 border-2 border-stone-800 rounded-lg text-sm text-stone-400 mb-6 leading-relaxed">
+                                    <p className="font-bold text-yellow-400 mb-1">Mengenai Kategori B2 Visual Impairment:</p>
+                                    <p>Butang sentuhan atas skrin bersaiz gergasi turut disediakan bagi menyokong paparan tablet, peranti mudah alih, dan kawalan tetikus secara selesa.</p>
+                                </div>
+
+                                <div className="flex justify-center">
+                                    <button 
+                                        onClick={() => { audio.playInteract(); setShowControlsModal(false); }}
+                                        className="px-6 py-3 bg-yellow-400 text-black font-black text-xl rounded-lg border-2 border-white interactive-item"
+                                    >
+                                        Tutup Panduan Manual
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* FOOTER METADATA */}
+                    <footer className="mt-8 pt-4 border-t-2 border-stone-900 flex justify-between items-center text-xs text-stone-500 font-bold">
+                        <p>Cahaya Quest: Journey of Independence • Edisi KAIKuP</p>
+                        <p>Kementerian Pendidikan Malaysia</p>
+                    </footer>
+
+                </div>
+            );
+        }
+
+        // --- APP INITIALIZER ENTRANCE ---
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuiz Pemulihan Bahasa Melayu</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts: Gabungan Inter (Moden) & Pixelify Sans (Retro) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Custom Animations */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes slideInUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        .animate-zoom-in { animation: zoomIn 0.4s ease-out forwards; }
+        .animate-slide-in-up { animation: slideInUp 0.3s ease-out forwards; }
+        
+        /* Font Asas: Retro Pixel untuk permainan */
+        body { font-family: 'Pixelify Sans', monospace, sans-serif; letter-spacing: 1px; }
+
+        /* Font Moden/Bersih (Khusus untuk Muka Hadapan, Tajuk Utama, & Leaderboard) */
+        .font-inter {
+            font-family: 'Inter', sans-serif !important;
+            letter-spacing: normal !important;
+        }
+
+        /* Watercolor & Oil Pastel Custom Button Styling for Topics */
+        .watercolor-btn {
+            border-radius: 255px 25px 225px 30px/35px 225px 40px 255px;
+            border: 3px solid rgba(110, 100, 150, 0.22);
+            box-shadow: 
+                inset 0 0 16px rgba(255, 255, 255, 0.7), 
+                3px 5px 15px rgba(0, 0, 0, 0.06);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .watercolor-btn:hover {
+            border-radius: 30px 240px 35px 255px/255px 35px 240px 30px;
+            box-shadow: 
+                inset 0 0 25px rgba(255, 255, 255, 0.95), 
+                5px 8px 22px rgba(100, 80, 140, 0.12);
+        }
+
+        /* High-Contrast Retro Oval Button Style */
+        .retro-btn {
+            border-radius: 9999px; /* Bujur Sempurna */
+            border: 4px solid #1E293B; /* Bingkai Gelap Tebal */
+            box-shadow: 4px 4px 0px 0px #1E293B; /* Bayangan Retro Flat */
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .watercolor-btn:active, .retro-active:active, .retro-btn-active:active {
+            transform: translateY(3px);
+            box-shadow: 1px 2px 0px rgba(0,0,0,0.1) !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-yellow-100 text-gray-800 flex flex-col items-center py-6 px-4 transition-all duration-500">
+
+    <!-- Universal Header (Menggunakan Font Inter untuk lebih profesional) -->
+    <header class="font-inter mb-6 text-center w-full">
+        <h1 class="text-3xl md:text-5xl font-extrabold text-indigo-700 drop-shadow-sm flex items-center justify-center gap-3">
+            <i class="fa-solid fa-star text-yellow-400 animate-pulse text-3xl md:text-5xl"></i>
+            JOM BELAJAR BAHASA MELAYU
+            <i class="fa-solid fa-star text-yellow-400 animate-pulse text-3xl md:text-5xl"></i>
+        </h1>
+    </header>
+
+    <!-- Main Content Container -->
+    <div id="app-container" class="w-full max-w-7xl flex flex-col items-center flex-grow">
+        <!-- Views will be injected here via JavaScript -->
+    </div>
+
+    <script>
+        // --- 1. Data Soalan (Menggunakan imej berkualiti tinggi yang telah cikgu muat naik) ---
+        const questionsTopic1 = [
+            { id: 1, type: "kv-kv", questionText: "bu + ___ = buku", options: ["ku", "ka", "ki"], answer: "ku", emoji: "📚", image: "bukuu.jpg" },
+            { id: 2, type: "kv-kv", questionText: "ba + ___ = baju", options: ["ju", "ja", "ji"], answer: "ju", emoji: "👕", image: "bajuu.jpg" },
+            { id: 3, type: "kv-kv", questionText: "bo + ___ = bola", options: ["la", "lu", "lo"], answer: "la", emoji: "⚽", image: "bolaa.jpg" },
+            { id: 4, type: "kv-kv", questionText: "pa + ___ = paku", options: ["ku", "ka", "ki"], answer: "ku", emoji: "🔨", image: "paku.jpg" },
+            { id: 5, type: "kv-kv", questionText: "gi + ___ = gigi", options: ["gi", "gu", "ga"], answer: "gi", emoji: "🦷", image: "gigiii.jpg" },
+            { id: 6, type: "kv-kv", questionText: "ma + ___ = mata", options: ["ta", "tu", "ti"], answer: "ta", emoji: "👁️", image: "mataa.jpg" },
+            { id: 7, type: "kv-kv", questionText: "me + ___ = meja", options: ["ja", "ju", "ji"], answer: "ja", emoji: "🪑", image: "mejaaa.jpg" },
+            { id: 8, type: "kv-kv", questionText: "ro + ___ = roti", options: ["ti", "tu", "ta"], answer: "ti", emoji: "🍞", image: "rotii.jpg" },
+            { id: 9, type: "kv-kv", questionText: "lo + ___ = lori", options: ["ri", "ru", "ra"], answer: "ri", emoji: "🚚", image: "lorii.jpg" },
+            { id: 10, type: "kv-kv", questionText: "su + ___ = susu", options: ["su", "sa", "si"], answer: "su", emoji: "🥛", image: "susuu.jpg" },
+            { id: 11, type: "kv-kv", questionText: "ja + ___ = jari", options: ["ri", "ru", "ra"], answer: "ri", emoji: "👉", image: "jarii.jpg" }
+        ];
+
+        const questionsTopic2 = [
+            { id: 1, type: "ayat", questionText: "Saya suka main ___.", options: ["bola", "baju", "buku"], answer: "bola", emoji: "⚽", image: "bolaa.jpg" },
+            { id: 2, type: "ayat", questionText: "Bapa pandu ___ laju.", options: ["lori", "lari", "roti"], answer: "lori", emoji: "🚚", image: "lorii.jpg" },
+            { id: 3, type: "ayat", questionText: "Bapa beli ___ baru.", options: ["baju", "paku", "gigi"], answer: "baju", emoji: "👕", image: "bajuu.jpg" },
+            { id: 4, type: "ayat", questionText: "Ali baca ___ cerita.", options: ["buku", "meja", "mata"], answer: "buku", emoji: "📚", image: "bukuu.jpg" },
+            { id: 5, type: "ayat", questionText: "Siti minum ___ lembu.", options: ["susu", "roti", "gigi"], answer: "susu", emoji: "🥛", image: "susuu.jpg" }
+        ];
+
+        const questionsTopic3 = [
+            { id: 1, type: "perkataan", questionText: "Apakah nama gambar di atas?", options: ["kucing", "burung", "anjing"], answer: "kucing", emoji: "🐱" },
+            { id: 2, type: "perkataan", questionText: "Apakah nama gambar di atas?", options: ["kereta", "lori", "basikal"], answer: "kereta", emoji: "🚗", image: "kereta.jpg" },
+            { id: 3, type: "perkataan", questionText: "Apakah nama gambar di atas?", options: ["rumah", "kedai", "sekolah"], answer: "rumah", emoji: "🏠" },
+            { id: 4, type: "perkataan", questionText: "Apakah nama gambar di atas?", options: ["epal", "pisang", "oren"], answer: "epal", emoji: "🍎" },
+            { id: 5, type: "perkataan", questionText: "Apakah nama gambar di atas?", options: ["ikan", "ketam", "sotong"], answer: "ikan", emoji: "🐟" },
+            { id: 6, type: "perkataan", questionText: "Apakah nama gambar di atas?", options: ["ayam", "itik", "burung"], answer: "ayam", emoji: "🐓" },
+            { id: 7, type: "perkataan", questionText: "Apakah nama gambar di atas?", options: ["pokok", "bunga", "daun"], answer: "pokok", emoji: "🌳" },
+            { id: 8, type: "perkataan", questionText: "Apakah nama gambar di atas?", options: ["kaki", "tangan", "muka"], answer: "kaki", emoji: "🦶" },
+            { id: 9, type: "perkataan", questionText: "Apakah nama gambar di atas?", options: ["kapak", "paku", "pisau"], answer: "kapak", emoji: "🪓" },
+            { id: 10, type: "perkataan", questionText: "Apakah nama gambar di atas?", options: ["lobak", "kubis", "cili"], answer: "lobak", emoji: "🥕" }
+        ];
+
+        const questionsTopic4 = [
+            { id: 1, type: "abjad", questionText: "Pilih huruf kecil yang betul untuk: A", options: ["a", "c", "d"], answer: "a", emoji: "" },
+            { id: 2, type: "abjad", questionText: "Pilih huruf kecil yang betul untuk: B", options: ["d", "p", "b"], answer: "b", emoji: "" },
+            { id: 3, type: "abjad", questionText: "Pilih huruf kecil yang betul untuk: D", options: ["b", "q", "d"], answer: "d", emoji: "" },
+            { id: 4, type: "abjad", questionText: "Pilih huruf kecil yang betul untuk: E", options: ["o", "e", "a"], answer: "e", emoji: "" },
+            { id: 5, type: "abjad", questionText: "Pilih huruf kecil yang betul untuk: G", options: ["q", "y", "g"], answer: "g", emoji: "" },
+            { id: 6, type: "abjad", questionText: "Pilih huruf kecil yang betul untuk: M", options: ["w", "n", "m"], answer: "m", emoji: "" },
+            { id: 7, type: "abjad", questionText: "Pilih huruf kecil yang betul untuk: N", options: ["u", "r", "n"], answer: "n", emoji: "" },
+            { id: 8, type: "abjad", questionText: "Pilih huruf kecil yang betul untuk: P", options: ["q", "d", "p"], answer: "p", emoji: "" },
+            { id: 9, type: "abjad", questionText: "Pilih huruf kecil yang betul untuk: Q", options: ["p", "g", "q"], answer: "q", emoji: "" },
+            { id: 10, type: "abjad", questionText: "Pilih huruf kecil yang betul untuk: U", options: ["n", "v", "u"], answer: "u", emoji: "" }
+        ];
+
+        const questionsTopic5 = [
+            { id: 1, type: "kv-kv-kv", questionText: "ke + la + ___ = kelapa", options: ["pa", "pi", "pu"], answer: "pa", emoji: "🥥", image: "kelapaa.jpg" },
+            { id: 2, type: "kv-kv-kv", questionText: "ke + ___ + ta = kereta", options: ["re", "ri", "ro"], answer: "re", emoji: "🚗", image: "kereta.jpg" },
+            { id: 3, type: "kv-kv-kv", questionText: "ke + ___ + la = kepala", options: ["pa", "pi", "pu"], answer: "pa", emoji: "🧑" },
+            { id: 4, type: "kv-kv-kv", questionText: "bo + ne + ___ = boneka", options: ["ka", "ki", "ku"], answer: "ka", emoji: "🧸" },
+            { id: 5, type: "kv-kv-kv", questionText: "ca + me + ___ = kamera", options: ["ra", "ri", "ru"], answer: "ra", emoji: "📷" },
+            { id: 6, type: "kv-kv-kv", questionText: "se + ___ + tu = sepatu", options: ["pa", "pi", "pu"], answer: "pa", emoji: "👞" },
+            { id: 7, type: "kv-kv-kv", questionText: "pe + ___ + ta = pelita", options: ["li", "la", "lo"], answer: "li", emoji: "🪔" },
+            { id: 8, type: "kv-kv-kv", questionText: "re + ba + ___ = rebana", options: ["na", "ni", "nu"], answer: "na", emoji: "🥁" },
+            { id: 9, type: "kv-kv-kv", questionText: "ke + la + ___ = keladi", options: ["di", "da", "du"], answer: "di", emoji: "🍠" },
+            { id: 10, type: "kv-kv-kv", questionText: "de + li + ___ = delima", options: ["ma", "mi", "mu"], answer: "ma", emoji: "🍓" }
+        ];
+
+        const questionsTopic6 = [
+            { id: 1, type: "kvk", questionText: "___ + a + t = cat", options: ["c", "b", "j"], answer: "c", emoji: "🎨" },
+            { id: 2, type: "kvk", questionText: "j + ___ + s = jus", options: ["u", "a", "i"], answer: "u", emoji: "🥤" },
+            { id: 3, type: "kvk", questionText: "t + i + ___ = tin", options: ["n", "m", "p"], answer: "n", emoji: "🥫" },
+            { id: 4, type: "kvk", questionText: "b + a + ___ = bas", options: ["s", "g", "t"], answer: "s", emoji: "🚌" },
+            { id: 5, type: "kvk", questionText: "b + ___ + g = beg", options: ["e", "a", "o"], answer: "e", emoji: "🎒" },
+            { id: 6, type: "kvk", questionText: "j + a + ___ = jam", options: ["m", "n", "k"], answer: "m", emoji: "⏰" },
+            { id: 7, type: "kvk", questionText: "p + ___ + n = pen", options: ["e", "i", "u"], answer: "e", emoji: "🖊️" },
+            { id: 8, type: "kvk", questionText: "___ + a + n = van", options: ["v", "f", "b"], answer: "v", emoji: "🚐" },
+            { id: 9, type: "kvk", questionText: "z + i + ___ = zip", options: ["p", "b", "t"], answer: "p", emoji: "🤐" },
+            { id: 10, type: "kvk", questionText: "b + ___ + t = bot", options: ["o", "e", "a"], answer: "o", emoji: "⛵" }
+        ];
+
+        const questionsTopic7 = [
+            { id: 1, type: "v-kvk", questionText: "i + ___ = ikan", options: ["kan", "kun", "kin"], answer: "kan", emoji: "🐟" },
+            { id: 2, type: "v-kvk", questionText: "a + ___ = ayam", options: ["yam", "yum", "yim"], answer: "yam", emoji: "🐓" },
+            { id: 3, type: "v-kvk", questionText: "i + ___ = itik", options: ["tik", "tuk", "tak"], answer: "tik", emoji: "🦆" },
+            { id: 4, type: "v-kvk", questionText: "u + ___ = ulat", options: ["lat", "lut", "lit"], answer: "lat", emoji: "🐛" },
+            { id: 5, type: "v-kvk", questionText: "e + ___ = emas", options: ["mas", "mus", "mis"], answer: "mas", emoji: "🪙" },
+            { id: 6, type: "v-kvk", questionText: "e + ___ = epal", options: ["pal", "pul", "pel"], answer: "pal", emoji: "🍎" },
+            { id: 7, type: "v-kvk", questionText: "u + ___ = ubat", options: ["bat", "but", "bit"], answer: "bat", emoji: "💊" },
+            { id: 8, type: "v-kvk", questionText: "a + ___ = awan", options: ["wan", "wun", "win"], answer: "wan", emoji: "☁️" },
+            { id: 9, type: "v-kvk", questionText: "a + ___ = asin", options: ["sin", "sun", "san"], answer: "sin", emoji: "SALT" },
+            { id: 10, type: "v-kvk", questionText: "e + ___ = ekor", options: ["kor", "kur", "kar"], answer: "kor", emoji: "🐒" }
+        ];
+
+        // --- Data Mentah Untuk Padanan Tajuk 8 (Dua Gambar & Dua Perkataan Rawak) ---
+        const rawTopic8Items = [
+            { id: "pokok", text: "pokok", emoji: "🌳", kv: "po", kvk: "kok" },
+            { id: "kasut", text: "kasut", emoji: "👟", kv: "ka", kvk: "sut" },
+            { id: "gitar", text: "gitar", emoji: "🎸", kv: "gi", kvk: "tar" },
+            { id: "hujan", text: "hujan", emoji: "🌧️", kv: "hu", kvk: "jan" },
+            { id: "jarum", text: "jarum", emoji: "🪡", kv: "ja", kvk: "rum" },
+            { id: "semut", text: "semut", emoji: "🐜", kv: "se", kvk: "mut" },
+            { id: "katak", text: "katak", emoji: "🐸", kv: "ka", kvk: "tak" },
+            { id: "gajah", text: "gajah", emoji: "🐘", kv: "ga", kvk: "jah" },
+            { id: "sikat", text: "sikat", emoji: "🪮", kv: "si", kvk: "kat" },
+            { id: "lebah", text: "lebah", emoji: "🐝", kv: "le", kvk: "bah" }
+        ];
+
+        const topic8WordMappings = {
+            "pokok": { kv: "po", kvk: "kok" },
+            "kasut": { kv: "ka", kvk: "sut" },
+            "gitar": { kv: "gi", kvk: "tar" },
+            "hujan": { kv: "hu", kvk: "jan" },
+            "jarum": { kv: "ja", kvk: "rum" },
+            "semut": { kv: "se", kvk: "mut" },
+            "katak": { kv: "ka", kvk: "tak" },
+            "gajah": { kv: "ga", kvk: "jah" },
+            "sikat": { kv: "si", kvk: "kat" },
+            "lebah": { kv: "le", kvk: "bah" }
+        };
+
+        // Membina 10 Set Soalan Padanan Dinamik (Setiap set mengandungi 2 Gambar dan 2 Pilihan jawapan diacak)
+        const generateTopic8Questions = () => {
+            const list = [];
+            for (let i = 0; i < 10; i++) {
+                const shuffledRaw = shuffleArray(rawTopic8Items);
+                const itemA = shuffledRaw[0];
+                const itemB = shuffledRaw[1];
+                const options = shuffleArray([itemA.text, itemB.text]);
+
+                list.push({
+                    id: i + 1,
+                    type: "suaikan-gambar",
+                    questionText: "Suaikan kedua-dua gambar dengan perkataan:",
+                    itemA: itemA, // Gambar 1
+                    itemB: itemB, // Gambar 2
+                    options: options, // 2 Perkataan diacak
+                    answer: { [itemA.text]: "itemA", [itemB.text]: "itemB" } // Peta jawapan
+                });
+            }
+            return list;
+        };
+
+        // --- 2. State Management ---
+        let activeQuestions = [];
+        let activeTopicNum = 1;
+        let playerCount = 1;
+        let players = [];
+        let timeLeft = 120; // 2 minit
+        let timerInterval = null;
+
+        // Leaderboard & Teacher Mode Data Storage (Saved in LocalStorage so it persists across refreshes)
+        let teacherRecords = JSON.parse(localStorage.getItem('sk_miri_records')) || [];
+        
+        // Pilihan Tab Pemantauan Guru (Default: "semua" untuk paparan pengumpulan mengikut tajuk)
+        let activeTeacherTab = "semua"; 
+
+        const appContainer = document.getElementById('app-container');
+
+        // --- 3. Helper Functions ---
+        const shuffleArray = (array) => {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        };
+
+        const formatTime = (seconds) => {
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            return `${m}:${s.toString().padStart(2, '0')}`;
+        };
+
+        const getTopicName = (num) => {
+            const names = {
+                1: "Tajuk 1: Suku Kata KV+KV",
+                2: "Tajuk 2: Ayat Pendek",
+                3: "Tajuk 3: Perkataan",
+                4: "Tajuk 4: Huruf Besar & Kecil",
+                5: "Tajuk 5: Suku Kata KV+KV+KV",
+                6: "Tajuk 6: Perkataan KVK",
+                7: "Tajuk 7: Suku Kata V+KVK",
+                8: "Tajuk 8: Suaikan Gambar (KV+KVK)"
+            };
+            return names[num] || `Tajuk ${num}`;
+        };
+
+        // Membantu mewarnakan huruf vokal (merah jambu) dan konsonan (biru) secara dinamik
+        const formatKVK = (text) => {
+            const vowels = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
+            return text.split('').map(char => {
+                if (vowels.includes(char)) {
+                    return `<span class="text-rose-500 font-extrabold">${char}</span>`;
+                } else if (/[a-zA-Z]/.test(char)) {
+                    return `<span class="text-blue-600 font-extrabold">${char}</span>`;
+                } else if (char === '_') {
+                    return `<span class="text-gray-400 font-black">${char}</span>`;
+                }
+                return char;
+            }).join('');
+        };
+
+        const playSound = (type) => {
+            try {
+                let audio = new Audio(
+                    type === 'correct' 
+                    ? 'https://assets.mixkit.co/sfx/preview/mixkit-small-group-cheer-and-applause-518.mp3'
+                    : 'https://assets.mixkit.co/sfx/preview/mixkit-crowd-booing-1629.mp3'
+                );
+                audio.play();
+            } catch (error) {
+                console.error("Gagal memainkan bunyi:", error);
+            }
+        };
+
+        // Get responsive grid classes based on player count
+        const getGridClass = (count) => {
+            if (count === 1) return 'grid-cols-1 max-w-2xl mx-auto';
+            if (count === 2) return 'grid-cols-1 md:grid-cols-2';
+            return 'grid-cols-1 md:grid-cols-3';
+        };
+
+        const getSetupGridClass = (count) => {
+            if (count === 1) return 'grid-cols-1 max-w-md mx-auto';
+            if (count === 2) return 'grid-cols-1 sm:grid-cols-2';
+            return 'grid-cols-1 sm:grid-cols-3';
+        };
+
+        // --- 4. Game Logic Functions ---
+        window.selectTopic = (topic) => {
+            activeTopicNum = topic;
+            if (topic === 1) {
+                activeQuestions = questionsTopic1;
+            } else if (topic === 2) {
+                activeQuestions = questionsTopic2;
+            } else if (topic === 3) {
+                activeQuestions = questionsTopic3;
+            } else if (topic === 4) {
+                activeQuestions = questionsTopic4;
+            } else if (topic === 5) {
+                activeQuestions = questionsTopic5;
+            } else if (topic === 6) {
+                activeQuestions = questionsTopic6;
+            } else if (topic === 7) {
+                activeQuestions = questionsTopic7;
+            } else {
+                activeQuestions = generateTopic8Questions();
+            }
+            renderSetupCount();
+        };
+
+        window.initPlayers = (count) => {
+            playerCount = count;
+            players = Array.from({ length: count }, (_, i) => ({
+                id: i,
+                name: `PEMAIN ${i + 1}`,
+                score: 0,
+                currentQuestion: 0,
+                feedback: null,
+                isFinished: false,
+                playerQuestions: shuffleArray(activeQuestions),
+                // Khas untuk Tajuk 8 State Padanan
+                selectedImg: null, // "A" atau "B"
+                selectedWord: null, // Perkataan dipilih
+                matches: {} // Menyimpan padanan semasa { "A": "word", "B": "word" }
+            }));
+            renderSetupNames();
+        };
+
+        window.startGame = () => {
+            // Save names from inputs
+            players.forEach((p, index) => {
+                const inputVal = document.getElementById(`name-input-${index}`).value;
+                if (inputVal.trim() !== '') p.name = inputVal.toUpperCase();
+            });
+
+            timeLeft = 120;
+            renderPlayingBoard();
+            
+            // Start Timer
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerUI();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    finishGame();
+                }
+            }, 1000);
+        };
+
+        // Simpan markah akhir sesi penuh ke dalam senarai rekod Mod Guru (Hanya dipanggil selepas tamat semua soalan)
+        window.simpanMarkahAkhirSesi = (playerIndex) => {
+            const player = players[playerIndex];
+            if (!player) return;
+
+            const record = {
+                id: Date.now() + '-' + playerIndex,
+                date: new Date().toLocaleDateString('ms-MY'),
+                time: new Date().toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' }),
+                playerName: player.name,
+                topic: getTopicName(activeTopicNum),
+                question: `Sesi Kuiz Lengkap (10 Soalan)`,
+                score: player.score,
+                total: player.playerQuestions.length,
+                status: "Selesai Sesi"
+            };
+
+            // Simpan ke array
+            teacherRecords.unshift(record);
+            localStorage.setItem('sk_miri_records', JSON.stringify(teacherRecords));
+
+            // Papar maklum balas kejayaan simpan
+            paparNotifikasiSimpan(`Skor Akhir ${player.name} Berjaya Disimpan!`);
+        };
+
+        const paparNotifikasiSimpan = (msg) => {
+            const toast = document.createElement('div');
+            toast.className = "font-inter fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-xl font-bold py-3 px-8 rounded-full border-4 border-[#E9C46A] shadow-xl z-50 animate-bounce";
+            toast.innerHTML = `✨ ${msg}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
+        };
+
+        // Menandakan gambar terpilih (A atau B) untuk Tajuk 8
+        window.selectImageSuaikan = (playerIndex, imgKey) => {
+            const player = players[playerIndex];
+            if (player.feedback || player.isFinished) return;
+
+            // Jika gambar sudah dipadankan, abaikan klik
+            if (player.matches[imgKey]) return;
+
+            player.selectedImg = imgKey;
+            updatePlayerColumn(playerIndex);
+            
+            // Cuba padankan jika perkataan juga sudah dipilih
+            checkAndMatchSuaikan(playerIndex);
+        };
+
+        // Menandakan perkataan terpilih untuk Tajuk 8
+        window.selectWordSuaikan = (playerIndex, word) => {
+            const player = players[playerIndex];
+            if (player.feedback || player.isFinished) return;
+
+            // Jika perkataan ini sudah dipadankan pada mana-mana gambar, abaikan klik
+            if (Object.values(player.matches).includes(word)) return;
+
+            player.selectedWord = word;
+            updatePlayerColumn(playerIndex);
+
+            // Cuba padankan jika gambar juga sudah dipilih
+            checkAndMatchSuaikan(playerIndex);
+        };
+
+        // Menggabungkan pilihan gambar dan perkataan yang sesuai
+        const checkAndMatchSuaikan = (playerIndex) => {
+            const player = players[playerIndex];
+            if (player.selectedImg && player.selectedWord) {
+                player.matches[player.selectedImg] = player.selectedWord;
+                
+                // Set Semula State Pilihan Sementara
+                player.selectedImg = null;
+                player.selectedWord = null;
+                updatePlayerColumn(playerIndex);
+
+                // Jika kedua-dua gambar sudah berjaya dipadankan, semak keputusan
+                if (player.matches["A"] && player.matches["B"]) {
+                    semakKeputusanSuaikan(playerIndex);
+                }
+            }
+        };
+
+        // Semak adakah padanan yang dilakukan murid betul
+        const semakKeputusanSuaikan = (playerIndex) => {
+            const player = players[playerIndex];
+            const currentQ = player.playerQuestions[player.currentQuestion];
+
+            // Semak jawapan
+            const isCorrectA = player.matches["A"] === currentQ.itemA.text;
+            const isCorrectB = player.matches["B"] === currentQ.itemB.text;
+            const isAllCorrect = isCorrectA && isCorrectB;
+
+            playSound(isAllCorrect ? 'correct' : 'wrong');
+
+            // Hantar feedback visual
+            player.feedback = { isCorrect: isAllCorrect };
+            if (isAllCorrect) {
+                player.score += 1;
+            }
+
+            checkAllFinished();
+            updatePlayerColumn(playerIndex);
+        };
+
+        // Mengosongkan padanan yang silap jika murid mahu buat semula sebelum disemak
+        window.resetSuaikanMatches = (playerIndex) => {
+            const player = players[playerIndex];
+            if (player.feedback || player.isFinished) return;
+            player.matches = {};
+            player.selectedImg = null;
+            player.selectedWord = null;
+            updatePlayerColumn(playerIndex);
+        };
+
+        window.handleAnswer = (playerIndex, option) => {
+            const player = players[playerIndex];
+            if (player.feedback || player.isFinished) return;
+
+            const currentQ = player.playerQuestions[player.currentQuestion];
+            const isCorrect = option === currentQ.answer;
+
+            playSound(isCorrect ? 'correct' : 'wrong');
+
+            player.feedback = { option: option, isCorrect: isCorrect };
+            if (isCorrect) {
+                player.score += 1;
+            }
+
+            checkAllFinished();
+            updatePlayerColumn(playerIndex);
+        };
+
+        window.handleNextQuestion = (playerIndex) => {
+            const player = players[playerIndex];
+            player.currentQuestion += 1;
+            player.feedback = null;
+            player.matches = {}; // Reset state padanan untuk soalan seterusnya
+            player.selectedImg = null;
+            player.selectedWord = null;
+            
+            if (player.currentQuestion >= player.playerQuestions.length) {
+                player.isFinished = true;
+            }
+            
+            checkAllFinished();
+            updatePlayerColumn(playerIndex);
+        };
+
+        window.resetGame = () => {
+            if (timerInterval) clearInterval(timerInterval);
+            players = [];
+            renderMainMenu();
+        };
+
+        const checkAllFinished = () => {
+            if (players.length > 0 && players.every(p => p.isFinished)) {
+                if (timerInterval) clearInterval(timerInterval);
+                setTimeout(finishGame, 500); // delay sikit untuk lihat kesan selesai
+            }
+        };
+
+        const finishGame = () => {
+            // Auto simpan keputusan akhir (Sesi Penuh 10 soalan) untuk setiap pemain apabila permainan tamat secara lengkap
+            players.forEach((p, idx) => {
+                p.isFinished = true;
+                simpanMarkahAkhirSesi(idx);
+            });
+            renderResults();
+        };
+
+        // Mengawal penukaran Tab Mod Guru
+        window.setTeacherTab = (tabValue) => {
+            activeTeacherTab = tabValue;
+            renderTeacherMode();
+        };
+
+        // --- EXCEL EXPORT (CSV / HTML Table Method for flawless offline downloads) ---
+        window.muatTurunExcel = () => {
+            if (teacherRecords.length === 0) {
+                alert("Tiada rekod data untuk dimuat turun!");
+                return;
+            }
+
+            // Membina struktur jadual HTML untuk memastikan Excel membaca format bahasa & warna dengan betul
+            let htmlTable = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                <head>
+                    <meta charset="utf-8">
+                    <!--[if gte mso 9]>
+                    <xml>
+                        <x:ExcelWorkbook>
+                            <x:ExcelWorksheets>
+                                <x:ExcelWorksheet>
+                                    <x:Name>Rekod Markah SKPK MIRI</x:Name>
+                                    <x:WorksheetOptions>
+                                        <x:DisplayGridlines/>
+                                    </x:WorksheetOptions>
+                                </x:ExcelWorksheet>
+                            </x:ExcelWorksheets>
+                        </x:ExcelWorkbook>
+                    </xml>
+                    <![endif]-->
+                    <style>
+                        table { border-collapse: collapse; }
+                        th { background-color: #2A9D8F; color: white; font-weight: bold; border: 1px solid #1E293B; }
+                        td { border: 1px solid #1E293B; padding: 5px; }
+                    </style>
+                </head>
+                <body>
+                    <h2>REKOD MARKAH MURID - SK PENDIDIKAN KHAS MIRI</h2>
+                    <p>Tarikh Muat Turun: ${new Date().toLocaleDateString('ms-MY')} | Masa: ${new Date().toLocaleTimeString('ms-MY')}</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Bil</th>
+                                <th>Tarikh</th>
+                                <th>Masa</th>
+                                <th>Nama Pemain</th>
+                                <th>Tajuk Permainan</th>
+                                <th>Status/Soalan</th>
+                                <th>Markah</th>
+                                <th>Jumlah Soalan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            teacherRecords.forEach((record, index) => {
+                htmlTable += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${record.date}</td>
+                        <td>${record.time}</td>
+                        <td>${record.playerName}</td>
+                        <td>${record.topic}</td>
+                        <td>${record.status}</td>
+                        <td>${record.score}</td>
+                        <td>${record.total}</td>
+                    </tr>
+                `;
+            });
+
+            htmlTable += `
+                        </tbody>
+                    </table>
+                </body>
+                </html>
+            `;
+
+            // Proses pemuatan turun fail Excel
+            const blob = new Blob([htmlTable], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Rekod_Markah_SKPK_Miri_${new Date().toISOString().slice(0,10)}.xls`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
+        window.padamSemuaRekod = () => {
+            if (confirm("Adakah anda pasti mahu memadam semua rekod markah murid?")) {
+                teacherRecords = [];
+                localStorage.removeItem('sk_miri_records');
+                renderTeacherMode();
+                paparNotifikasiSimpan("Semua rekod dipadam!");
+            }
+        };
+
+        // Helper to reset background style to original state
+        const resetBodyBackground = () => {
+            document.body.style.backgroundImage = "none";
+            document.body.style.backgroundSize = "auto";
+            document.body.style.backgroundPosition = "0% 0%";
+            document.body.style.backgroundRepeat = "repeat";
+            document.body.style.backgroundAttachment = "scroll";
+        };
+
+        // --- 5. UI Render Functions ---
+
+        // View -1: Halaman Depan Selamat Datang dengan rujukan sekolah SK PENDIDIKAN KHAS MIRI
+        const renderWelcomeScreen = () => {
+            // Set watercolor canvas background specifically for the welcome screen
+            document.body.style.backgroundImage = "url('background.jpg')";
+            document.body.style.backgroundSize = "cover";
+            document.body.style.backgroundPosition = "center";
+            document.body.style.backgroundRepeat = "no-repeat";
+            document.body.style.backgroundAttachment = "fixed";
+
+            // Tambah class .font-inter pada container ini untuk mengekalkan fon moden yang bersih
+            appContainer.innerHTML = `
+                <main class="font-inter bg-white/95 backdrop-blur-sm rounded-[32px] shadow-2xl p-8 md:p-12 w-full max-w-3xl text-center border-4 border-indigo-200/50 animate-zoom-in flex flex-col items-center">
+                    <div class="relative mb-6">
+                        <i class="fa-solid fa-graduation-cap text-indigo-600 text-8xl animate-bounce"></i>
+                        <i class="fa-solid fa-heart text-pink-500 text-3xl absolute -top-2 -right-4 animate-pulse"></i>
+                    </div>
+                    
+                    <h2 class="text-3xl md:text-5xl font-black text-indigo-950 mb-6 leading-tight tracking-wide">
+                        Selamat Datang Ke <br>
+                        <span class="text-indigo-600">Kelas Pemulihan Khas:</span> <br>
+                        <span class="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 bg-clip-text text-transparent">Bahasa Malaysia</span> <br>
+                        <span class="text-2xl md:text-4xl text-indigo-800 font-extrabold tracking-normal mt-2 block">SK PENDIDIKAN KHAS MIRI</span>
+                    </h2>
+                    
+                    <p class="text-xl md:text-2xl text-purple-600 font-bold mb-10 max-w-xl">
+                        Mari belajar mengeja, memadankan abjad, dan membina ayat dengan sangat seronok! 🌟
+                    </p>
+                    
+                    <button onclick="renderMainMenu()" class="retro-btn w-full max-w-md bg-[#E76F51] hover:bg-[#F4A261] text-white text-3xl font-extrabold py-6 px-8 flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-play text-4xl animate-pulse"></i>
+                        MULA BELAJAR
+                    </button>
+                    
+                    <!-- Butang Mod Guru Cepat di Bawah Skrin Utama -->
+                    <button onclick="renderTeacherMode()" class="mt-8 text-slate-500 hover:text-indigo-700 font-extrabold text-lg flex items-center gap-2 transition-transform hover:scale-105 active:scale-95">
+                        <i class="fa-solid fa-chalkboard-user"></i> MOD GURU (ADMIN)
+                    </button>
+                    
+                    <div class="mt-8 flex gap-6 text-gray-400 font-semibold text-base md:text-lg">
+                        <span><i class="fa-solid fa-shield-halved text-green-500"></i> Mesra Smartboard</span>
+                        <span>•</span>
+                        <span><i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i> Interaktif</span>
+                        <span>•</span>
+                        <span><i class="fa-solid fa-user-group text-blue-500"></i> 1-3 Pemain</span>
+                    </div>
+                </main>
+            `;
+        };
+
+        // View 0: Main Menu (Sistem grid yang dihiasi butang cat air & oil pastel beralun yang premium)
+        const renderMainMenu = () => {
+            resetBodyBackground();
+
+            appContainer.innerHTML = `
+                <main class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 md:p-12 w-full max-w-4xl text-center border-4 border-purple-200 animate-zoom-in">
+                    <i class="fa-solid fa-book-open text-purple-500 text-7xl mb-6"></i>
+                    <h2 class="text-4xl font-extrabold text-indigo-950 mb-8">Pilih Tajuk Permainan</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 px-2">
+                        <!-- Tajuk 1: Lavender Breeze -->
+                        <button onclick="selectTopic(1)" class="watercolor-btn bg-gradient-to-br from-indigo-50 via-purple-100 to-pink-100 hover:from-indigo-100 hover:to-pink-200 text-purple-950 text-xl md:text-2xl font-black py-6 px-4">
+                            Tajuk 1: Suku Kata KV+KV
+                        </button>
+                        <!-- Tajuk 2: Sunset Glow -->
+                        <button onclick="selectTopic(2)" class="watercolor-btn bg-gradient-to-br from-amber-50 via-orange-100 to-rose-100 hover:from-amber-100 hover:to-rose-200 text-orange-950 text-xl md:text-2xl font-black py-6 px-4">
+                            Tajuk 2: Ayat Pendek
+                        </button>
+                        <!-- Tajuk 3: Cherry Blossom -->
+                        <button onclick="selectTopic(3)" class="watercolor-btn bg-gradient-to-br from-rose-50 via-pink-100 to-fuchsia-100 hover:from-rose-100 hover:to-fuchsia-200 text-rose-950 text-xl md:text-2xl font-black py-6 px-4">
+                            Tajuk 3: Perkataan
+                        </button>
+                        <!-- Tajuk 4: Ocean Mist -->
+                        <button onclick="selectTopic(4)" class="watercolor-btn bg-gradient-to-br from-teal-50 via-cyan-100 to-sky-100 hover:from-teal-100 hover:to-sky-200 text-teal-950 text-xl md:text-2xl font-black py-6 px-4">
+                            Tajuk 4: Huruf Besar & Kecil
+                        </button>
+                        <!-- Tajuk 5: Golden Meadow -->
+                        <button onclick="selectTopic(5)" class="watercolor-btn bg-gradient-to-br from-lime-50 via-yellow-100 to-amber-100 hover:from-lime-100 hover:to-amber-200 text-yellow-950 text-xl md:text-2xl font-black py-6 px-4">
+                            Tajuk 5: Suku Kata KV+KV+KV
+                        </button>
+                        <!-- Tajuk 6: Sky Paint -->
+                        <button onclick="selectTopic(6)" class="watercolor-btn bg-gradient-to-br from-sky-50 via-blue-100 to-purple-100 hover:from-sky-100 hover:to-purple-200 text-blue-950 text-xl md:text-2xl font-black py-6 px-4">
+                            Tajuk 6: Perkataan KVK
+                        </button>
+                        <!-- Tajuk 7: Summer Berries -->
+                        <button onclick="selectTopic(7)" class="watercolor-btn bg-gradient-to-br from-fuchsia-50 via-purple-100 to-rose-100 hover:from-fuchsia-100 hover:to-rose-200 text-fuchsia-950 text-xl md:text-2xl font-black py-6 px-4">
+                            Tajuk 7: Suku Kata V+KVK
+                        </button>
+                        <!-- Tajuk 8: Suaikan Gambar Terkini (KV+KVK) -->
+                        <button onclick="selectTopic(8)" class="watercolor-btn bg-gradient-to-br from-sky-50 via-cyan-100 to-blue-100 hover:from-sky-100 hover:to-blue-200 text-blue-950 text-xl md:text-2xl font-black py-6 px-4">
+                            Tajuk 8: Suaikan Gambar (KV+KVK)
+                        </button>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                        <button onclick="renderWelcomeScreen()" class="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-extrabold text-xl transition-transform active:scale-95">
+                            <i class="fa-solid fa-arrow-left"></i> KEMBALI KE MUKA DEPAN
+                        </button>
+                        <span class="text-gray-300 hidden sm:block">|</span>
+                        <button onclick="renderTeacherMode()" class="inline-flex items-center gap-2 text-teal-600 hover:text-teal-800 font-extrabold text-xl transition-transform active:scale-95">
+                            <i class="fa-solid fa-chalkboard-user"></i> DIARI / MOD GURU
+                        </button>
+                    </div>
+                </main>
+            `;
+        };
+
+        // View 1: Setup Count (Diperbaharui dengan butang BUJUR RETRO KONTRA)
+        const renderSetupCount = () => {
+            resetBodyBackground();
+
+            appContainer.innerHTML = `
+                <main class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 md:p-12 w-full max-w-3xl text-center border-4 border-purple-200 animate-zoom-in">
+                    <i class="fa-solid fa-users text-purple-500 text-7xl mb-6"></i>
+                    <h2 class="text-4xl font-extrabold text-indigo-950 mb-8">Berapa orang nak main?</h2>
+                    <div class="flex flex-col sm:flex-row justify-center gap-6 mb-8">
+                        <!-- Coral Red Bujur Retro -->
+                        <button onclick="initPlayers(1)" class="retro-btn flex-1 bg-[#E76F51] hover:bg-[#F4A261] text-white text-3xl font-extrabold py-8 px-6 flex flex-col items-center justify-center gap-2">
+                            <span class="text-4xl">👦</span>
+                            <span>1 Pemain</span>
+                        </button>
+                        <!-- Mustard Yellow Bujur Retro -->
+                        <button onclick="initPlayers(2)" class="retro-btn flex-1 bg-[#E9C46A] hover:bg-[#F4D068] text-slate-900 text-3xl font-extrabold py-8 px-6 flex flex-col items-center justify-center gap-2">
+                            <span class="text-4xl">👦👧</span>
+                            <span>2 Pemain</span>
+                        </button>
+                        <!-- Persian Teal Bujur Retro -->
+                        <button onclick="initPlayers(3)" class="retro-btn flex-1 bg-[#2A9D8F] hover:bg-[#3dbbb1] text-white text-3xl font-extrabold py-8 px-6 flex flex-col items-center justify-center gap-2">
+                            <span class="text-4xl">👦👧🧒</span>
+                            <span>3 Pemain</span>
+                        </button>
+                    </div>
+                    
+                    <button onclick="resetGame()" class="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-extrabold text-2xl transition-transform active:scale-95">
+                        <i class="fa-solid fa-arrow-left"></i> KEMBALI KE MENU UTAMA
+                    </button>
+                </main>
+            `;
+        };
+
+        // View 2: Setup Names (Diperbaharui dengan butang BUJUR RETRO KONTRA)
+        const renderSetupNames = () => {
+            resetBodyBackground();
+
+            let inputsHTML = players.map((p, index) => `
+                <div class="flex flex-col items-center bg-purple-50/50 p-6 rounded-2xl border-2 border-purple-150">
+                    <i class="fa-solid fa-user text-5xl mb-4 ${index === 0 ? 'text-purple-500' : index === 1 ? 'text-indigo-500' : 'text-amber-500'}"></i>
+                    <input id="name-input-${index}" type="text" value="${p.name}" class="w-full text-center text-2xl font-black p-3 border-b-4 border-purple-300 focus:border-indigo-500 bg-transparent outline-none uppercase text-indigo-950" maxlength="10">
+                </div>
+            `).join('');
+
+            appContainer.innerHTML = `
+                <main class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 md:p-12 w-full max-w-4xl text-center border-4 border-purple-200 animate-fade-in">
+                    <h2 class="text-4xl font-extrabold text-indigo-950 mb-8">Sila Masukkan Nama:</h2>
+                    <div class="grid gap-6 mb-10 ${getSetupGridClass(playerCount)}">
+                        ${inputsHTML}
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button onclick="renderSetupCount()" class="retro-btn flex-1 bg-gray-150 hover:bg-gray-250 text-slate-800 text-2xl font-extrabold py-5 px-8 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-arrow-left"></i> KEMBALI
+                        </button>
+                        <!-- Persian Teal Mula Bermain Bujur Retro -->
+                        <button onclick="startGame()" class="retro-btn flex-[2] bg-[#2A9D8F] hover:bg-[#3dbbb1] text-white text-2xl md:text-3xl font-extrabold py-6 px-8 flex items-center justify-center gap-3">
+                            <i class="fa-solid fa-play text-4xl animate-pulse"></i>
+                            MULA BERMAIN!
+                        </button>
+                    </div>
+                </main>
+            `;
+        };
+
+        // View 3: Playing Board Layout
+        const renderPlayingBoard = () => {
+            resetBodyBackground();
+
+            appContainer.innerHTML = `
+                <div class="w-full flex flex-col flex-grow animate-fade-in">
+                    <!-- Timer Header & Back Button Row -->
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6 max-w-7xl w-full px-4">
+                        <button onclick="resetGame()" class="retro-btn flex items-center gap-2 px-6 py-3 bg-white text-purple-700 hover:bg-purple-50 font-extrabold text-xl">
+                            <i class="fa-solid fa-arrow-left"></i> Keluar Ke Menu
+                        </button>
+                        <div id="timer-container" class="flex items-center gap-4 px-8 py-3 rounded-full border-4 shadow-md bg-white border-purple-300 text-purple-700 transition-colors">
+                            <i class="fa-solid fa-clock text-4xl"></i>
+                            <span id="timer-display" class="text-5xl font-black tracking-wider">${formatTime(timeLeft)}</span>
+                        </div>
+                        <div class="w-[100px] sm:block hidden"></div> <!-- Spacer to align layout -->
+                    </div>
+                    <!-- Player Columns -->
+                    <div id="columns-container" class="grid gap-4 w-full flex-grow ${getGridClass(playerCount)}">
+                        <!-- Columns generated dynamically -->
+                    </div>
+                </div>
+            `;
+            
+            // Render each column content
+            players.forEach((_, index) => {
+                const colWrapper = document.createElement('div');
+                colWrapper.id = `player-col-${index}`;
+                
+                const borderColors = ['border-purple-200', 'border-indigo-200', 'border-yellow-200'];
+                
+                colWrapper.className = `flex flex-col bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg border-4 ${borderColors[index]} overflow-hidden relative`;
+                document.getElementById('columns-container').appendChild(colWrapper);
+                
+                updatePlayerColumn(index);
+            });
+        };
+
+        // Update specific player column logic (Butang jawapan diubah kepada BUJUR RETRO KONTRA)
+        const updatePlayerColumn = (index) => {
+            const player = players[index];
+            const colElement = document.getElementById('player-col-' + index);
+            if (!colElement) return;
+
+            const bgColors = ['bg-purple-50/70', 'bg-indigo-50/70', 'bg-yellow-50/70'];
+            const borderColors = ['border-purple-200', 'border-indigo-200', 'border-yellow-200'];
+            const textColors = ['text-purple-800', 'text-indigo-800', 'text-amber-800'];
+
+            // Header Section
+            let html = `
+                <div class="${bgColors[index]} p-4 flex justify-between items-center border-b-4 ${borderColors[index]}">
+                    <span class="text-2xl font-black uppercase ${textColors[index]} truncate max-w-[60%]">${player.name}</span>
+                    <span class="text-2xl font-bold bg-white px-3 py-1 rounded-full flex items-center gap-1 shadow-sm border border-purple-100">
+                        <i class="fa-solid fa-star text-yellow-500 animate-bounce"></i> ${player.score}
+                    </span>
+                </div>
+                <div class="p-4 flex-grow flex flex-col relative h-full">
+            `;
+
+            if (player.isFinished) {
+                // Finished State
+                html += `
+                    <div class="flex flex-col items-center justify-center flex-grow text-center h-full animate-zoom-in">
+                        <i class="fa-solid fa-trophy text-7xl text-yellow-400 mb-4 drop-shadow-md"></i>
+                        <h3 class="text-3xl font-black text-green-600 mb-2">SELESAI!</h3>
+                        <p class="text-xl text-gray-500 font-bold">Markah dihantar ke Diari Guru!</p>
+                    </div>
+                `;
+            } else {
+                // Active Question State
+                const currentQ = player.playerQuestions[player.currentQuestion];
+                const progressPct = (player.currentQuestion / player.playerQuestions.length) * 100;
+                
+                // Imej pintas berserta sistem sandaran (Kecuali untuk abjad, tidak diletakkan mediaHtml)
+                let mediaHtml = '';
+                if (currentQ.type === 'abjad') {
+                    mediaHtml = ''; // Tiada sebarang emoji atau gambar untuk soalan abjad
+                } else if (currentQ.image) {
+                    mediaHtml = `
+                        <div class="relative flex justify-center items-center mb-4 min-h-[140px] md:min-h-[180px]">
+                            <img src="${currentQ.image}" alt="${currentQ.answer}" 
+                                 onerror="this.style.display='none'; document.getElementById('emoji-fallback-${index}').style.display='block';" 
+                                 class="h-32 md:h-40 object-contain rounded-2xl mx-auto shadow-md border-2 border-purple-200 bg-white p-2">
+                            <div id="emoji-fallback-${index}" style="display: none;" class="text-7xl animate-bounce">
+                                ${currentQ.emoji}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    mediaHtml = `
+                        <div class="text-7xl mb-4 animate-bounce flex justify-center items-center min-h-[140px] md:min-h-[180px]">
+                            ${currentQ.emoji}
+                        </div>
+                    `;
+                }
+
+                // Dapatkan teks soalan yang telah diwarnakan
+                let displayQuestionText = currentQ.questionText;
+                if (currentQ.type === 'abjad') {
+                    const targetLetter = currentQ.questionText.slice(-1);
+                    const instruction = currentQ.questionText.slice(0, -1);
+                    displayQuestionText = instruction + formatKVK(targetLetter);
+                } else if (currentQ.type === 'kv-kvk') {
+                    displayQuestionText = `<span class="text-blue-600 font-extrabold">${currentQ.kv}</span> + <span class="text-gray-400 font-black">___</span> = <span class="text-blue-600 font-extrabold">${currentQ.kv}</span><span class="text-pink-500 font-extrabold">${currentQ.kvk}</span>`;
+                } else if (currentQ.type === 'kvk' || currentQ.type === 'kv-kv' || currentQ.type === 'kv-kv-kv' || currentQ.type === 'v-kvk' || currentQ.type === 'suaikan-gambar') {
+                    displayQuestionText = formatKVK(currentQ.questionText);
+                }
+
+                html += `
+                    <div class="flex flex-col h-full animate-fade-in">
+                        <!-- Progress Bar -->
+                        <div class="w-full bg-gray-200 rounded-full h-3 mb-4 overflow-hidden">
+                          <div class="bg-gradient-to-r from-purple-400 to-indigo-400 h-3 rounded-full transition-all duration-300" style="width: ${progressPct}%"></div>
+                        </div>
+
+                        <!-- Gambar / Media -->
+                        ${mediaHtml}
+
+                        <!-- Soalan -->
+                        <div class="flex flex-col items-center text-center flex-grow">
+                            <h3 class="text-3xl lg:text-4xl font-black text-indigo-950 mb-6 lg:mb-8 tracking-wide">
+                                ${displayQuestionText}
+                            </h3>
+
+                            <!-- Options Grid dengan Gaya Retro Kontra Bujur -->
+                            <div class="grid grid-cols-1 gap-4 w-full">
+                `;
+
+                currentQ.options.forEach((opt, i) => {
+                    let btnClass = "";
+                    let iconHtml = "";
+
+                    // Warna asas retro kontra bergilir-gilir mengikut susunan pilihan butang
+                    const retroColors = [
+                        'bg-[#E9C46A] hover:bg-[#f3d18c] text-slate-900',  // Mustard Yellow
+                        'bg-[#E76F51] hover:bg-[#f08066] text-white',      // Terracotta Red
+                        'bg-[#2A9D8F] hover:bg-[#3dbbb1] text-white'       // Persian Teal
+                    ];
+
+                    let baseColor = retroColors[i % retroColors.length];
+
+                    if (player.feedback) {
+                        if (opt === currentQ.answer) {
+                            btnClass = "bg-green-100 border-green-600 text-green-800 shadow-[2px_2px_0px_0px_#166534]";
+                            iconHtml = `<i class="fa-solid fa-circle-check absolute right-5 top-1/2 -translate-y-1/2 text-3xl text-green-600 animate-bounce"></i>`;
+                        } else if (opt === player.feedback.option) {
+                            btnClass = "bg-red-100 border-red-600 text-red-800 shadow-[2px_2px_0px_0px_#991b1b]";
+                            iconHtml = `<i class="fa-solid fa-circle-xmark absolute right-5 top-1/2 -translate-y-1/2 text-3xl text-red-600"></i>`;
+                        } else {
+                            btnClass = "opacity-30 border-gray-300 bg-gray-50 text-gray-400 shadow-none";
+                        }
+                    } else {
+                        btnClass = `${baseColor} cursor-pointer`;
+                    }
+                    
+                    let displayOpt = opt;
+                    if (currentQ.type === 'suaikan-gambar' && topic8WordMappings[opt]) {
+                        const mapData = topic8WordMappings[opt];
+                        displayOpt = `<span class="text-blue-600 font-extrabold">${mapData.kv}</span><span class="text-rose-500 font-extrabold">${mapData.kvk}</span>`;
+                    } else if (currentQ.type === 'kv-kvk') {
+                        displayOpt = `<span class="text-pink-900 font-extrabold">${opt}</span>`;
+                    } else if (currentQ.type === 'kvk' || currentQ.type === 'kv-kv' || currentQ.type === 'kv-kv-kv' || currentQ.type === 'abjad' || currentQ.type === 'v-kvk') {
+                        displayOpt = formatKVK(opt);
+                    }
+
+                    html += `
+                        <button ${player.feedback ? 'disabled' : ''} onclick="handleAnswer(${index}, '${opt}')" class="retro-btn py-4 px-2 text-3xl font-black transition-all relative ${btnClass}">
+                            ${displayOpt}
+                            ${iconHtml}
+                        </button>
+                    `;
+                });
+
+                html += `
+                            </div>
+                        </div>
+                `;
+
+                // Feedback Overlay inside column (Penyimpanan per-soalan ditiadakan untuk penumpuan pusingan penuh)
+                if (player.feedback) {
+                    const isCorrect = player.feedback.isCorrect;
+                    const fbBg = isCorrect ? 'bg-green-100/95' : 'bg-red-100/95';
+                    const fbText = isCorrect ? 'text-green-800' : 'text-red-800';
+                    const fbMessage = isCorrect ? 'BAGUS!' : 'CUBA LAGI';
+                    const btnBg = isCorrect ? 'bg-[#2A9D8F] hover:bg-[#3dbbb1]' : 'bg-[#E76F51] hover:bg-[#f08066]';
+
+                    html += `
+                        <div class="mt-4 p-4 rounded-[24px] border-4 border-slate-800 shadow-[4px_4px_0px_0px_rgba(30,41,59,1)] flex flex-col items-center animate-slide-in-up ${fbBg}">
+                            <p class="text-3xl font-black uppercase mb-3 ${fbText}">${fbMessage}</p>
+                            <button onclick="handleNextQuestion(${index})" class="retro-btn w-full py-3 text-xl font-bold text-white flex justify-center items-center gap-2 ${btnBg}">
+                                Teruskan <i class="fa-solid fa-arrow-right animate-pulse"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+
+                html += `</div>`; // End active state container
+            }
+            
+            html += `</div>`; // End p-4 flex-grow container
+            colElement.innerHTML = html;
+        };
+
+        const updateTimerUI = () => {
+            const timerContainer = document.getElementById('timer-container');
+            const timerDisplay = document.getElementById('timer-display');
+            if (!timerDisplay) return;
+
+            timerDisplay.innerText = formatTime(timeLeft);
+
+            if (timeLeft <= 10) {
+                timerContainer.className = "flex items-center gap-4 px-8 py-3 rounded-full border-4 shadow-md bg-red-100 border-red-500 text-red-600 animate-pulse";
+            }
+        };
+
+        // View 4: Results (Menyimpan markah secara rasmi di sini selepas tamat keseluruhan sesi)
+        const renderResults = () => {
+            resetBodyBackground();
+            const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
+            
+            let podiumHTML = sortedPlayers.map((p, index) => `
+                <div class="bg-purple-50 rounded-3xl p-6 border-4 border-slate-800 shadow-[4px_4px_0px_0px_rgba(30,41,59,1)] flex flex-col items-center relative overflow-hidden">
+                    ${(index === 0 && playerCount > 1) ? `<div class="absolute top-0 left-0 w-full bg-yellow-400 text-yellow-950 font-black py-1 text-sm uppercase border-b-2 border-slate-800">Pemenang</div>` : ''}
+                    <i class="fa-solid fa-user text-6xl mb-2 mt-4 ${index === 0 ? 'text-yellow-500 animate-bounce' : 'text-purple-400'}"></i>
+                    <h3 class="text-3xl font-black text-indigo-950 mb-2 truncate w-full">${p.name}</h3>
+                    <div class="bg-white px-6 py-3 rounded-full flex items-center justify-center gap-2 w-full border-2 border-gray-200">
+                        <i class="fa-solid fa-star text-yellow-400 text-3xl"></i>
+                        <span class="text-4xl font-black text-blue-600">${p.score}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            appContainer.innerHTML = `
+                <main class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 md:p-12 w-full max-w-4xl text-center border-4 border-purple-200 animate-zoom-in">
+                    <i class="fa-solid fa-trophy text-yellow-400 text-8xl mx-auto mb-6 drop-shadow-lg animate-pulse"></i>
+                    <h2 class="text-5xl font-black text-indigo-950 mb-2">
+                        ${timeLeft <= 0 ? "MASA TAMAT!" : "KUIZ TAMAT!"}
+                    </h2>
+                    <p class="text-2xl text-purple-600 font-bold mb-4">Kerja yang sangat bagus semua!</p>
+                    <p class="font-inter text-md text-emerald-700 font-bold mb-8">💾 Semua markah murid telah berjaya direkodkan secara automatik ke dalam Diari Mod Guru!</p>
+                    
+                    <div class="grid gap-6 mb-10 ${getGridClass(playerCount)}">
+                        ${podiumHTML}
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button onclick="resetGame()" class="retro-btn flex-1 inline-flex items-center justify-center gap-3 bg-[#E76F51] hover:bg-[#F4A261] text-white text-3xl font-extrabold py-5 px-10">
+                            <i class="fa-solid fa-rotate-right"></i>
+                            Main Semula
+                        </button>
+                        <button onclick="renderTeacherMode()" class="retro-btn flex-1 inline-flex items-center justify-center gap-3 bg-[#2A9D8F] hover:bg-[#3dbbb1] text-white text-3xl font-extrabold py-5 px-10">
+                            <i class="fa-solid fa-chalkboard-user"></i>
+                            Mod Guru
+                        </button>
+                    </div>
+                </main>
+            `;
+        };
+
+        // --- View 5: MOD GURU & LEADERBOARD (Koleksi Rekod Sesi Ditulis dengan Inter & Dikelompok Mengikut Tajuk) ---
+        window.renderTeacherMode = () => {
+            resetBodyBackground();
+            if (timerInterval) clearInterval(timerInterval);
+
+            // 1. Bina Struktur Butang Tab Penapis Lembut (Watercolor Pastel)
+            const isAllActive = activeTeacherTab === "semua";
+            let tabButtonsHTML = `
+                <button onclick="setTeacherTab('semua')" class="px-5 py-2.5 rounded-full font-bold text-sm transition-all border-2 ${isAllActive ? 'bg-[#2A9D8F] text-white border-slate-800 shadow-[2px_2px_0px_0px_#1E293B]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'}">
+                    ⭐ Paparan Pengumpulan (Semua)
+                </button>
+            `;
+            
+            for (let tNum = 1; tNum <= 8; tNum++) {
+                const isActive = activeTeacherTab === tNum;
+                tabButtonsHTML += `
+                    <button onclick="setTeacherTab(${tNum})" class="px-4 py-2.5 rounded-full font-bold text-sm transition-all border-2 ${isActive ? 'bg-[#2A9D8F] text-white border-slate-800 shadow-[2px_2px_0px_0px_#1E293B]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'}">
+                        Tajuk ${tNum}
+                    </button>
+                `;
+            }
+
+            // 2. Bina Paparan Mengikut Pemilihan Tab
+            let mainContentHTML = "";
+
+            if (isAllActive) {
+                // --- PAPARAN KUMPULAN MENGIKUT TAJUK (SUMMARY GRID OF TOP 3 FOR EACH TOPIC) ---
+                mainContentHTML += `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-slate-700">
+                `;
+
+                for (let tNum = 1; tNum <= 8; tNum++) {
+                    const topicName = getTopicName(tNum);
+                    // Tapis data mengikut tajuk ini sahaja
+                    const topicRecords = teacherRecords.filter(r => r.topic === topicName);
+                    // Sort mengikut skor tertinggi
+                    const sortedTopicRecords = [...topicRecords].sort((a, b) => b.score - a.score).slice(0, 3);
+
+                    let topicTableRows = sortedTopicRecords.map((r, i) => `
+                        <tr class="border-b border-slate-100 text-xs font-semibold">
+                            <td class="p-2 text-center font-bold text-indigo-600">${i + 1}</td>
+                            <td class="p-2 font-bold truncate max-w-[120px]">${r.playerName}</td>
+                            <td class="p-2 text-center">
+                                <span class="bg-indigo-50 text-indigo-900 py-0.5 px-2 rounded-full font-black text-xs">
+                                    ${r.score}/${r.total}
+                                </span>
+                            </td>
+                            <td class="p-2 text-center text-[10px] text-slate-400 font-medium">${r.date}</td>
+                        </tr>
+                    `).join('');
+
+                    if (sortedTopicRecords.length === 0) {
+                        topicTableRows = `
+                            <tr>
+                                <td colspan="4" class="p-4 text-center text-xs text-slate-400 font-medium">
+                                    Tiada rekod disimpan untuk tajuk ini.
+                                </td>
+                            </tr>
+                        `;
+                    }
+
+                    mainContentHTML += `
+                        <div class="bg-white border-2 border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all">
+                            <div class="flex justify-between items-center border-b border-slate-150 pb-2 mb-3">
+                                <h4 class="text-sm font-extrabold text-slate-900 truncate max-w-[80%]">${topicName}</h4>
+                                <span class="bg-teal-50 text-teal-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-teal-150">
+                                    Sesi: ${topicRecords.length}
+                                </span>
+                            </div>
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 text-[10px] font-bold text-slate-500 border-b border-slate-200">
+                                        <th class="p-2 text-center">Ked</th>
+                                        <th class="p-2">Nama</th>
+                                        <th class="p-2 text-center">Skor</th>
+                                        <th class="p-2 text-center">Tarikh</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${topicTableRows}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                }
+
+                mainContentHTML += `</div>`; // End Grid
+
+            } else {
+                // --- DETAILED LEADERBOARD TABLE FOR SELECTED SINGLE TOPIC ---
+                const selectedTopicName = getTopicName(activeTeacherTab);
+                const filteredRecords = teacherRecords.filter(r => r.topic === selectedTopicName);
+                const sortedRecords = [...filteredRecords].sort((a, b) => b.score - a.score);
+
+                let leaderboardHTML = sortedRecords.map((r, i) => `
+                    <tr class="border-b border-slate-200 text-base font-semibold ${i === 0 ? 'bg-yellow-50/50 text-yellow-900' : 'text-slate-800'}">
+                        <td class="p-3 text-center font-bold">${i + 1} 🏆</td>
+                        <td class="p-3 font-bold">${r.playerName}</td>
+                        <td class="p-3 text-indigo-750 font-medium">${r.topic}</td>
+                        <td class="p-3 text-center">
+                            <span class="bg-indigo-100 text-indigo-900 py-1 px-3 rounded-full text-sm font-bold">
+                                ${r.score} / ${r.total}
+                            </span>
+                        </td>
+                        <td class="p-3 text-center text-sm text-slate-500 font-medium">${r.date} &nbsp;<span class="text-xs text-slate-400">${r.time}</span></td>
+                    </tr>
+                `).join('');
+
+                if (sortedRecords.length === 0) {
+                    leaderboardHTML = `
+                        <tr>
+                            <td colspan="5" class="p-8 text-center text-lg text-slate-400 font-bold">
+                                📭 Tiada rekod markah murid untuk tajuk ini lagi.
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                mainContentHTML += `
+                    <div class="bg-white border-2 border-slate-300 rounded-2xl shadow-md overflow-hidden overflow-x-auto text-slate-700">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b-2 border-slate-200 text-sm font-bold text-slate-600">
+                                    <th class="p-3 text-center">Ked</th>
+                                    <th class="p-3">Nama Pemain</th>
+                                    <th class="p-3">Tajuk Permainan</th>
+                                    <th class="p-3 text-center">Skor Akhir</th>
+                                    <th class="p-3 text-center">Tarikh & Masa</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm">
+                                ${leaderboardHTML}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            // Semua Sejarah Sesi Log Kecil (Ditempatkan di bahagian bawah)
+            let allLogsHTML = teacherRecords.map((r) => `
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-xs font-semibold shadow-sm">
+                    <div>
+                        <span class="text-[10px] text-slate-400 block mb-1 font-medium">${r.date} &nbsp; ${r.time}</span>
+                        <span class="text-base font-bold text-slate-900">${r.playerName}</span>
+                        <span class="text-xs text-indigo-600 block mt-0.5">${r.topic}</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="bg-[#2A9D8F] text-white text-xs font-bold py-1 px-3 rounded-full border border-slate-700 shadow-sm">
+                            Skor Akhir: ${r.score} / ${r.total}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+
+            if (teacherRecords.length === 0) {
+                allLogsHTML = `
+                    <div class="text-center py-6 text-slate-400 font-bold text-sm">
+                        Tiada log sesi disimpan.
+                    </div>
+                `;
+            }
+
+            appContainer.innerHTML = `
+                <!-- Seluruh Container Menggunakan Font Inter bagi Kekemasan Maksimum -->
+                <main class="font-inter bg-white/95 backdrop-blur-sm rounded-[32px] shadow-2xl p-6 md:p-10 w-full max-w-5xl border-4 border-indigo-200/50 animate-zoom-in">
+                    <!-- Header Mod Guru -->
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4 border-b-2 border-slate-200 pb-6 mb-6">
+                        <div class="text-center md:text-left">
+                            <span class="bg-teal-100 text-teal-800 border border-teal-200 font-bold py-1 px-4 rounded-full text-xs">
+                                <i class="fa-solid fa-circle-check"></i> DIARI PEMULIHAN KHAS
+                            </span>
+                            <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1">Papan Pemantauan Guru</h2>
+                            <p class="text-sm text-slate-500 font-semibold">SK PENDIDIKAN KHAS MIRI, SARAWAK</p>
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-3">
+                            <!-- Butang Simpan ke Excel -->
+                            <button onclick="muatTurunExcel()" class="retro-btn bg-[#2A9D8F] hover:bg-[#3dbbb1] text-white font-bold py-3 px-6 text-base flex items-center gap-2">
+                                <i class="fa-solid fa-file-excel text-xl"></i> Simpan Excel (.xls)
+                            </button>
+                            <button onclick="padamSemuaRekod()" class="retro-btn bg-[#E76F51] hover:bg-[#f08066] text-white font-bold py-3 px-6 text-base flex items-center gap-2">
+                                <i class="fa-solid fa-trash-can"></i> Padam Log
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Butang Tab Penapis Lembut (Watercolor Pastel) -->
+                    <div class="mb-6">
+                        <p class="text-sm font-bold text-slate-500 mb-3"><i class="fa-solid fa-filter"></i> Tapis Mengikut Tajuk Soalan:</p>
+                        <div class="flex flex-wrap gap-2 justify-start">
+                            ${tabButtonsHTML}
+                        </div>
+                    </div>
+
+                    <!-- Kandungan Utama (Koleksi Kelompok atau Jadual Tajuk Tunggal) -->
+                    <div class="mb-10">
+                        ${mainContentHTML}
+                    </div>
+
+                    <!-- Sejarah Log Sesi Lengkap Semua Murid -->
+                    <div class="border-t-2 border-slate-200 pt-6">
+                        <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-history text-slate-500"></i> Sejarah Sesi Log Lengkap Murid (Semua Rekod)
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[250px] overflow-y-auto pr-1">
+                            ${allLogsHTML}
+                        </div>
+                    </div>
+
+                    <!-- Footer Mod Guru -->
+                    <div class="border-t-2 border-slate-150 pt-6 mt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <button onclick="renderMainMenu()" class="retro-btn bg-[#E9C46A] hover:bg-[#f3d18c] text-slate-900 font-bold py-3 px-8 text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-chevron-left"></i> Kembali ke Menu Utama
+                        </button>
+                        <p class="text-xs font-semibold text-slate-400">© 2026 SK Pendidikan Khas Miri | Sistem Diari Interaktif</p>
+                    </div>
+                </main>
+            `;
+        };
+
+        // --- 6. Initialize App ---
+        renderWelcomeScreen();
+
+    </script>
+</body>
+</html>

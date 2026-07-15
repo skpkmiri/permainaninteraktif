@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super Minds Unit 2: Let's Play! - Toys Quiz</title>
+  
+  <!-- Google Fonts: Quicksand for cute rounded typography -->
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Quicksand', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+
+  <style>
+    /* Custom animations for special needs visual feedback */
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(-3deg); }
+      50% { transform: rotate(3deg); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+    @keyframes pulse-grow {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+    .animate-wiggle {
+      animation: wiggle 0.5s ease-in-out infinite;
+    }
+    .animate-shake {
+      animation: shake 0.3s ease-in-out infinite;
+    }
+    .animate-pulse-grow {
+      animation: pulse-grow 2s ease-in-out infinite;
+    }
+
+    /* Print styling to print ONLY the certificate card on A4 */
+    @media print {
+      body {
+        background: white !important;
+        color: black !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-shadow: none !important;
+        border: 12px double #facc15 !important;
+        margin: 0 !important;
+        padding: 2rem !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-800 min-h-screen flex flex-col font-sans select-none overflow-x-hidden">
+
+  <!-- ================= SETUP SCREEN ================= -->
+  <div id="setup-screen" class="min-h-screen bg-gradient-to-br from-blue-300 via-purple-300 to-pink-300 flex flex-col items-center justify-center p-6 no-print">
+    <div class="bg-white/95 backdrop-blur-sm p-6 md:p-8 rounded-3xl shadow-2xl max-w-2xl w-full border-4 border-white text-center">
+      <div class="flex justify-center mb-3 text-5xl animate-bounce">
+        🤟 🪁 🧸 🤟
+      </div>
+      <h1 class="text-3xl md:text-5xl font-black text-blue-800 mb-1 uppercase tracking-wide">English Year 1</h1>
+      <h2 class="text-xl md:text-2xl font-bold text-purple-600 mb-6">Unit 2: Let's Play! (Special Needs Education)</h2>
+      
+      <!-- GAME GAME SELECTION CARD -->
+      <div class="mb-6 bg-blue-50 p-4 rounded-2xl border-2 border-blue-200">
+        <label class="text-lg font-black text-blue-800 block mb-3">🎮 SELECT GAME MODE:</label>
+        <div class="grid grid-cols-2 gap-3">
+          <button onclick="setGameMode('emoji')" id="btn-mode-emoji" class="py-3 px-4 rounded-xl font-black text-base md:text-lg transition-all border-4 border-blue-500 bg-blue-500 text-white shadow-md flex flex-col items-center justify-center">
+            <span class="text-3xl mb-1">🧸</span>
+            <span>Game 1: Emoji Quiz</span>
+          </button>
+          <button onclick="setGameMode('sign')" id="btn-mode-sign" class="py-3 px-4 rounded-xl font-black text-base md:text-lg transition-all border-4 border-blue-200 bg-white text-blue-700 hover:bg-blue-100 flex flex-col items-center justify-center">
+            <span class="text-3xl mb-1">🤟</span>
+            <span>Game 2: Sign Language</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- PLAYER COUNT SELECTOR -->
+      <div class="mb-6 bg-purple-50 p-4 rounded-2xl border-2 border-purple-200">
+        <label class="text-lg font-black text-purple-800 block mb-3">👥 CHOOSE NUMBER OF PLAYERS:</label>
+        <div class="flex justify-center gap-3">
+          <button onclick="setPlayerCount(1)" id="btn-count-1" class="flex-1 py-2.5 px-3 rounded-xl font-black text-base md:text-lg transition-all border-4 border-purple-200 bg-white text-purple-750 hover:bg-purple-100">
+            1 Player
+          </button>
+          <button onclick="setPlayerCount(2)" id="btn-count-2" class="flex-1 py-2.5 px-3 rounded-xl font-black text-base md:text-lg transition-all border-4 border-purple-200 bg-white text-purple-750 hover:bg-purple-100">
+            2 Players
+          </button>
+          <button onclick="setPlayerCount(3)" id="btn-count-3" class="flex-1 py-2.5 px-3 rounded-xl font-black text-base md:text-lg transition-all border-4 border-purple-500 bg-purple-500 text-white shadow-md">
+            3 Players
+          </button>
+        </div>
+      </div>
+
+      <div class="space-y-3 mb-6">
+        <!-- Player 1 -->
+        <div id="input-group-1" class="flex flex-col items-start bg-pink-50 p-3 rounded-2xl border-2 border-pink-200">
+          <label class="text-base font-bold text-pink-700 mb-1">👦 Player 1 Name (Pink Zone):</label>
+          <input 
+            type="text" 
+            id="p1-name-input"
+            placeholder="Enter pupil 1 name..."
+            class="w-full text-xl p-2.5 rounded-xl border-2 border-gray-300 focus:border-pink-500 focus:ring-4 focus:ring-pink-200 outline-none transition-all text-center font-bold"
+            maxLength="15"
+            oninput="checkNamesFilled()"
+          />
+        </div>
+
+        <!-- Player 2 -->
+        <div id="input-group-2" class="flex flex-col items-start bg-cyan-50 p-3 rounded-2xl border-2 border-cyan-200">
+          <label class="text-base font-bold text-cyan-700 mb-1">👦 Player 2 Name (Blue Zone):</label>
+          <input 
+            type="text" 
+            id="p2-name-input"
+            placeholder="Enter pupil 2 name..."
+            class="w-full text-xl p-2.5 rounded-xl border-2 border-gray-300 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-200 outline-none transition-all text-center font-bold"
+            maxLength="15"
+            oninput="checkNamesFilled()"
+          />
+        </div>
+
+        <!-- Player 3 -->
+        <div id="input-group-3" class="flex flex-col items-start bg-amber-50 p-3 rounded-2xl border-2 border-amber-200">
+          <label class="text-base font-bold text-amber-700 mb-1">👦 Player 3 Name (Orange Zone):</label>
+          <input 
+            type="text" 
+            id="p3-name-input"
+            placeholder="Enter pupil 3 name..."
+            class="w-full text-xl p-2.5 rounded-xl border-2 border-gray-300 focus:border-amber-500 focus:ring-4 focus:ring-amber-200 outline-none transition-all text-center font-bold"
+            maxLength="15"
+            oninput="checkNamesFilled()"
+          />
+        </div>
+      </div>
+
+      <button 
+        id="start-btn"
+        onclick="startGame()"
+        disabled
+        class="w-full py-4 rounded-2xl text-2xl font-black flex items-center justify-center gap-3 transition-all bg-gray-300 text-gray-500 cursor-not-allowed"
+      >
+        🎮 ENTER NAME TO PLAY
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ================= GAMEPLAY SCREEN ================= -->
+  <div id="game-screen" class="hidden h-screen w-full bg-slate-900 flex flex-col overflow-hidden no-print">
+    
+    <!-- Top Header -->
+    <div class="bg-white/10 p-4 flex justify-between items-center shrink-0">
+      
+      <!-- Return Menu Button -->
+      <button onclick="toggleQuitModal(true)" class="bg-red-500 hover:bg-red-600 text-white font-black px-5 py-2 rounded-full text-xl flex items-center gap-2 shadow-md border-2 border-red-350 transition-all hover:scale-105">
+        🏠 MENU
+      </button>
+
+      <div id="round-badge" class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2 rounded-full font-black text-2xl shadow-lg border-2 border-blue-400">
+        Round 1 / 10
+      </div>
+      
+      <!-- Visual Timer Bar -->
+      <div class="flex-1 mx-6 bg-gray-800 rounded-full h-8 border-2 border-gray-600 overflow-hidden relative">
+        <div id="timer-bar" class="h-full bg-green-500 rounded-full transition-all duration-1000 ease-linear" style="width: 100%"></div>
+        <div id="timer-text" class="absolute inset-0 flex items-center justify-center text-white font-black text-xl drop-shadow-md">10s</div>
+      </div>
+    </div>
+
+    <!-- Center Question Area -->
+    <div class="flex-1 flex flex-col items-center justify-center p-4 relative">
+      
+      <!-- Global Reveal Overlay -->
+      <div id="reveal-overlay" class="hidden absolute inset-0 z-10 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+        <div class="text-center animate-bounce">
+          <span id="overlay-emoji" class="text-[120px] md:text-[160px] drop-shadow-2xl block">✅</span>
+          <h1 id="overlay-text" class="text-5xl md:text-7xl font-black mt-4 drop-shadow-xl">YES! It matches!</h1>
+        </div>
+      </div>
+
+      <!-- Current Question Card -->
+      <div id="question-card" class="bg-white rounded-[3rem] shadow-2xl p-6 md:p-8 w-full max-w-4xl flex flex-col items-center border-8 border-blue-400 transition-all">
+        
+        <!-- Element for Game 1 (Emoji) -->
+        <div id="question-emoji" class="text-[140px] md:text-[180px] leading-none mb-4 animate-pulse-grow">
+          🪁
+        </div>
+        
+        <!-- Element for Game 2 (Sign Language Image) -->
+        <div id="question-image-container" class="hidden w-full max-w-xs md:max-w-md h-48 md:h-64 flex items-center justify-center mb-4 overflow-hidden rounded-2xl border-4 border-dashed border-purple-300 p-2 bg-purple-50">
+          <img id="question-sign-img" src="" alt="Sign Language Picture" class="h-full object-contain" onerror="handleImageError(this)" />
+          <div id="question-image-fallback" class="hidden text-center">
+             <span class="text-6xl block mb-2">🤟</span>
+             <span id="fallback-text" class="font-bold text-gray-500 text-lg">Image Loading...</span>
+          </div>
+        </div>
+
+        <div class="bg-blue-100 px-12 py-5 rounded-3xl border-4 border-blue-300">
+          <h2 id="question-word" class="text-5xl md:text-7xl font-black text-blue-900 tracking-wider capitalize">
+            Kite
+          </h2>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Controls: Dynamic Player Zones -->
+    <div class="h-72 shrink-0 flex gap-2 md:gap-4 p-4 bg-gray-950">
+      
+      <!-- Player 1 Control Box -->
+      <div id="p1-box" class="flex-1 bg-pink-100 rounded-3xl border-4 border-pink-500 flex flex-col overflow-hidden relative shadow-inner">
+        <div class="bg-pink-500 text-white p-3 flex justify-between items-center font-bold text-lg md:text-xl">
+          <span id="p1-label" class="truncate pr-2 uppercase">PLAYER 1</span>
+          <span class="bg-black/25 px-3 py-1 rounded-full text-base flex items-center gap-1">
+            <span id="p1-score-val">0</span> ⭐
+          </span>
+        </div>
+        <div id="p1-overlay" class="hidden absolute inset-0 top-12 z-20 flex flex-col items-center justify-center bg-white/95 p-3"></div>
+        <div class="flex-1 flex p-2 gap-2">
+          <button onclick="submitAnswer(1, true)" id="p1-yes" class="flex-1 rounded-2xl flex flex-col items-center justify-center border-4 bg-green-100 border-green-400 hover:bg-green-200 active:scale-95 transition-all shadow-md">
+            <span class="text-4xl md:text-5xl">✅</span>
+            <span class="text-xl md:text-2xl font-black text-green-700 mt-2">YES</span>
+          </button>
+          <button onclick="submitAnswer(1, false)" id="p1-no" class="flex-1 rounded-2xl flex flex-col items-center justify-center border-4 bg-red-100 border-red-400 hover:bg-red-200 active:scale-95 transition-all shadow-md">
+            <span class="text-4xl md:text-5xl">❌</span>
+            <span class="text-xl md:text-2xl font-black text-red-700 mt-2">NO</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Player 2 Control Box -->
+      <div id="p2-box" class="flex-1 bg-cyan-100 rounded-3xl border-4 border-cyan-500 flex flex-col overflow-hidden relative shadow-inner">
+        <div class="bg-cyan-500 text-white p-3 flex justify-between items-center font-bold text-lg md:text-xl">
+          <span id="p2-label" class="truncate pr-2 uppercase">PLAYER 2</span>
+          <span class="bg-black/25 px-3 py-1 rounded-full text-base flex items-center gap-1">
+            <span id="p2-score-val">0</span> ⭐
+          </span>
+        </div>
+        <div id="p2-overlay" class="hidden absolute inset-0 top-12 z-20 flex flex-col items-center justify-center bg-white/95 p-3"></div>
+        <div class="flex-1 flex p-2 gap-2">
+          <button onclick="submitAnswer(2, true)" id="p2-yes" class="flex-1 rounded-2xl flex flex-col items-center justify-center border-4 bg-green-100 border-green-400 hover:bg-green-200 active:scale-95 transition-all shadow-md">
+            <span class="text-4xl md:text-5xl">✅</span>
+            <span class="text-xl md:text-2xl font-black text-green-700 mt-2">YES</span>
+          </button>
+          <button onclick="submitAnswer(2, false)" id="p2-no" class="flex-1 rounded-2xl flex flex-col items-center justify-center border-4 bg-red-100 border-red-400 hover:bg-red-200 active:scale-95 transition-all shadow-md">
+            <span class="text-4xl md:text-5xl">❌</span>
+            <span class="text-xl md:text-2xl font-black text-red-700 mt-2">NO</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Player 3 Control Box -->
+      <div id="p3-box" class="flex-1 bg-amber-100 rounded-3xl border-4 border-amber-500 flex flex-col overflow-hidden relative shadow-inner">
+        <div class="bg-amber-500 text-white p-3 flex justify-between items-center font-bold text-lg md:text-xl">
+          <span id="p3-label" class="truncate pr-2 uppercase">PLAYER 3</span>
+          <span class="bg-black/25 px-3 py-1 rounded-full text-base flex items-center gap-1">
+            <span id="p3-score-val">0</span> ⭐
+          </span>
+        </div>
+        <div id="p3-overlay" class="hidden absolute inset-0 top-12 z-20 flex flex-col items-center justify-center bg-white/95 p-3"></div>
+        <div class="flex-1 flex p-2 gap-2">
+          <button onclick="submitAnswer(3, true)" id="p3-yes" class="flex-1 rounded-2xl flex flex-col items-center justify-center border-4 bg-green-100 border-green-400 hover:bg-green-200 active:scale-95 transition-all shadow-md">
+            <span class="text-4xl md:text-5xl">✅</span>
+            <span class="text-xl md:text-2xl font-black text-green-700 mt-2">YES</span>
+          </button>
+          <button onclick="submitAnswer(3, false)" id="p3-no" class="flex-1 rounded-2xl flex flex-col items-center justify-center border-4 bg-red-100 border-red-400 hover:bg-red-200 active:scale-95 transition-all shadow-md">
+            <span class="text-4xl md:text-5xl">❌</span>
+            <span class="text-xl md:text-2xl font-black text-red-700 mt-2">NO</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ================= QUIT GAME MODAL (VISUAL & NO ALERTS) ================= -->
+  <div id="quit-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-6 no-print">
+    <div class="bg-white border-8 border-red-500 rounded-3xl p-8 max-w-lg w-full text-center shadow-2xl">
+      <span class="text-7xl block mb-4 animate-pulse">⚠️</span>
+      <h2 class="text-3xl font-black text-red-600 mb-2 uppercase tracking-wide">Back to Menu?</h2>
+      <p class="text-xl text-gray-700 font-bold mb-8">Do you want to stop the game and go back to the Main Menu?</p>
+      
+      <div class="flex gap-4">
+        <!-- Yes Option -->
+        <button onclick="confirmQuit(true)" class="flex-1 py-4 bg-red-600 hover:bg-red-700 text-white font-black text-xl rounded-2xl shadow-lg transition-all hover:scale-105 active:scale-95">
+          YES, QUIT
+        </button>
+        <!-- No Option -->
+        <button onclick="confirmQuit(false)" class="flex-1 py-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-black text-xl rounded-2xl shadow-lg transition-all hover:scale-105 active:scale-95 border-2 border-gray-400">
+          NO, PLAY
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ================= END / CERTIFICATE SCREEN ================= -->
+  <div id="end-screen" class="hidden min-h-screen bg-blue-100 flex flex-col items-center p-4 md:p-8 overflow-auto">
+    
+    <!-- Controls (Hidden during print) -->
+    <div class="no-print text-center mb-8 max-w-2xl">
+      <h1 class="text-5xl font-black text-blue-900 mb-2 animate-pulse">🎉 Match Finished! 🎉</h1>
+      <p class="text-lg text-gray-700 mb-6 font-bold">Select a pupil below to view and print their individual Certificate of Achievement!</p>
+      
+      <!-- Select Player Tabs -->
+      <div id="cert-selector-bar" class="flex flex-wrap justify-center gap-3 mb-8 bg-white p-3 rounded-2xl shadow-md border-2 border-blue-200">
+        <button onclick="selectCertificate(1)" id="btn-cert-p1" class="px-6 py-3 rounded-xl font-bold text-lg transition-all flex items-center gap-2 bg-blue-600 text-white shadow-lg scale-105 ring-4 ring-blue-300">
+          👤 <span id="cert-tab-p1">Player 1</span>
+        </button>
+        <button onclick="selectCertificate(2)" id="btn-cert-p2" class="px-6 py-3 rounded-xl font-bold text-lg transition-all flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700">
+          👤 <span id="cert-tab-p2">Player 2</span>
+        </button>
+        <button onclick="selectCertificate(3)" id="btn-cert-p3" class="px-6 py-3 rounded-xl font-bold text-lg transition-all flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700">
+          👤 <span id="cert-tab-p3">Player 3</span>
+        </button>
+      </div>
+
+      <div class="flex justify-center gap-4 mb-4">
+        <button onclick="window.print()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-8 py-4 rounded-2xl font-black text-xl flex items-center gap-2 shadow-lg transition-transform hover:scale-105">
+          🖨️ Print Certificate
+        </button>
+        <button onclick="resetGame()" class="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white px-8 py-4 rounded-2xl font-black text-xl flex items-center gap-2 shadow-lg transition-transform hover:scale-105">
+          🔄 Main Menu
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Certificate Card for Print & View -->
+    <div class="w-full max-w-3xl print-area">
+      <div class="bg-white border-[16px] border-double border-yellow-400 rounded-3xl p-8 md:p-12 text-center shadow-2xl relative overflow-hidden">
+        
+        <!-- Blue upper glow -->
+        <div class="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-blue-100 to-transparent"></div>
+        
+        <div class="relative z-10 flex flex-col justify-between h-full">
+          <div>
+            <div class="flex justify-center mb-4">
+              <div class="bg-yellow-100 p-4 rounded-full border-4 border-yellow-400">
+                <span class="text-6xl">🏆</span>
+              </div>
+            </div>
+            
+            <h2 class="text-4xl md:text-5xl font-black text-blue-900 mb-1 uppercase tracking-widest">Certificate</h2>
+            <p class="text-2xl text-blue-600 font-extrabold mb-6 uppercase tracking-wider">Of Achievement</p>
+            
+            <p class="text-xl text-gray-600 italic mb-2">This is proudly awarded to</p>
+            <div class="border-b-4 border-dashed border-blue-800 pb-2 mb-6 inline-block w-4/5">
+              <h3 id="cert-holder-name" class="text-4xl md:text-5xl font-black text-blue-950 uppercase">MOHD</h3>
+            </div>
+            
+            <p class="text-xl text-gray-700 mb-6 font-medium leading-relaxed">
+              For showing super knowledge in Year 1 English Syllabus <br/>
+              <span class="font-extrabold text-purple-700 text-2xl">Super Minds (Unit 2: Let's Play!)</span>
+            </p>
+            
+            <div class="bg-gradient-to-r from-yellow-100 to-amber-100 rounded-2xl px-6 py-4 inline-block mb-8 border-2 border-yellow-300 shadow-md">
+              <p class="text-2xl font-black text-yellow-800">
+                ⭐ Score Gained: <span id="cert-score-val">0</span> / 100 Points
+              </p>
+            </div>
+          </div>
+          
+          <div class="flex justify-between items-end mt-12 px-6">
+            <div class="text-center">
+              <div class="border-b-2 border-gray-400 w-36 h-10 mb-2"></div>
+              <p class="text-sm text-gray-500 font-bold uppercase">English Teacher</p>
+            </div>
+            <div class="flex flex-col items-center">
+              <span class="text-5xl">🏅</span>
+              <span class="text-xs font-bold text-gray-400 mt-1 uppercase">EXCELLENT</span>
+            </div>
+            <div class="text-center">
+              <div class="border-b-2 border-gray-400 w-36 h-10 mb-2"></div>
+              <p class="text-sm text-gray-500 font-bold uppercase">Date</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================= GAMEPLAY ENGINE & LOGIC ================= -->
+  <script>
+    // Toys database updated with user-provided sign language picture names
+    const TOYS = [
+      { word: "ball", icon: "⚽", signImg: "BALL.png" },
+      { word: "bike", icon: "🚲", signImg: "BIKE.png" },
+      { word: "car", icon: "🚗", signImg: "CAR.png" },
+      { word: "computer", icon: "💻", signImg: "COMPUTER.png" },
+      { word: "doll", icon: "🧸", signImg: "DOLL.png" },
+      { word: "game", icon: "🎮", signImg: "GAME.png" },
+      { word: "kite", icon: "🪁", signImg: "KITE.png" },
+      { word: "monster", icon: "👾", signImg: "MONSTER.png" },
+      { word: "plane", icon: "✈️", signImg: "PLANE.png" },
+      { word: "train", icon: "🚂", signImg: "TRAIN.png" }
+    ];
+
+    const MEMES = [
+      { emoji: "🐱✨", phrase: "Purr-fect!", bg: "from-pink-400 to-rose-500" },
+      { emoji: "🐶🎉", phrase: "Super Pup!", bg: "from-amber-400 to-orange-500" },
+      { emoji: "🐵⭐", phrase: "Banana-tastic!", bg: "from-yellow-400 to-amber-500" },
+      { emoji: "🦄💖", phrase: "Magical!", bg: "from-purple-400 to-pink-500" },
+      { emoji: "🦖🔥", phrase: "Rex-cellent!", bg: "from-emerald-400 to-green-500" },
+      { emoji: "🐧❄️", phrase: "Super Cool!", bg: "from-cyan-400 to-blue-500" }
+    ];
+
+    const ROUNDS_TOTAL = 10;
+    const ROUND_TIME_SECONDS = 10;
+
+    let gameState = {
+      phase: 'setup',
+      gameMode: 'emoji', // 'emoji' or 'sign' (sign language)
+      playerCount: 3, 
+      isPaused: false, 
+      players: [
+        { id: 1, name: '', score: 0, currentAnswer: null, isCorrect: null, memeIndex: 0 },
+        { id: 2, name: '', score: 0, currentAnswer: null, isCorrect: null, memeIndex: 0 },
+        { id: 3, name: '', score: 0, currentAnswer: null, isCorrect: null, memeIndex: 0 }
+      ],
+      questions: [],
+      currentRound: 0,
+      timeLeft: ROUND_TIME_SECONDS,
+      selectedCertificatePlayerId: 1
+    };
+
+    let countdownTimer = null;
+
+    // Set Game Mode choice (Emoji vs Sign Language)
+    function setGameMode(mode) {
+      gameState.gameMode = mode;
+      
+      const emojiBtn = document.getElementById('btn-mode-emoji');
+      const signBtn = document.getElementById('btn-mode-sign');
+
+      if (mode === 'emoji') {
+        emojiBtn.className = "py-3 px-4 rounded-xl font-black text-base md:text-lg transition-all border-4 border-blue-500 bg-blue-500 text-white shadow-md flex flex-col items-center justify-center";
+        signBtn.className = "py-3 px-4 rounded-xl font-black text-base md:text-lg transition-all border-4 border-blue-200 bg-white text-blue-700 hover:bg-blue-100 flex flex-col items-center justify-center";
+      } else {
+        emojiBtn.className = "py-3 px-4 rounded-xl font-black text-base md:text-lg transition-all border-4 border-blue-200 bg-white text-blue-700 hover:bg-blue-100 flex flex-col items-center justify-center";
+        signBtn.className = "py-3 px-4 rounded-xl font-black text-base md:text-lg transition-all border-4 border-blue-500 bg-blue-500 text-white shadow-md flex flex-col items-center justify-center";
+      }
+    }
+
+    // Set active player selection & update UI fields
+    function setPlayerCount(count) {
+      gameState.playerCount = count;
+
+      // Update selection button styles
+      for (let i = 1; i <= 3; i++) {
+        const btn = document.getElementById(`btn-count-${i}`);
+        if (i === count) {
+          btn.className = "flex-1 py-2.5 px-3 rounded-xl font-black text-base md:text-lg transition-all border-4 border-purple-500 bg-purple-500 text-white shadow-md";
+        } else {
+          btn.className = "flex-1 py-2.5 px-3 rounded-xl font-black text-base md:text-lg transition-all border-4 border-purple-200 bg-white text-purple-750 hover:bg-purple-100";
+        }
+      }
+
+      // Show/Hide active input fields
+      document.getElementById('input-group-1').style.display = 'flex'; // always visible
+      document.getElementById('input-group-2').style.display = count >= 2 ? 'flex' : 'none';
+      document.getElementById('input-group-3').style.display = count >= 3 ? 'flex' : 'none';
+
+      checkNamesFilled();
+    }
+
+    // Monitor Input fields to enable the Start Game button
+    function checkNamesFilled() {
+      const p1 = document.getElementById('p1-name-input').value.trim();
+      const p2 = document.getElementById('p2-name-input').value.trim();
+      const p3 = document.getElementById('p3-name-input').value.trim();
+      const startBtn = document.getElementById('start-btn');
+
+      let isValid = false;
+      if (gameState.playerCount === 1 && p1) isValid = true;
+      if (gameState.playerCount === 2 && p1 && p2) isValid = true;
+      if (gameState.playerCount === 3 && p1 && p2 && p3) isValid = true;
+
+      if (isValid) {
+        startBtn.removeAttribute('disabled');
+        startBtn.className = "w-full py-4 rounded-2xl text-2xl font-black flex items-center justify-center gap-3 transition-all bg-gradient-to-r from-green-400 to-emerald-600 text-white shadow-lg hover:scale-105 active:scale-95 cursor-pointer";
+        startBtn.innerHTML = "🎮 START GAME";
+      } else {
+        startBtn.setAttribute('disabled', 'true');
+        startBtn.className = "w-full py-4 rounded-2xl text-2xl font-black flex items-center justify-center gap-3 transition-all bg-gray-300 text-gray-500 cursor-not-allowed";
+        startBtn.innerHTML = "🎮 ENTER ALL NAMES TO PLAY";
+      }
+    }
+
+    function generateQuestions() {
+      const list = [];
+      for (let i = 0; i < ROUNDS_TOTAL; i++) {
+        const isMatching = Math.random() > 0.5;
+        const actualToy = TOYS[Math.floor(Math.random() * TOYS.length)];
+        let displayedWord = actualToy.word;
+
+        if (!isMatching) {
+          let wrongToy = TOYS[Math.floor(Math.random() * TOYS.length)];
+          while (wrongToy.word === actualToy.word) {
+            wrongToy = TOYS[Math.floor(Math.random() * TOYS.length)];
+          }
+          displayedWord = wrongToy.word;
+        }
+
+        list.push({
+          image: actualToy.icon,
+          signImage: actualToy.signImg,
+          actualWord: actualToy.word,
+          displayedWord: displayedWord,
+          correctAnswer: isMatching
+        });
+      }
+      return list;
+    }
+
+    function startGame() {
+      // Collect names based on player count
+      gameState.players[0].name = document.getElementById('p1-name-input').value.trim() || "Player 1";
+      gameState.players[1].name = document.getElementById('p2-name-input').value.trim() || "Player 2";
+      gameState.players[2].name = document.getElementById('p3-name-input').value.trim() || "Player 3";
+
+      // Reset scores, states and randomize starting memes
+      gameState.players.forEach(p => {
+        p.score = 0;
+        p.currentAnswer = null;
+        p.isCorrect = null;
+        p.memeIndex = Math.floor(Math.random() * MEMES.length);
+      });
+
+      gameState.questions = generateQuestions();
+      gameState.currentRound = 0;
+      gameState.phase = 'playing';
+      gameState.timeLeft = ROUND_TIME_SECONDS;
+      gameState.isPaused = false;
+
+      // Update static player label tags on controller zones
+      document.getElementById('p1-label').innerText = gameState.players[0].name;
+      document.getElementById('p2-label').innerText = gameState.players[1].name;
+      document.getElementById('p3-label').innerText = gameState.players[2].name;
+
+      // Hide/Show bottom player control zones based on count selection
+      document.getElementById('p1-box').style.display = 'flex';
+      document.getElementById('p2-box').style.display = gameState.playerCount >= 2 ? 'flex' : 'none';
+      document.getElementById('p3-box').style.display = gameState.playerCount >= 3 ? 'flex' : 'none';
+
+      // Update certificate selector tabs
+      document.getElementById('cert-tab-p1').innerText = gameState.players[0].name;
+      document.getElementById('cert-tab-p2').innerText = gameState.players[1].name;
+      document.getElementById('cert-tab-p3').innerText = gameState.players[2].name;
+
+      // Only show certificate tabs for players who played!
+      document.getElementById('btn-cert-p1').style.display = 'flex';
+      document.getElementById('btn-cert-p2').style.display = gameState.playerCount >= 2 ? 'flex' : 'none';
+      document.getElementById('btn-cert-p3').style.display = gameState.playerCount >= 3 ? 'flex' : 'none';
+
+      // Switch screens
+      document.getElementById('setup-screen').classList.add('hidden');
+      document.getElementById('game-screen').classList.remove('hidden');
+
+      renderRound();
+      startTimer();
+    }
+
+    function renderRound() {
+      const q = gameState.questions[gameState.currentRound];
+      
+      // Update header
+      document.getElementById('round-badge').innerText = `Round ${gameState.currentRound + 1} / ${ROUNDS_TOTAL}`;
+      
+      // Update central question text
+      document.getElementById('question-word').innerText = q.displayedWord;
+
+      // Manage Game 1 VS Game 2 visual elements
+      const emojiEl = document.getElementById('question-emoji');
+      const signContainer = document.getElementById('question-image-container');
+      const signImg = document.getElementById('question-sign-img');
+      const fallbackContainer = document.getElementById('question-image-fallback');
+
+      if (gameState.gameMode === 'emoji') {
+        emojiEl.style.display = 'block';
+        signContainer.style.display = 'none';
+        emojiEl.innerText = q.image;
+      } else {
+        emojiEl.style.display = 'none';
+        signContainer.style.display = 'flex';
+        
+        // Load the local Sign Language image path
+        fallbackContainer.style.display = 'none';
+        signImg.style.display = 'block';
+        signImg.src = q.signImage;
+      }
+
+      // Reset style classes on central question board
+      const qCard = document.getElementById('question-card');
+      qCard.className = "bg-white rounded-[3rem] shadow-2xl p-6 md:p-8 w-full max-w-4xl flex flex-col items-center border-8 border-blue-400 transition-all";
+
+      // Hide reveal overlays
+      document.getElementById('reveal-overlay').classList.add('hidden');
+      document.getElementById('p1-overlay').classList.add('hidden');
+      document.getElementById('p2-overlay').classList.add('hidden');
+      document.getElementById('p3-overlay').classList.add('hidden');
+
+      // Reset active player decision layouts
+      for (let i = 1; i <= gameState.playerCount; i++) {
+        resetButtonStyles(i);
+      }
+
+      // Reset internal play states
+      gameState.players.forEach(p => {
+        p.currentAnswer = null;
+        p.isCorrect = null;
+      });
+    }
+
+    // Handles the scenario where images don't load instantly in local testing or environments
+    function handleImageError(imageElement) {
+      imageElement.style.display = 'none';
+      
+      const fallbackContainer = document.getElementById('question-image-fallback');
+      const fallbackText = document.getElementById('fallback-text');
+      const currentQ = gameState.questions[gameState.currentRound];
+      
+      fallbackContainer.classList.remove('hidden');
+      fallbackContainer.style.display = 'block';
+      fallbackText.innerText = `Sign: "${currentQ.actualWord.toUpperCase()}"`;
+    }
+
+    function resetButtonStyles(playerId) {
+      const yesBtn = document.getElementById(`p${playerId}-yes`);
+      const noBtn = document.getElementById(`p${playerId}-no`);
+      
+      yesBtn.removeAttribute('disabled');
+      noBtn.removeAttribute('disabled');
+
+      yesBtn.className = "flex-1 rounded-2xl flex flex-col items-center justify-center border-4 bg-green-100 border-green-400 hover:bg-green-200 active:scale-95 transition-all shadow-md opacity-100";
+      noBtn.className = "flex-1 rounded-2xl flex flex-col items-center justify-center border-4 bg-red-100 border-red-400 hover:bg-red-200 active:scale-95 transition-all shadow-md opacity-100";
+    }
+
+    function submitAnswer(playerId, val) {
+      if (gameState.phase !== 'playing' || gameState.isPaused) return;
+
+      const player = gameState.players[playerId - 1];
+      if (player.currentAnswer !== null) return; // already answered
+
+      player.currentAnswer = val;
+
+      // Lock buttons visually
+      const yesBtn = document.getElementById(`p${playerId}-yes`);
+      const noBtn = document.getElementById(`p${playerId}-no`);
+      
+      yesBtn.setAttribute('disabled', 'true');
+      noBtn.setAttribute('disabled', 'true');
+
+      if (val === true) {
+        yesBtn.className = "flex-1 rounded-2xl flex flex-col items-center justify-center border-4 bg-green-500 border-green-700 scale-95 shadow-inner opacity-100 text-white";
+        noBtn.className = "flex-1 rounded-2xl flex flex-col items-center justify-center border-4 bg-red-100 border-red-400 shadow-md opacity-30";
+      } else {
+        yesBtn.className = "flex-1 rounded-2xl flex flex-col items-center justify-center border-4 bg-green-100 border-green-400 shadow-md opacity-30";
+        noBtn.className = "flex-1 rounded-2xl flex flex-col items-center justify-center border-4 bg-red-500 border-red-700 scale-95 shadow-inner opacity-100 text-white";
+      }
+
+      // Check if all participating players answered
+      const activePlayersSlice = gameState.players.slice(0, gameState.playerCount);
+      const allAnswered = activePlayersSlice.every(p => p.currentAnswer !== null);
+      if (allAnswered) {
+        clearInterval(countdownTimer);
+        revealAnswers();
+      }
+    }
+
+    function startTimer() {
+      gameState.timeLeft = ROUND_TIME_SECONDS;
+      updateTimerUI();
+
+      countdownTimer = setInterval(() => {
+        if (gameState.isPaused) return; // skip down if pause is active
+
+        gameState.timeLeft--;
+        updateTimerUI();
+
+        if (gameState.timeLeft <= 0) {
+          clearInterval(countdownTimer);
+          revealAnswers();
+        }
+      }, 1000);
+    }
+
+    function updateTimerUI() {
+      const percentage = (gameState.timeLeft / ROUND_TIME_SECONDS) * 100;
+      const bar = document.getElementById('timer-bar');
+      const text = document.getElementById('timer-text');
+
+      bar.style.width = `${percentage}%`;
+      text.innerText = `${gameState.timeLeft}s`;
+
+      if (gameState.timeLeft > 5) {
+        bar.className = "h-full bg-green-500 rounded-full transition-all duration-1000 ease-linear";
+      } else if (gameState.timeLeft > 2) {
+        bar.className = "h-full bg-yellow-500 rounded-full transition-all duration-1000 ease-linear";
+      } else {
+        bar.className = "h-full bg-red-500 rounded-full transition-all duration-1000 ease-linear";
+      }
+    }
+
+    function revealAnswers() {
+      gameState.phase = 'reveal';
+      const q = gameState.questions[gameState.currentRound];
+
+      // Global announcement
+      const overlay = document.getElementById('reveal-overlay');
+      const emojiSpan = document.getElementById('overlay-emoji');
+      const textH1 = document.getElementById('overlay-text');
+
+      emojiSpan.innerText = q.correctAnswer ? "✅" : "❌";
+      textH1.innerText = q.correctAnswer ? 'YES! It matches!' : 'NO! It does not match!';
+      textH1.className = `text-5xl md:text-7xl font-black mt-4 drop-shadow-xl ${q.correctAnswer ? 'text-green-400' : 'text-red-400'}`;
+
+      // Show central card border result color
+      const qCard = document.getElementById('question-card');
+      qCard.classList.remove('border-blue-400');
+      qCard.classList.add(q.correctAnswer ? 'border-green-500' : 'border-red-500');
+
+      overlay.classList.remove('hidden');
+
+      // Process and render individual player scores & feedback memes
+      gameState.players.forEach((player, idx) => {
+        // Skip updating hidden inactive players
+        if (idx >= gameState.playerCount) return;
+
+        const pOverlay = document.getElementById(`p${player.id}-overlay`);
+        pOverlay.classList.remove('hidden');
+
+        const isCorrect = player.currentAnswer === q.correctAnswer;
+        player.isCorrect = isCorrect;
+
+        if (isCorrect) {
+          player.score += 10;
+          document.getElementById(`p${player.id}-score-val`).innerText = player.score;
+
+          // Pick active meme and render card
+          const meme = MEMES[player.memeIndex];
+          pOverlay.innerHTML = `
+            <div class="w-full h-full rounded-2xl bg-gradient-to-br ${meme.bg} text-white p-2 flex flex-col items-center justify-center shadow-lg transform scale-100 transition-all duration-300 animate-wiggle">
+              <span class="text-5xl md:text-6xl animate-bounce mb-1">${meme.emoji}</span>
+              <span class="text-xl md:text-2xl font-black uppercase tracking-wider drop-shadow-md">${meme.phrase}</span>
+              <span class="text-sm md:text-base font-bold bg-white/20 px-3 py-1 rounded-full mt-1">Correct! +10</span>
+            </div>
+          `;
+        } else {
+          // Render incorrect visual response (No meme card)
+          pOverlay.innerHTML = `
+            <div class="w-full h-full bg-red-100 text-red-600 rounded-2xl flex flex-col items-center justify-center p-2 border-4 border-red-300">
+               <span class="text-4xl md:text-5xl animate-shake">❌</span>
+               <span class="text-lg md:text-xl font-black uppercase tracking-wider mt-1">Try again!</span>
+            </div>
+          `;
+        }
+
+        // Generate next meme choice randomly for the player
+        player.memeIndex = Math.floor(Math.random() * MEMES.length);
+      });
+
+      // Advance to next round or end game after 4 seconds
+      setTimeout(() => {
+        if (gameState.phase !== 'reveal') return; // state mutated elsewhere (e.g. Menu Quit clicked)
+
+        if (gameState.currentRound < ROUNDS_TOTAL - 1) {
+          gameState.currentRound++;
+          gameState.phase = 'playing';
+          renderRound();
+          startTimer();
+        } else {
+          endGame();
+        }
+      }, 4000);
+    }
+
+    function endGame() {
+      gameState.phase = 'end';
+      
+      // Stop gameplay elements
+      document.getElementById('game-screen').classList.add('hidden');
+      document.getElementById('end-screen').classList.remove('hidden');
+
+      // Pre-select Player 1 certificate to show initially
+      selectCertificate(1);
+    }
+
+    function selectCertificate(playerId) {
+      gameState.selectedCertificatePlayerId = playerId;
+      
+      // Update UI active tab state
+      for (let i = 1; i <= gameState.playerCount; i++) {
+        const tabBtn = document.getElementById(`btn-cert-p${i}`);
+        if (i === playerId) {
+          tabBtn.className = "px-6 py-3 rounded-xl font-bold text-lg transition-all flex items-center gap-2 bg-blue-600 text-white shadow-lg scale-105 ring-4 ring-blue-300";
+        } else {
+          tabBtn.className = "px-6 py-3 rounded-xl font-bold text-lg transition-all flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700";
+        }
+      }
+
+      // Update certificate details
+      const targetPlayer = gameState.players[playerId - 1];
+      document.getElementById('cert-holder-name').innerText = targetPlayer.name || `Player ${playerId}`;
+      document.getElementById('cert-score-val').innerText = targetPlayer.score;
+    }
+
+    // Handle Custom Quit Modal overlays
+    function toggleQuitModal(show) {
+      const modal = document.getElementById('quit-modal');
+      if (show) {
+        gameState.isPaused = true;
+        modal.classList.remove('hidden');
+      } else {
+        gameState.isPaused = false;
+        modal.classList.add('hidden');
+      }
+    }
+
+    function confirmQuit(quit) {
+      toggleQuitModal(false);
+      if (quit) {
+        // Clean timers
+        clearInterval(countdownTimer);
+        resetGame();
+      }
+    }
+
+    function resetGame() {
+      // Clear inputs
+      document.getElementById('p1-name-input').value = '';
+      document.getElementById('p2-name-input').value = '';
+      document.getElementById('p3-name-input').value = '';
+      
+      // Reset Default mode back to 3 players and Emoji mode
+      setPlayerCount(3);
+      setGameMode('emoji');
+      checkNamesFilled();
+
+      // Return back to setup screen
+      document.getElementById('end-screen').classList.add('hidden');
+      document.getElementById('game-screen').classList.add('hidden');
+      document.getElementById('setup-screen').classList.remove('hidden');
+    }
+
+    // Initialize with default of 3 players and Emoji Mode on load
+    window.onload = function() {
+      setPlayerCount(3);
+      setGameMode('emoji');
+    };
+  </script>
+</body>
+</html>

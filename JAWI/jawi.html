@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumba Jawi Mumtaz - Lumba Serentak Bersebelahan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Baloo+2:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Baloo 2', cursive, sans-serif;
+            background-color: #f0fdf4;
+            background-image: radial-gradient(#bbf7d0 2px, transparent 2px);
+            background-size: 30px 30px;
+        }
+        .jawi-text {
+            font-family: 'Amiri', serif;
+            line-height: 1.3;
+        }
+        
+        /* Animasi goyang untuk jawapan salah */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+            20%, 40%, 60%, 80% { transform: translateX(4px); }
+        }
+        .shake-animation {
+            animation: shake 0.4s;
+        }
+
+        /* Animasi pop untuk jawapan betul */
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            80% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .pop-animation {
+            animation: popIn 0.3s ease-out forwards;
+        }
+
+        /* Confetti style */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            z-index: 50;
+            pointer-events: none;
+            animation: fall linear forwards;
+        }
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-3 select-none">
+
+    <!-- Tajuk Utama Atas Skrin (Dikecilkan sedikit untuk penjimatan ruang) -->
+    <div class="text-center mb-4">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-green-700 drop-shadow">⚡ LUMBA PINTAR JAWI ⚡</h1>
+        <p class="text-green-600 font-bold bg-green-100 px-4 py-0.5 rounded-full inline-block mt-1 shadow-sm text-xs">
+            Sentuh Jawapan Serentak • Kedudukan Sebelah-menyebelah!
+        </p>
+        <div class="mt-2">
+            <button onclick="generateNewQuizWithAI()" class="bg-yellow-400 hover:bg-yellow-500 text-yellow-950 font-bold px-4 py-1.5 rounded-full shadow-md text-xs transition duration-200 transform hover:scale-105">
+                ✨ Bina 15 Soalan Baru dengan AI
+            </button>
+        </div>
+    </div>
+
+    <!-- Container Utama: TIGA BAHAGIAN SISI-KE-SISI SECARA KEKAL (grid-cols-3) -->
+    <div id="players-wrapper" class="w-full max-w-7xl grid grid-cols-3 gap-3 md:gap-4 items-stretch justify-center">
+        
+        <!-- ================= PEMAIN 1 (IZZUANDIE - BIRU) ================= -->
+        <div id="p1-card" class="bg-white rounded-2xl shadow-lg border-2 md:border-4 border-blue-400 overflow-hidden relative flex flex-col transition-all duration-300">
+            <!-- Header Pemain 1 -->
+            <div class="bg-blue-600 text-white text-center py-2 px-2 relative">
+                <span class="absolute left-2 top-2 bg-blue-800 text-[10px] px-1.5 py-0.5 rounded-full font-bold" id="p1-q-tracker">S1/5</span>
+                <h2 class="text-lg md:text-xl font-bold truncate">Izzuandie 🔵</h2>
+                <div class="mt-1 bg-blue-700 rounded-full py-0.5 px-2.5 inline-block text-[11px] font-bold">
+                    Markah: <span id="score-p1" class="text-yellow-300">0</span>
+                </div>
+            </div>
+
+            <!-- Konten Pemain 1 -->
+            <div class="p-3 md:p-5 text-center flex-1 flex flex-col justify-between min-h-[300px] md:min-h-[360px]">
+                <p class="text-gray-500 text-[11px] md:text-xs">Bunyi suku kata ini?</p>
+                
+                <!-- Perkataan Jawi P1 -->
+                <div class="my-2 bg-blue-50 rounded-xl py-3 border border-blue-100 shadow-inner relative">
+                    <h2 id="jawi-word-p1" class="jawi-text text-6xl md:text-7xl text-blue-800 font-bold" dir="rtl">با</h2>
+                </div>
+
+                <!-- Butang Tanya Guru AI P1 -->
+                <button onclick="askGuruAI(1)" class="mb-3 bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold py-1 px-2.5 rounded-lg text-[10px] border border-blue-200 transition duration-150 transform hover:scale-105 mx-auto">
+                    ✨ Tanya Guru AI
+                </button>
+
+                <!-- Pilihan Jawapan P1 -->
+                <div id="options-p1" class="grid grid-cols-1 gap-2 text-md">
+                    <!-- Ditjana oleh JS -->
+                </div>
+            </div>
+
+            <!-- Progress Bar P1 -->
+            <div class="bg-gray-100 h-2 w-full">
+                <div id="p1-progress" class="bg-blue-500 h-full transition-all duration-300" style="width: 20%"></div>
+            </div>
+
+            <!-- Feedback Overlay Kecil untuk P1 -->
+            <div id="p1-feedback-overlay" class="hidden absolute inset-0 bg-white/90 flex flex-col items-center justify-center z-20 p-2 text-center">
+                <div id="p1-feedback-content" class="bg-white p-4 rounded-xl shadow-md border-2 border-blue-400 w-full max-w-xs pop-animation">
+                    <div id="p1-feedback-icon" class="text-3xl mb-1">🌟</div>
+                    <h3 id="p1-feedback-title" class="text-xl font-bold text-blue-600">MUMTAZ!</h3>
+                    <p id="p1-feedback-msg" class="text-gray-600 text-[10px] my-1">Bagus! Kamu pantas.</p>
+                </div>
+            </div>
+
+            <!-- Penamat Tempatan P1 -->
+            <div id="p1-finished-overlay" class="hidden absolute inset-0 bg-blue-900/85 backdrop-blur-[2px] flex flex-col items-center justify-center z-10 text-center p-3 text-white">
+                <span class="text-4xl animate-bounce">🏁</span>
+                <h3 class="text-lg font-bold mt-1">TAMAT!</h3>
+                <p class="text-[11px] text-blue-200 mt-0.5 animate-pulse" id="p1-rank-text">Menunggu rakan...</p>
+            </div>
+        </div>
+
+
+        <!-- ================= PEMAIN 2 (SURAIYA - UNGU) ================= -->
+        <div id="p2-card" class="bg-white rounded-2xl shadow-lg border-2 md:border-4 border-purple-400 overflow-hidden relative flex flex-col transition-all duration-300">
+            <!-- Header Pemain 2 -->
+            <div class="bg-purple-600 text-white text-center py-2 px-2 relative">
+                <span class="absolute left-2 top-2 bg-purple-800 text-[10px] px-1.5 py-0.5 rounded-full font-bold" id="p2-q-tracker">S1/5</span>
+                <h2 class="text-lg md:text-xl font-bold truncate">Suraiya 🟣</h2>
+                <div class="mt-1 bg-purple-700 rounded-full py-0.5 px-2.5 inline-block text-[11px] font-bold">
+                    Markah: <span id="score-p2" class="text-yellow-300">0</span>
+                </div>
+            </div>
+
+            <!-- Konten Pemain 2 -->
+            <div class="p-3 md:p-5 text-center flex-1 flex flex-col justify-between min-h-[300px] md:min-h-[360px]">
+                <p class="text-gray-500 text-[11px] md:text-xs">Bunyi suku kata ini?</p>
+                
+                <!-- Perkataan Jawi P2 -->
+                <div class="my-2 bg-purple-50 rounded-xl py-3 border border-purple-100 shadow-inner relative">
+                    <h2 id="jawi-word-p2" class="jawi-text text-6xl md:text-7xl text-purple-800 font-bold" dir="rtl">تي</h2>
+                </div>
+
+                <!-- Butang Tanya Guru AI P2 -->
+                <button onclick="askGuruAI(2)" class="mb-3 bg-purple-50 hover:bg-purple-100 text-purple-800 font-bold py-1 px-2.5 rounded-lg text-[10px] border border-purple-200 transition duration-150 transform hover:scale-105 mx-auto">
+                    ✨ Tanya Guru AI
+                </button>
+
+                <!-- Pilihan Jawapan P2 -->
+                <div id="options-p2" class="grid grid-cols-1 gap-2 text-md">
+                    <!-- Ditjana oleh JS -->
+                </div>
+            </div>
+
+            <!-- Progress Bar P2 -->
+            <div class="bg-gray-100 h-2 w-full">
+                <div id="p2-progress" class="bg-purple-500 h-full transition-all duration-300" style="width: 20%"></div>
+            </div>
+
+            <!-- Feedback Overlay Kecil untuk P2 -->
+            <div id="p2-feedback-overlay" class="hidden absolute inset-0 bg-white/90 flex flex-col items-center justify-center z-20 p-2 text-center">
+                <div id="p2-feedback-content" class="bg-white p-4 rounded-xl shadow-md border-2 border-purple-400 w-full max-w-xs pop-animation">
+                    <div id="p2-feedback-icon" class="text-3xl mb-1">🌟</div>
+                    <h3 id="p2-feedback-title" class="text-xl font-bold text-purple-600">MUMTAZ!</h3>
+                    <p id="p2-feedback-msg" class="text-gray-600 text-[10px] my-1">Hebat! Teruskan kelajuan.</p>
+                </div>
+            </div>
+
+            <!-- Penamat Tempatan P2 -->
+            <div id="p2-finished-overlay" class="hidden absolute inset-0 bg-purple-900/85 backdrop-blur-[2px] flex flex-col items-center justify-center z-10 text-center p-3 text-white">
+                <span class="text-4xl animate-bounce">🏁</span>
+                <h3 class="text-lg font-bold mt-1">TAMAT!</h3>
+                <p class="text-[11px] text-purple-200 mt-0.5 animate-pulse" id="p2-rank-text">Menunggu rakan...</p>
+            </div>
+        </div>
+
+
+        <!-- ================= PEMAIN 3 (AINA - OREN) ================= -->
+        <div id="p3-card" class="bg-white rounded-2xl shadow-lg border-2 md:border-4 border-amber-400 overflow-hidden relative flex flex-col transition-all duration-300">
+            <!-- Header Pemain 3 -->
+            <div class="bg-amber-500 text-white text-center py-2 px-2 relative">
+                <span class="absolute left-2 top-2 bg-amber-700 text-[10px] px-1.5 py-0.5 rounded-full font-bold" id="p3-q-tracker">S1/5</span>
+                <h2 class="text-lg md:text-xl font-bold truncate">Aina 🟠</h2>
+                <div class="mt-1 bg-amber-600 rounded-full py-0.5 px-2.5 inline-block text-[11px] font-bold">
+                    Markah: <span id="score-p3" class="text-yellow-300">0</span>
+                </div>
+            </div>
+
+            <!-- Konten Pemain 3 -->
+            <div class="p-3 md:p-5 text-center flex-1 flex flex-col justify-between min-h-[300px] md:min-h-[360px]">
+                <p class="text-gray-500 text-[11px] md:text-xs">Bunyi suku kata ini?</p>
+                
+                <!-- Perkataan Jawi P3 -->
+                <div class="my-2 bg-amber-50 rounded-xl py-3 border border-amber-100 shadow-inner relative">
+                    <h2 id="jawi-word-p3" class="jawi-text text-6xl md:text-7xl text-amber-800 font-bold" dir="rtl">جو</h2>
+                </div>
+
+                <!-- Butang Tanya Guru AI P3 -->
+                <button onclick="askGuruAI(3)" class="mb-3 bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold py-1 px-2.5 rounded-lg text-[10px] border border-amber-200 transition duration-150 transform hover:scale-105 mx-auto">
+                    ✨ Tanya Guru AI
+                </button>
+
+                <!-- Pilihan Jawapan P3 -->
+                <div id="options-p3" class="grid grid-cols-1 gap-2 text-md">
+                    <!-- Ditjana oleh JS -->
+                </div>
+            </div>
+
+            <!-- Progress Bar P3 -->
+            <div class="bg-gray-100 h-2 w-full">
+                <div id="p3-progress" class="bg-amber-500 h-full transition-all duration-300" style="width: 20%"></div>
+            </div>
+
+            <!-- Feedback Overlay Kecil untuk P3 -->
+            <div id="p3-feedback-overlay" class="hidden absolute inset-0 bg-white/90 flex flex-col items-center justify-center z-20 p-2 text-center">
+                <div id="p3-feedback-content" class="bg-white p-4 rounded-xl shadow-md border-2 border-amber-400 w-full max-w-xs pop-animation">
+                    <div id="p3-feedback-icon" class="text-3xl mb-1">🌟</div>
+                    <h3 id="p3-feedback-title" class="text-xl font-bold text-amber-600">MUMTAZ!</h3>
+                    <p id="p3-feedback-msg" class="text-gray-600 text-[10px] my-1">Bagus! Laju lagi.</p>
+                </div>
+            </div>
+
+            <!-- Penamat Tempatan P3 -->
+            <div id="p3-finished-overlay" class="hidden absolute inset-0 bg-amber-900/85 backdrop-blur-[2px] flex flex-col items-center justify-center z-10 text-center p-3 text-white">
+                <span class="text-4xl animate-bounce">🏁</span>
+                <h3 class="text-lg font-bold mt-1">TAMAT!</h3>
+                <p class="text-[11px] text-amber-200 mt-0.5 animate-pulse" id="p3-rank-text">Menunggu rakan...</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Ruangan Penamat Mutlak (Papar Kedudukan 1, 2, 3) -->
+    <div id="end-screen" class="hidden w-full max-w-lg bg-white rounded-3xl shadow-xl border-4 border-green-400 p-8 text-center mt-6">
+        <div class="text-7xl mb-4">🏁🏆🏁</div>
+        <h2 class="text-3xl font-bold text-green-600 mb-2">Keputusan Perlumbaan!</h2>
+        <p class="text-gray-600 mb-6 font-bold">Syabas anak-anak murid pintar!</p>
+        
+        <!-- Kedudukan Podium -->
+        <div class="flex flex-col gap-3 mb-8 text-left">
+            <div class="bg-yellow-100 rounded-2xl p-4 border-2 border-yellow-400 flex items-center justify-between shadow-sm">
+                <div class="flex items-center gap-3">
+                    <span class="text-3xl">🥇</span>
+                    <span class="text-lg font-extrabold text-yellow-900" id="podium-1st">Izzuandie</span>
+                </div>
+                <span class="bg-yellow-400 text-yellow-950 font-bold px-3 py-1 rounded-full text-xs">Johan</span>
+            </div>
+            <div class="bg-gray-100 rounded-2xl p-4 border-2 border-gray-300 flex items-center justify-between shadow-sm">
+                <div class="flex items-center gap-3">
+                    <span class="text-3xl">🥈</span>
+                    <span class="text-lg font-extrabold text-gray-800" id="podium-2nd">Suraiya</span>
+                </div>
+                <span class="bg-gray-300 text-gray-800 font-bold px-3 py-1 rounded-full text-xs">Naib Johan</span>
+            </div>
+            <div class="bg-amber-100 rounded-2xl p-4 border-2 border-amber-300 flex items-center justify-between shadow-sm">
+                <div class="flex items-center gap-3">
+                    <span class="text-3xl">🥉</span>
+                    <span class="text-lg font-extrabold text-amber-900" id="podium-3nd">Aina</span>
+                </div>
+                <span class="bg-amber-300 text-amber-900 font-bold px-3 py-1 rounded-full text-xs">Ketiga</span>
+            </div>
+        </div>
+
+        <div class="flex justify-center gap-4 mb-6">
+            <div class="bg-blue-100 rounded-2xl p-3 w-28 border-2 border-blue-300 text-center">
+                <p class="text-blue-800 font-bold text-xs">Izzuandie</p>
+                <p id="final-score-p1" class="text-2xl font-bold text-blue-600 mt-1">0</p>
+            </div>
+            <div class="bg-purple-100 rounded-2xl p-3 w-28 border-2 border-purple-300 text-center">
+                <p class="text-purple-800 font-bold text-xs">Suraiya</p>
+                <p id="final-score-p2" class="text-2xl font-bold text-purple-600 mt-1">0</p>
+            </div>
+            <div class="bg-amber-100 rounded-2xl p-3 w-28 border-2 border-amber-300 text-center">
+                <p class="text-amber-800 font-bold text-xs">Aina</p>
+                <p id="final-score-p3" class="text-2xl font-bold text-amber-600 mt-1">0</p>
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-3">
+            <button onclick="restartGame()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl transition transform hover:scale-105 shadow-md text-lg">
+                🔄 Main Semula Set Sedia Ada
+            </button>
+            <button onclick="generateNewQuizWithAI()" class="w-full bg-yellow-400 hover:bg-yellow-500 text-yellow-950 font-bold py-3 px-6 rounded-xl transition transform hover:scale-105 shadow-md text-lg">
+                ✨ Bina Set Soalan Baru (AI)
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL GURU AI -->
+    <div id="ai-tutor-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl border-4 border-yellow-400 w-full max-w-md overflow-hidden pop-animation">
+            <div class="bg-yellow-400 p-4 text-center text-yellow-950 font-bold flex items-center justify-center gap-2">
+                <span class="text-2xl">👩‍🏫</span>
+                <span class="text-lg">Tanya Ustazah AI</span>
+            </div>
+            <div class="p-6 text-center">
+                <div class="bg-yellow-50 py-3 px-6 rounded-2xl border border-yellow-200 inline-block mb-4">
+                    <span id="ai-tutor-target-jawi" class="jawi-text text-6xl text-yellow-900 font-bold">با</span>
+                </div>
+                <div id="ai-tutor-loading" class="py-6 flex flex-col items-center">
+                    <div class="w-10 h-10 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p class="text-gray-500 text-sm mt-3 animate-pulse">Ustazah AI sedang menulis nota ringkas...</p>
+                </div>
+                <div id="ai-tutor-result" class="hidden text-left text-gray-700 bg-gray-50 p-4 rounded-xl border border-gray-200 font-medium leading-relaxed text-sm">
+                    <!-- Teks dari Gemini -->
+                </div>
+                <button onclick="closeTutorModal()" class="mt-6 bg-yellow-400 hover:bg-yellow-500 text-yellow-950 font-bold py-2.5 px-6 rounded-xl transition shadow text-sm w-full">
+                    Selesai, Terima Kasih Ustazah! ❤️
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL GENERATOR SOALAN AI -->
+    <div id="ai-generator-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl border-4 border-green-400 w-full max-w-sm overflow-hidden pop-animation text-center p-8">
+            <div class="text-5xl mb-4 animate-bounce">✏️</div>
+            <h3 class="text-2xl font-bold text-green-700">Membina Lumba Jawi AI</h3>
+            <p class="text-gray-500 text-sm mt-2">Gemini AI sedang menyediakan 15 soalan satu suku kata Jawi yang mencabar untuk perlumbaan...</p>
+            <div class="my-6 flex justify-center">
+                <div class="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <p class="text-xs text-gray-400">Tiga pemain akan mendapat soalan unik!</p>
+        </div>
+    </div>
+
+    <!-- Audio ringkas -->
+    <audio id="sound-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" preload="auto"></audio>
+    <audio id="sound-wrong" src="https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3" preload="auto"></audio>
+
+    <script>
+        // Data Soalan (15 Soalan: Setiap pemain dapat 5 soalan unik secara bergilir dalam array)
+        // P1: indeks 0, 3, 6, 9, 12
+        // P2: indeks 1, 4, 7, 10, 13
+        // P3: indeks 2, 5, 8, 11, 14
+        let questions = [
+            { jawi: "با", options: ["ba", "bi", "bu"], answer: "ba" }, // P1 - S1
+            { jawi: "تي", options: ["ta", "ti", "tu"], answer: "ti" }, // P2 - S1
+            { jawi: "جو", options: ["ja", "ji", "ju"], answer: "ju" }, // P3 - S1
+            
+            { jawi: "دي", options: ["da", "di", "du"], answer: "di" }, // P1 - S2
+            { jawi: "سو", options: ["sa", "si", "su"], answer: "su" }, // P2 - S2
+            { jawi: "ڤا", options: ["pa", "pi", "pu"], answer: "pa" }, // P3 - S2
+            
+            { jawi: "مي", options: ["ma", "mi", "mu"], answer: "mi" }, // P1 - S3
+            { jawi: "بو", options: ["ba", "bi", "bu"], answer: "bu" }, // P2 - S3
+            { jawi: "رو", options: ["ra", "ri", "ru"], answer: "ru" }, // P3 - S3
+            
+            { jawi: "ني", options: ["na", "ni", "nu"], answer: "ni" }, // P1 - S4
+            { jawi: "كا", options: ["ka", "ki", "ku"], answer: "ka" }, // P2 - S4
+            { jawi: "لو", options: ["la", "li", "lu"], answer: "lu" }, // P3 - S4
+            
+            { jawi: "چي", options: ["ca", "ci", "cu"], answer: "ci" }, // P1 - S5
+            { jawi: "ها", options: ["ha", "hi", "hu"], answer: "ha" }, // P2 - S5
+            { jawi: "غو", options: ["ga", "gi", "gu"], answer: "gu" }  // P3 - S5
+        ];
+
+        // Kedudukan & Data Semasa Pemain
+        let p1CurrentIndex = 0; // Rentang 0 - 4
+        let p2CurrentIndex = 0; // Rentang 0 - 4
+        let p3CurrentIndex = 0; // Rentang 0 - 4
+
+        let scoreP1 = 0;
+        let scoreP2 = 0;
+        let scoreP3 = 0;
+
+        let p1IncorrectHits = 0; // Jejak jika murid meneka salah sebelum dapat betul
+        let p2IncorrectHits = 0;
+        let p3IncorrectHits = 0;
+
+        let p1Finished = false;
+        let p2Finished = false;
+        let p3Finished = false;
+
+        // Susunan pemain yang tamat lumba
+        let finishOrder = []; 
+
+        // DOM Elements P1 (Izzuandie)
+        const p1Card = document.getElementById('p1-card');
+        const jawiWordP1 = document.getElementById('jawi-word-p1');
+        const optionsP1 = document.getElementById('options-p1');
+        const p1QTracker = document.getElementById('p1-q-tracker');
+        const scoreP1El = document.getElementById('score-p1');
+        const p1Progress = document.getElementById('p1-progress');
+        const p1FeedbackOverlay = document.getElementById('p1-feedback-overlay');
+        const p1FeedbackContent = document.getElementById('p1-feedback-content');
+        const p1FinishedOverlay = document.getElementById('p1-finished-overlay');
+        const p1RankText = document.getElementById('p1-rank-text');
+
+        // DOM Elements P2 (Suraiya)
+        const p2Card = document.getElementById('p2-card');
+        const jawiWordP2 = document.getElementById('jawi-word-p2');
+        const optionsP2 = document.getElementById('options-p2');
+        const p2QTracker = document.getElementById('p2-q-tracker');
+        const scoreP2El = document.getElementById('score-p2');
+        const p2Progress = document.getElementById('p2-progress');
+        const p2FeedbackOverlay = document.getElementById('p2-feedback-overlay');
+        const p2FeedbackContent = document.getElementById('p2-feedback-content');
+        const p2FinishedOverlay = document.getElementById('p2-finished-overlay');
+        const p2RankText = document.getElementById('p2-rank-text');
+
+        // DOM Elements P3 (Aina)
+        const p3Card = document.getElementById('p3-card');
+        const jawiWordP3 = document.getElementById('jawi-word-p3');
+        const optionsP3 = document.getElementById('options-p3');
+        const p3QTracker = document.getElementById('p3-q-tracker');
+        const scoreP3El = document.getElementById('score-p3');
+        const p3Progress = document.getElementById('p3-progress');
+        const p3FeedbackOverlay = document.getElementById('p3-feedback-overlay');
+        const p3FeedbackContent = document.getElementById('p3-feedback-content');
+        const p3FinishedOverlay = document.getElementById('p3-finished-overlay');
+        const p3RankText = document.getElementById('p3-rank-text');
+
+        const endScreen = document.getElementById('end-screen');
+        const soundCorrect = document.getElementById('sound-correct');
+        const soundWrong = document.getElementById('sound-wrong');
+
+        // Dom Modal Guru AI
+        const aiTutorModal = document.getElementById('ai-tutor-modal');
+        const aiTutorTargetJawi = document.getElementById('ai-tutor-target-jawi');
+        const aiTutorLoading = document.getElementById('ai-tutor-loading');
+        const aiTutorResult = document.getElementById('ai-tutor-result');
+
+        // Dom Modal Gen AI
+        const aiGeneratorModal = document.getElementById('ai-generator-modal');
+
+        // Mulakan Soalan secara Berasingan (Semua boleh tekan serentak)
+        function initGame() {
+            finishOrder = [];
+            p1Finished = false;
+            p2Finished = false;
+            p3Finished = false;
+
+            p1FinishedOverlay.classList.add('hidden');
+            p2FinishedOverlay.classList.add('hidden');
+            p3FinishedOverlay.classList.add('hidden');
+
+            loadQuestionForPlayer(1);
+            loadQuestionForPlayer(2);
+            loadQuestionForPlayer(3);
+        }
+
+        // Paparkan soalan semasa untuk pemain tertentu
+        function loadQuestionForPlayer(playerNum) {
+            if (playerNum === 1) {
+                if (p1CurrentIndex >= 5) {
+                    finishPlayer(1);
+                    return;
+                }
+                p1IncorrectHits = 0; // Reset penanda kesalahan untuk soalan ini
+                const realIndex = p1CurrentIndex * 3;
+                const q = questions[realIndex];
+                
+                jawiWordP1.textContent = q.jawi;
+                p1QTracker.textContent = `S${p1CurrentIndex + 1}/5`;
+                p1Progress.style.width = `${(p1CurrentIndex / 5) * 100}%`;
+
+                optionsP1.innerHTML = '';
+                q.options.forEach(option => {
+                    const btn = document.createElement('button');
+                    btn.textContent = option;
+                    btn.className = "bg-white border-2 border-blue-200 hover:border-blue-400 hover:bg-blue-50 text-gray-700 font-bold py-2 px-3 rounded-xl transition-all shadow-sm active:scale-95 w-full text-sm md:text-base";
+                    btn.onclick = () => checkAnswer(1, option, btn);
+                    optionsP1.appendChild(btn);
+                });
+            } 
+            else if (playerNum === 2) {
+                if (p2CurrentIndex >= 5) {
+                    finishPlayer(2);
+                    return;
+                }
+                p2IncorrectHits = 0;
+                const realIndex = (p2CurrentIndex * 3) + 1;
+                const q = questions[realIndex];
+                
+                jawiWordP2.textContent = q.jawi;
+                p2QTracker.textContent = `S${p2CurrentIndex + 1}/5`;
+                p2Progress.style.width = `${(p2CurrentIndex / 5) * 100}%`;
+
+                optionsP2.innerHTML = '';
+                q.options.forEach(option => {
+                    const btn = document.createElement('button');
+                    btn.textContent = option;
+                    btn.className = "bg-white border-2 border-purple-200 hover:border-purple-400 hover:bg-purple-50 text-gray-700 font-bold py-2 px-3 rounded-xl transition-all shadow-sm active:scale-95 w-full text-sm md:text-base";
+                    btn.onclick = () => checkAnswer(2, option, btn);
+                    optionsP2.appendChild(btn);
+                });
+            } 
+            else if (playerNum === 3) {
+                if (p3CurrentIndex >= 5) {
+                    finishPlayer(3);
+                    return;
+                }
+                p3IncorrectHits = 0;
+                const realIndex = (p3CurrentIndex * 3) + 2;
+                const q = questions[realIndex];
+                
+                jawiWordP3.textContent = q.jawi;
+                p3QTracker.textContent = `S${p3CurrentIndex + 1}/5`;
+                p3Progress.style.width = `${(p3CurrentIndex / 5) * 100}%`;
+
+                optionsP3.innerHTML = '';
+                q.options.forEach(option => {
+                    const btn = document.createElement('button');
+                    btn.textContent = option;
+                    btn.className = "bg-white border-2 border-amber-200 hover:border-amber-400 hover:bg-amber-50 text-gray-700 font-bold py-2 px-3 rounded-xl transition-all shadow-sm active:scale-95 w-full text-sm md:text-base";
+                    btn.onclick = () => checkAnswer(3, option, btn);
+                    optionsP3.appendChild(btn);
+                });
+            }
+        }
+
+        // Semak Jawapan secara Individu
+        function checkAnswer(playerNum, selectedOption, btnElement) {
+            let realIndex = 0;
+            if (playerNum === 1) realIndex = p1CurrentIndex * 3;
+            else if (playerNum === 2) realIndex = (p2CurrentIndex * 3) + 1;
+            else if (playerNum === 3) realIndex = (p3CurrentIndex * 3) + 2;
+
+            const correctOption = questions[realIndex].answer;
+
+            if (selectedOption === correctOption) {
+                // Jawapan betul!
+                try { soundCorrect.play(); } catch(e){}
+                
+                // Tambah markah hanya jika tekaan pertama betul
+                if (playerNum === 1) {
+                    if (p1IncorrectHits === 0) { scoreP1++; scoreP1El.textContent = scoreP1; }
+                } else if (playerNum === 2) {
+                    if (p2IncorrectHits === 0) { scoreP2++; scoreP2El.textContent = scoreP2; }
+                } else if (playerNum === 3) {
+                    if (p3IncorrectHits === 0) { scoreP3++; scoreP3El.textContent = scoreP3; }
+                }
+
+                // Papar overlay kejayaan sekejap & auto advance
+                showInstantFeedback(playerNum);
+                shootConfetti();
+            } else {
+                // Jawapan salah!
+                if (playerNum === 1) p1IncorrectHits++;
+                else if (playerNum === 2) p2IncorrectHits++;
+                else if (playerNum === 3) p3IncorrectHits++;
+
+                try { soundWrong.play(); } catch(e){}
+
+                // Goyangkan butang salah
+                btnElement.classList.add('bg-red-100', 'border-red-400', 'text-red-600', 'shake-animation');
+                setTimeout(() => {
+                    btnElement.classList.remove('shake-animation');
+                }, 400);
+            }
+        }
+
+        // Paparan Maklumbalas Kilat untuk kelajuan lumba (0.6 saat terus mara)
+        function showInstantFeedback(playerNum) {
+            const overlay = document.getElementById(`p${playerNum}-feedback-overlay`);
+            const content = document.getElementById(`p${playerNum}-feedback-content`);
+
+            overlay.classList.remove('hidden');
+            content.classList.remove('pop-animation');
+            void content.offsetWidth; // Trigger reflow
+            content.classList.add('pop-animation');
+
+            // Auto mara selepas 600 milisaat tanpa perlu klik apa-apa!
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                if (playerNum === 1) p1CurrentIndex++;
+                else if (playerNum === 2) p2CurrentIndex++;
+                else if (playerNum === 3) p3CurrentIndex++;
+
+                loadQuestionForPlayer(playerNum);
+            }, 600);
+        }
+
+        // Tandakan Pemain Selesai Lumba
+        function finishPlayer(playerNum) {
+            if (playerNum === 1 && !p1Finished) {
+                p1Finished = true;
+                p1Progress.style.width = "100%";
+                finishOrder.push("Izzuandie 🔵");
+                p1FinishedOverlay.classList.remove('hidden');
+                p1RankText.textContent = `Tempat Ke-${finishOrder.length}!`;
+            } 
+            else if (playerNum === 2 && !p2Finished) {
+                p2Finished = true;
+                p2Progress.style.width = "100%";
+                finishOrder.push("Suraiya 🟣");
+                p2FinishedOverlay.classList.remove('hidden');
+                p2RankText.textContent = `Tempat Ke-${finishOrder.length}!`;
+            } 
+            else if (playerNum === 3 && !p3Finished) {
+                p3Finished = true;
+                p3Progress.style.width = "100%";
+                finishOrder.push("Aina 🟠");
+                p3FinishedOverlay.classList.remove('hidden');
+                p3RankText.textContent = `Tempat Ke-${finishOrder.length}!`;
+            }
+
+            // Tamat apabila ketiga-tiga pemain habis lumba
+            if (p1Finished && p2Finished && p3Finished) {
+                showFinalResults();
+            }
+        }
+
+        // Keputusan Akhir Perlumbaan
+        function showFinalResults() {
+            // Sembunyikan semua kad lumba
+            document.getElementById('players-wrapper').classList.add('hidden');
+            endScreen.classList.remove('hidden');
+
+            // Tetapkan podium mengikut turutan tamat
+            document.getElementById('podium-1st').textContent = finishOrder[0] || "Izzuandie 🔵";
+            document.getElementById('podium-2nd').textContent = finishOrder[1] || "Suraiya 🟣";
+            document.getElementById('podium-3nd').textContent = finishOrder[2] || "Aina 🟠";
+
+            // Tetapkan markah penamat
+            document.getElementById('final-score-p1').textContent = scoreP1;
+            document.getElementById('final-score-p2').textContent = scoreP2;
+            document.getElementById('final-score-p3').textContent = scoreP3;
+
+            shootConfetti();
+            setTimeout(shootConfetti, 500);
+            setTimeout(shootConfetti, 1000);
+        }
+
+        // Main Semula Set Sedia Ada
+        function restartGame() {
+            p1CurrentIndex = 0;
+            p2CurrentIndex = 0;
+            p3CurrentIndex = 0;
+            scoreP1 = 0;
+            scoreP2 = 0;
+            scoreP3 = 0;
+
+            scoreP1El.textContent = scoreP1;
+            scoreP2El.textContent = scoreP2;
+            scoreP3El.textContent = scoreP3;
+
+            endScreen.classList.add('hidden');
+            document.getElementById('players-wrapper').classList.remove('hidden');
+
+            initGame();
+        }
+
+        // ================= INTEGRASI GEMINI API =================
+
+        // Helper: Panggilan API Gemini dengan Exponential Backoff
+        async function callGeminiAPI(payload, retries = 5, delay = 1000) {
+            const apiKey = ""; // Runtime auto-inject
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    if (i === retries - 1) throw error;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2;
+                }
+            }
+        }
+
+        // Tanya Guru AI (Bantuan tersendiri mengikut pemain)
+        async function askGuruAI(playerNum) {
+            let activeWord = "";
+            let correctSound = "";
+
+            if (playerNum === 1) {
+                activeWord = questions[p1CurrentIndex * 3].jawi;
+                correctSound = questions[p1CurrentIndex * 3].answer;
+            } else if (playerNum === 2) {
+                activeWord = questions[(p2CurrentIndex * 3) + 1].jawi;
+                correctSound = questions[(p2CurrentIndex * 3) + 1].answer;
+            } else if (playerNum === 3) {
+                activeWord = questions[(p3CurrentIndex * 3) + 2].jawi;
+                correctSound = questions[(p3CurrentIndex * 3) + 2].answer;
+            }
+
+            // Papar modal
+            aiTutorTargetJawi.textContent = activeWord;
+            aiTutorLoading.classList.remove('hidden');
+            aiTutorResult.classList.add('hidden');
+            aiTutorModal.classList.remove('hidden');
+
+            const systemPrompt = "Anda adalah Ustazah AI yang ramah, kelakar dan menyayangi kanak-kanak. Bantu terangkan sebutan satu suku kata Jawi.";
+            const userPrompt = `Terangkan sebutan bagi Jawi '${activeWord}' yang berbunyi '${correctSound}' kepada kanak-kanak berumur 7 tahun dalam satu ayat yang sangat ringkas dan ceria. Berikan juga satu contoh perkataan mudah bermula dengan suku kata ini.`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userPrompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            try {
+                const data = await callGeminiAPI(payload);
+                const textResult = data.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf sayang, Ustazah AI sedang minum air sebentar! Mari kita teka bersama!";
+                aiTutorLoading.classList.add('hidden');
+                aiTutorResult.textContent = textResult;
+                aiTutorResult.classList.remove('hidden');
+            } catch (error) {
+                aiTutorLoading.classList.add('hidden');
+                aiTutorResult.textContent = "Alamak, Ustazah AI sedang sibuk mengajar kelas lain. Mari terus mencuba secara pantas!";
+                aiTutorResult.classList.remove('hidden');
+            }
+        }
+
+        function closeTutorModal() {
+            aiTutorModal.classList.add('hidden');
+        }
+
+        // Menjana 15 Soalan Unik Baru dari Gemini AI
+        async function generateNewQuizWithAI() {
+            aiGeneratorModal.classList.remove('hidden');
+
+            const systemPrompt = "Anda pakar pendidikan Islam membina soalan Jawi suku kata terbuka tunggal yang mudah dibaca untuk kanak-kanak.";
+            const userPrompt = `Bina 15 soalan suku kata terbuka Jawi satu suku kata yang berbeza sepenuhnya (contoh: "با", "تي", "لو", "مي", "سا", "رو"). Pastikan padanan rumi tidak mengelirukan (menggunakan vokal a, i, u, o sahaja secara jelas). Pulangkan format JSON array yang mengandungi objek dengan properties:
+            - "jawi" (tulisan Jawi satu suku kata sahaja)
+            - "options" (tiga pilihan rumi ringkas berbeza, semua huruf kecil)
+            - "answer" (jawapan rumi yang tepat).`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userPrompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "ARRAY",
+                        items: {
+                            type: "OBJECT",
+                            properties: {
+                                jawi: { type: "STRING" },
+                                options: { type: "ARRAY", items: { type: "STRING" } },
+                                answer: { type: "STRING" }
+                            },
+                            required: ["jawi", "options", "answer"]
+                        }
+                    }
+                }
+            };
+
+            try {
+                const data = await callGeminiAPI(payload);
+                const rawJson = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (rawJson) {
+                    const parsed = JSON.parse(rawJson);
+                    if (Array.isArray(parsed) && parsed.length >= 15) {
+                        questions = parsed;
+                        
+                        // Set semula semua permainan
+                        p1CurrentIndex = 0;
+                        p2CurrentIndex = 0;
+                        p3CurrentIndex = 0;
+                        scoreP1 = 0;
+                        scoreP2 = 0;
+                        scoreP3 = 0;
+
+                        scoreP1El.textContent = scoreP1;
+                        scoreP2El.textContent = scoreP2;
+                        scoreP3El.textContent = scoreP3;
+
+                        endScreen.classList.add('hidden');
+                        document.getElementById('players-wrapper').classList.remove('hidden');
+
+                        initGame();
+                        shootConfetti();
+                    }
+                }
+            } catch (error) {
+                const errorBanner = document.createElement('div');
+                errorBanner.className = "fixed bottom-5 right-5 bg-red-500 text-white p-4 rounded-xl shadow-lg z-50 text-sm";
+                errorBanner.textContent = "Oh tidak! AI gagal dijana. Kami mulakan perlumbaan dengan soalan sedia ada!";
+                document.body.appendChild(errorBanner);
+                setTimeout(() => errorBanner.remove(), 4000);
+            } finally {
+                aiGeneratorModal.classList.add('hidden');
+            }
+        }
+
+        // Animasi Letupan Kertas (Confetti)
+        function shootConfetti() {
+            const colors = ['#3b82f6', '#a855f7', '#fbbf24', '#f472b6', '#34d399'];
+            for (let i = 0; i < 45; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = -10 + 'px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDuration = (Math.random() * 2 + 1.2) + 's';
+                if (Math.random() > 0.5) confetti.style.borderRadius = '50%';
+                document.body.appendChild(confetti);
+
+                setTimeout(() => { confetti.remove(); }, 3000);
+            }
+        }
+
+        // Mulakan game secara automatik
+        window.onload = initGame;
+    </script>
+</body>
+</html>
