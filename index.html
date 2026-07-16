@@ -12,6 +12,12 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
+        /* Corak Latar Belakang Titik (Polka Dot) */
+        .bg-dots {
+            background-image: radial-gradient(rgba(0, 0, 0, 0.07) 2px, transparent 2px);
+            background-size: 30px 30px;
+        }
+
         /* Animasi Latar Belakang */
         @keyframes blob {
             0% { transform: translate(0px, 0px) scale(1); }
@@ -33,25 +39,28 @@
         @keyframes bounce-short {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-5%); }
-        }
-        .animate-bounce-short {
-            animation: bounce-short 0.5s ease-out 1;
-        }
-    </style>
+    }
+    .animate-bounce-short {
+        animation: bounce-short 0.5s ease-out 1;
+    }
+</style>
 </head>
-<body class="min-h-screen bg-[#f0f9ff] relative overflow-x-hidden font-sans text-slate-800">
+<body class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 relative overflow-x-hidden font-sans text-slate-800">
 
-    <!-- Corak Latar Belakang Ceria -->
-    <div class="fixed top-0 left-0 w-full h-full overflow-hidden z-0 opacity-20 pointer-events-none">
-        <div class="absolute top-10 left-10 w-48 h-48 bg-yellow-300 rounded-full mix-blend-multiply filter blur-2xl animate-blob"></div>
-        <div class="absolute top-0 right-20 w-48 h-48 bg-pink-300 rounded-full mix-blend-multiply filter blur-2xl animate-blob animation-delay-2000"></div>
-        <div class="absolute -bottom-8 left-40 w-48 h-48 bg-blue-300 rounded-full mix-blend-multiply filter blur-2xl animate-blob animation-delay-4000"></div>
-    </div>
+<!-- Corak Latar Belakang Ceria yang Diperbaharui -->
+<div class="fixed top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+    <div class="absolute inset-0 bg-dots opacity-50"></div>
+    <div class="absolute top-10 left-10 w-64 h-64 bg-yellow-300 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-blob"></div>
+    <div class="absolute top-0 right-20 w-64 h-64 bg-pink-300 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-blob animation-delay-2000"></div>
+    <div class="absolute -bottom-8 left-40 w-64 h-64 bg-blue-300 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-blob animation-delay-4000"></div>
+    <div class="absolute bottom-20 right-1/4 w-64 h-64 bg-purple-300 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-blob animation-delay-2000"></div>
+    <div class="absolute top-1/4 left-1/3 w-64 h-64 bg-green-300 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-blob animation-delay-4000"></div>
+</div>
 
-    <!-- Konten Utama -->
-    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        
-        <!-- Bahagian Tajuk Utama (Header) & Logo Sekolah -->
+<!-- Konten Utama -->
+<div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    
+    <!-- Bahagian Tajuk Utama (Header) & Logo Sekolah -->
         <div class="text-center mb-12 flex flex-col items-center">
             
             <!-- Bekas Logo dan Nama Sekolah -->
@@ -127,15 +136,15 @@
             { title: "Benda Hidup & Bukan", path: "/benda hidup dan benda bukan hidup - ruyun/pokemon.html", color: "bg-fuchsia-400", icon: "leaf" },
             { title: "KAIKuP", path: "/KAIKuP/kaikup.html", color: "bg-pink-400", icon: "brain-circuit" },
             { title: "BM Pemulihan", path: "/PEMULIHAN - amal/BM PEMULIHAN/bmpemulihan.html", color: "bg-rose-400", icon: "book-open" },
-            { title: "Matematik Pemulihan", path: "/PEMULIHAN - amal/MATE PEMULIHAN/math.html", color: "bg-red-500", icon: "calculator" },
-            { title: "Kuiz Nombor 1-10", path: "kuiz_nombor_1_hingga_10.html", color: "bg-yellow-500", icon: "list-ordered" },
-            
-            // Aplikasi yang belum ada HTML (guna null untuk path)
-            { title: "Capitalization (Sya)", path: null, color: "bg-slate-400", icon: "wand-2" },
-            { title: "Punching Verbs", path: null, color: "bg-slate-500", icon: "gamepad-2" }
-        ];
+        { title: "Matematik Pemulihan", path: "/PEMULIHAN - amal/MATE PEMULIHAN/math.html", color: "bg-red-500", icon: "calculator" },
+        { title: "Kuiz Nombor 1-10", path: "kuiz_nombor_1_hingga_10.html", color: "bg-yellow-500", icon: "list-ordered" },
+        
+        // Aplikasi yang belum ada HTML (guna null untuk path)
+        { title: "Capitalization (Sya)", path: "grammar_quest.html", color: "bg-sky-500", icon: "wand-2" },
+        { title: "Punching Verbs", path: null, color: "bg-indigo-400", icon: "gamepad-2" }
+    ];
 
-        // Fungsi untuk mengendalikan klik aplikasi
+    // Fungsi untuk mengendalikan klik aplikasi
         function handleAppClick(path, title) {
             if (path) {
                 window.open(path, '_blank');
