@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grammar Quest - Capitalization & Full Stops</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #f0f9ff;
+        }
+        .heading-font {
+            font-family: 'Fredoka One', cursive;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-yellow-200">
+
+    <!-- Header Navigation -->
+    <header class="bg-white border-b-4 border-yellow-400 shadow-sm sticky top-0 z-50 transition-all">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+            <!-- Logo Section -->
+            <div class="flex items-center gap-3 cursor-pointer" onclick="goToScreen('home')">
+                <div class="w-12 h-12 bg-yellow-400 rounded-2xl flex items-center justify-center shadow-md border-2 border-slate-700 transform hover:rotate-6 transition-transform">
+                    <svg class="w-7 h-7 text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="heading-font text-2xl text-slate-800 tracking-wide leading-none">Grammar Quest</h1>
+                    <span class="text-xs font-bold text-amber-600 tracking-wider uppercase">Capitalization & Full Stops</span>
+                </div>
+            </div>
+
+            <!-- Stats/Progress in Header -->
+            <div id="header-stats" class="hidden sm:flex items-center gap-4 bg-amber-50 px-4 py-1.5 rounded-full border border-amber-200">
+                <div class="flex items-center gap-1.5 text-slate-700 font-bold text-sm">
+                    <svg class="w-4 h-4 text-indigo-500 fill-current" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                    <span id="header-player-name" class="text-slate-800 font-black">Guest</span>
+                </div>
+                <div id="header-p2-stats-divider" class="h-4 w-px bg-amber-200 hidden"></div>
+                <div id="header-p2-display" class="hidden items-center gap-1.5 text-slate-700 font-bold text-sm">
+                    <svg class="w-4 h-4 text-rose-500 fill-current" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                    <span id="header-player2-name" class="text-slate-800 font-black">Guest 2</span>
+                </div>
+                <div class="h-4 w-px bg-amber-200"></div>
+                <div class="flex items-center gap-1.5 text-slate-700 font-bold text-sm">
+                    <svg class="w-5 h-5 text-yellow-500 fill-current" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    <span id="stat-stars">0 Stars</span>
+                </div>
+                <div class="h-4 w-px bg-amber-200"></div>
+                <div class="text-xs font-bold text-slate-500" id="stat-level">Level: Easy</div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-2">
+                <button onclick="goToScreen('scoreboard')" class="bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold px-3 py-2 rounded-xl text-sm border-2 border-amber-200 flex items-center gap-1.5 transition-all active:scale-95">
+                    <span>🏆</span> Scoreboard
+                </button>
+                <button onclick="openTeacherDashboard()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-4 py-2 rounded-xl text-sm border-2 border-indigo-200 flex items-center gap-2 transition-all active:scale-95">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    Teacher Zone
+                </button>
+                <button onclick="toggleAudio()" id="audio-btn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 p-2 rounded-xl border-2 border-slate-200 transition-all">
+                    <svg id="audio-icon-on" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-4xl w-full mx-auto p-4 md:p-6 flex flex-col justify-center">
+
+        <!-- SCREEN 0: Welcome / Mode Selection & Name Registration -->
+        <div id="screen-welcome" class="space-y-8 max-w-md mx-auto w-full animate-fade-in text-center">
+            <div class="bg-white border-4 border-yellow-400 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+                <div class="w-24 h-24 mx-auto mb-4 relative transform hover:scale-110 transition-transform duration-300">
+                    <svg viewBox="0 0 200 200" class="w-full h-full">
+                        <rect x="70" y="30" width="60" height="110" fill="#fbbf24" rx="10" stroke="#334155" stroke-width="5" />
+                        <line x1="90" y1="30" x2="90" y2="140" stroke="#f59e0b" stroke-width="4" stroke-dasharray="8 4" />
+                        <line x1="110" y1="30" x2="110" y2="140" stroke="#f59e0b" stroke-width="4" stroke-dasharray="8 4" />
+                        <rect x="70" y="20" width="60" height="15" fill="#cbd5e1" stroke="#334155" stroke-width="4" />
+                        <path d="M 70 20 Q 100 0 130 20 Z" fill="#f43f5e" stroke="#334155" stroke-width="5" />
+                        <path d="M 70 140 L 100 180 L 130 140 Z" fill="#fed7aa" stroke="#334155" stroke-width="5" />
+                        <circle cx="88" cy="80" r="7" fill="#1e293b" />
+                        <circle cx="112" cy="80" r="7" fill="#1e293b" />
+                        <path d="M 90 95 Q 100 110 110 95" fill="none" stroke="#1e293b" stroke-width="4" stroke-linecap="round" />
+                    </svg>
+                </div>
+
+                <h2 class="heading-font text-3xl text-slate-800 mb-1">Welcome Writers!</h2>
+                <p class="text-slate-500 text-sm font-medium mb-6">Choose how many friends are practicing grammar today!</p>
+
+                <!-- Mode Switcher Tabs -->
+                <div class="grid grid-cols-2 gap-2 p-1.5 bg-slate-100 rounded-2xl mb-6">
+                    <button onclick="setGameMode(false)" id="tab-solo" class="py-2.5 rounded-xl font-bold text-sm transition-all bg-white text-indigo-700 shadow-sm border border-slate-200">
+                        👤 Solo Player
+                    </button>
+                    <button onclick="setGameMode(true)" id="tab-versus" class="py-2.5 rounded-xl font-bold text-sm transition-all text-slate-600 hover:text-slate-800">
+                        👥 Two Players
+                    </button>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Player 1 Name Field (Always shown) -->
+                    <div class="text-left space-y-1">
+                        <label id="p1-label" class="text-xs font-bold text-slate-500 uppercase tracking-wider block ml-1">Player Name</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-3 text-xl">💙</span>
+                            <input id="player-name-input" type="text" maxlength="12" placeholder="First writer's name..." class="w-full bg-slate-50 border-4 border-slate-200 rounded-2xl pl-12 pr-4 py-3 text-base font-bold text-slate-800 outline-none focus:border-blue-400 transition-all placeholder:text-slate-300">
+                        </div>
+                    </div>
+
+                    <!-- Player 2 Name Field (Versus Mode only) -->
+                    <div id="p2-input-wrapper" class="text-left space-y-1 hidden animate-fade-in">
+                        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block ml-1">Player 2 Name</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-3 text-xl">❤️</span>
+                            <input id="player2-name-input" type="text" maxlength="12" placeholder="Second writer's name..." class="w-full bg-slate-50 border-4 border-slate-200 rounded-2xl pl-12 pr-4 py-3 text-base font-bold text-slate-800 outline-none focus:border-rose-400 transition-all placeholder:text-slate-300">
+                        </div>
+                    </div>
+
+                    <button onclick="registerPlayers()" class="w-full bg-yellow-400 hover:bg-yellow-500 text-slate-800 font-black py-3.5 px-6 rounded-2xl border-b-4 border-yellow-600 shadow-md transition-all active:translate-y-[2px] active:border-b-2 text-lg flex items-center justify-center gap-2">
+                        <span>Let's Start Quest!</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 1: Home/Category Selection -->
+        <div id="screen-home" class="hidden space-y-8 animate-fade-in">
+            <!-- Hero Banner -->
+            <div class="bg-gradient-to-br from-amber-100 via-orange-50 to-yellow-100 rounded-3xl p-6 md:p-8 border-4 border-yellow-300 shadow-lg relative overflow-hidden flex flex-col md:flex-row items-center gap-6">
+                <div class="flex-1 space-y-3 z-10">
+                    <div class="flex items-center gap-3">
+                        <span class="inline-block bg-yellow-400 text-slate-800 font-black text-xs px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">Simple English Practice</span>
+                        <button onclick="changeActivePlayer()" class="text-xs font-bold text-indigo-600 hover:underline">Change Players 🔄</button>
+                    </div>
+                    <h2 class="heading-font text-3xl md:text-4xl text-slate-800">Hello, <span id="welcome-player-name" class="text-indigo-600">Learner</span>!</h2>
+                    <p class="text-slate-600 text-base md:text-lg font-medium leading-relaxed" id="welcome-submessage">
+                        Join Penny the Pencil to practice your writing. Find missing capital letters and place full stops to complete the sentences and earn shiny stars!
+                    </p>
+                </div>
+                <!-- Mascot Artwork -->
+                <div class="w-40 h-40 flex-shrink-0 relative transform hover:scale-105 transition-transform duration-300">
+                    <svg viewBox="0 0 200 200" class="w-full h-full">
+                        <rect x="70" y="30" width="60" height="110" fill="#fbbf24" rx="10" stroke="#334155" stroke-width="5" />
+                        <line x1="90" y1="30" x2="90" y2="140" stroke="#f59e0b" stroke-width="4" stroke-dasharray="8 4" />
+                        <line x1="110" y1="30" x2="110" y2="140" stroke="#f59e0b" stroke-width="4" stroke-dasharray="8 4" />
+                        <rect x="70" y="20" width="60" height="15" fill="#cbd5e1" stroke="#334155" stroke-width="4" />
+                        <path d="M 70 20 Q 100 0 130 20 Z" fill="#f43f5e" stroke="#334155" stroke-width="5" />
+                        <path d="M 70 140 L 100 180 L 130 140 Z" fill="#fed7aa" stroke="#334155" stroke-width="5" />
+                        <circle cx="88" cy="80" r="7" fill="#1e293b" />
+                        <circle cx="112" cy="80" r="7" fill="#1e293b" />
+                        <circle cx="86" cy="78" r="2.5" fill="#ffffff" />
+                        <circle cx="110" cy="78" r="2.5" fill="#ffffff" />
+                        <circle cx="80" cy="92" r="5" fill="#fca5a5" opacity="0.8" />
+                        <circle cx="120" cy="92" r="5" fill="#fca5a5" opacity="0.8" />
+                        <path d="M 90 95 Q 100 110 110 95" fill="none" stroke="#1e293b" stroke-width="4" stroke-linecap="round" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Game Mode Cards -->
+            <div class="space-y-4">
+                <h3 class="heading-font text-2xl text-slate-800 flex items-center gap-2">
+                    <span>🎯</span> Choose Your Lesson
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Level 1 Card -->
+                    <div onclick="startPractice('easy')" class="group bg-white border-4 border-emerald-400 rounded-3xl p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="bg-emerald-100 text-emerald-800 text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">Level 1</span>
+                                <span class="text-2xl">🌱</span>
+                            </div>
+                            <h4 class="heading-font text-xl text-slate-800 group-hover:text-emerald-600 transition-colors">Sentence Starters</h4>
+                            <p class="text-slate-600 text-sm font-medium">
+                                Practice capitalizing the **very first letter** of a simple sentence. The ending full stop is already placed for you!
+                            </p>
+                        </div>
+                        <div class="mt-6 flex items-center justify-between text-emerald-600 font-bold text-sm">
+                            <span>Play Level</span>
+                            <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </div>
+                    </div>
+
+                    <!-- Level 2 Card -->
+                    <div onclick="startPractice('medium')" class="group bg-white border-4 border-amber-400 rounded-3xl p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="bg-amber-100 text-amber-800 text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">Level 2</span>
+                                <span class="text-2xl">🚀</span>
+                            </div>
+                            <h4 class="heading-font text-xl text-slate-800 group-hover:text-amber-600 transition-colors">Special Names</h4>
+                            <p class="text-slate-600 text-sm font-medium">
+                                Capitalize **Sentence starters** AND special names of people (like *Tom* or *Ben*) and days of the week (like *Monday*).
+                            </p>
+                        </div>
+                        <div class="mt-6 flex items-center justify-between text-amber-600 font-bold text-sm">
+                            <span>Play Level</span>
+                            <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </div>
+                    </div>
+
+                    <!-- Level 3 Card -->
+                    <div onclick="startPractice('hard')" class="group bg-white border-4 border-indigo-400 rounded-3xl p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="bg-indigo-100 text-indigo-800 text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">Level 3</span>
+                                <span class="text-2xl">🏆</span>
+                            </div>
+                            <h4 class="heading-font text-xl text-slate-800 group-hover:text-indigo-600 transition-colors">Full Stop Master</h4>
+                            <p class="text-slate-600 text-sm font-medium">
+                                Show your skills! Capitalize the correct letters AND place the missing **full stop (.)** at the end of the sentence.
+                            </p>
+                        </div>
+                        <div class="mt-6 flex items-center justify-between text-indigo-600 font-bold text-sm">
+                            <span>Play Level</span>
+                            <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mini Tip Box -->
+            <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3">
+                <span class="text-2xl mt-0.5">💡</span>
+                <div>
+                    <h5 class="font-bold text-blue-900 text-sm">Teacher's Tip!</h5>
+                    <p class="text-blue-700 text-xs font-medium mt-0.5">
+                        A sentence always starts with a big capital letter! Proper names (like people and days) also get a capital letter. Don't forget to finish your sentence with a small dot called a full stop.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: Play/Active Challenge Workspace -->
+        <div id="screen-play" class="hidden space-y-6 animate-fade-in">
+            <!-- Active Turn Banner (Versus Mode) -->
+            <div id="versus-turn-banner" class="hidden p-4 rounded-2xl border-4 text-center transform shadow-md">
+                <span id="versus-turn-name" class="heading-font text-xl tracking-wide">Player's Turn!</span>
+            </div>
+
+            <!-- Game Status Bar -->
+            <div class="flex items-center justify-between gap-4 flex-wrap bg-white p-3 rounded-2xl border-2 border-slate-200 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <button onclick="goToScreen('home')" class="hover:bg-slate-100 text-slate-600 p-2 rounded-xl transition-all font-bold text-sm flex items-center gap-1.5 border border-slate-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                        Back
+                    </button>
+                    <span id="level-indicator-badge" class="bg-amber-100 text-amber-900 text-xs font-bold px-3 py-1 rounded-full">Level 1</span>
+                </div>
+                
+                <!-- Progress Indicators -->
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-slate-500">Sentence Progress:</span>
+                    <div class="flex gap-1.5" id="progress-dots">
+                        <!-- Instantiated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Learning Card -->
+            <div id="gameplay-workspace-card" class="bg-white rounded-3xl border-4 border-slate-700 shadow-xl overflow-hidden transition-all duration-300">
+                <!-- Helper/Instruction panel -->
+                <div id="workspace-helper-header" class="bg-amber-100 border-b-2 border-slate-700 p-4 flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">✍️</span>
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-sm sm:text-base">Find & Fix the Sentence!</h4>
+                            <p class="text-slate-600 text-xs sm:text-sm font-semibold">Click the first letters to make them CAPITAL. Click the end box to add a full stop!</p>
+                        </div>
+                    </div>
+                    <!-- Audio TTS trigger -->
+                    <button id="tts-speak-btn" onclick="speakCurrentSentence()" class="bg-yellow-400 hover:bg-yellow-500 text-slate-800 p-2.5 rounded-xl border border-yellow-500 shadow-sm transition-all active:scale-95 flex items-center gap-1.5 font-bold text-xs" title="Hear sentence read out loud">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                        <span class="hidden sm:inline">Listen</span>
+                    </button>
+                </div>
+
+                <!-- SENTENCE PLAYING CONTAINER (Interactive elements) -->
+                <div class="p-6 md:p-8 min-h-[160px] flex items-center justify-center bg-slate-50">
+                    <div id="interactive-sentence-container" class="flex flex-wrap items-center justify-center gap-x-2 gap-y-4 max-w-2xl text-center select-none">
+                        <!-- Dynamic letter & spacing blocks go here -->
+                    </div>
+                </div>
+
+                <!-- Action Bar -->
+                <div class="bg-slate-100 border-t-2 border-slate-200 p-4 flex items-center justify-between gap-4">
+                    <button onclick="resetCurrentSentence()" class="text-slate-500 hover:text-slate-700 font-bold text-sm px-3 py-2 rounded-xl hover:bg-slate-200 transition-colors">
+                        Reset Sentence
+                    </button>
+                    
+                    <button onclick="checkAnswer()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-black px-6 py-3 rounded-2xl border-b-4 border-emerald-700 shadow-md transition-all active:translate-y-[2px] active:border-b-2 flex items-center gap-2">
+                        <span>Check My Answer!</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Feedbacks Card (Pencil Companion speaks) -->
+            <div id="feedback-panel" class="hidden bg-white border-2 border-slate-200 rounded-3xl p-5 shadow-md animate-slide-up">
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+                    <!-- Mascot Face -->
+                    <div class="w-16 h-16 bg-amber-100 rounded-2xl flex-shrink-0 flex items-center justify-center border border-amber-300 shadow-sm" id="feedback-mascot-box">
+                        <svg viewBox="0 0 100 100" class="w-12 h-12" id="feedback-mascot-svg">
+                            <!-- Expressive Pencil Face -->
+                            <rect x="25" y="10" width="50" height="80" fill="#fbbf24" rx="8" />
+                            <circle id="mascot-eye-l" cx="40" cy="40" r="5" fill="#1e293b" />
+                            <circle id="mascot-eye-r" cx="60" cy="40" r="5" fill="#1e293b" />
+                            <path id="mascot-mouth" d="M 45 60 Q 50 60 55 60" fill="none" stroke="#1e293b" stroke-width="3" stroke-linecap="round" />
+                        </svg>
+                    </div>
+
+                    <div class="flex-1 space-y-2 text-center sm:text-left">
+                        <h4 class="heading-font text-lg text-slate-800" id="feedback-title">Result Title</h4>
+                        <div class="text-slate-600 text-sm font-medium leading-relaxed" id="feedback-message">
+                            Detailed correction rules explainers here.
+                        </div>
+                        
+                        <!-- Mini Explainer points lists -->
+                        <div id="feedback-explainers" class="mt-3 grid grid-cols-1 gap-2 text-xs text-left">
+                            <!-- Filled dynamically with correction bullets -->
+                        </div>
+
+                        <!-- Next controls -->
+                        <div class="pt-3 flex justify-end">
+                            <button id="next-sentence-btn" onclick="nextChallenge()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-2.5 rounded-xl border-b-4 border-blue-800 shadow-sm transition-all active:translate-y-[2px] active:border-b-2 flex items-center gap-2">
+                                <span id="next-btn-text">Next Sentence</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: Level Completed Celebration (Versus & Solo adaptable) -->
+        <div id="screen-celebration" class="hidden text-center space-y-8 py-8 animate-fade-in">
+            <div class="max-w-xl mx-auto bg-white border-4 border-yellow-400 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+                <!-- Confetti visual simulation -->
+                <div class="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(#facc15_15%,transparent_16%)] bg-[size:16px_16px]"></div>
+                
+                <div class="relative z-10 space-y-6">
+                    <!-- Grand Trophy/Star SVG -->
+                    <div id="celebration-badge-container" class="w-28 h-28 mx-auto bg-gradient-to-tr from-yellow-300 to-amber-500 rounded-full flex items-center justify-center shadow-lg border-4 border-white animate-bounce">
+                        <svg class="w-16 h-16 text-white drop-shadow-md" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                        </svg>
+                    </div>
+
+                    <div class="space-y-2">
+                        <h2 id="celebration-title" class="heading-font text-3xl text-slate-800">Excellent Work!</h2>
+                        <p id="celebration-subtext" class="text-slate-600 font-bold">You completed the level!</p>
+                    </div>
+
+                    <!-- Dual Player Final Comparison Dashboard -->
+                    <div id="celebration-duel-results" class="hidden grid grid-cols-2 gap-4 p-4 rounded-2xl border-2 border-dashed bg-slate-50">
+                        <!-- Player 1 Scoreboard Card -->
+                        <div class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 text-center relative">
+                            <span id="p1-win-crown" class="hidden absolute -top-5 left-1/2 transform -translate-x-1/2 text-2xl animate-pulse">👑</span>
+                            <span class="text-xs font-bold text-blue-800 uppercase block tracking-wider">💙 <span id="duel-p1-name">P1</span></span>
+                            <p class="text-3xl font-black text-slate-800 mt-2" id="duel-p1-score">0/3</p>
+                            <span class="text-xs text-slate-500 font-bold mt-1 block" id="duel-p1-stars">+0 Stars</span>
+                        </div>
+                        <!-- Player 2 Scoreboard Card -->
+                        <div class="bg-rose-50 border-2 border-rose-200 rounded-2xl p-4 text-center relative">
+                            <span id="p2-win-crown" class="hidden absolute -top-5 left-1/2 transform -translate-x-1/2 text-2xl animate-pulse">👑</span>
+                            <span class="text-xs font-bold text-rose-800 uppercase block tracking-wider">❤️ <span id="duel-p2-name">P2</span></span>
+                            <p class="text-3xl font-black text-slate-800 mt-2" id="duel-p2-score">0/3</p>
+                            <span class="text-xs text-slate-500 font-bold mt-1 block" id="duel-p2-stars">+0 Stars</span>
+                        </div>
+                    </div>
+
+                    <!-- Level Score Breakdown (Solo Mode fallback) -->
+                    <div id="celebration-solo-results" class="bg-slate-50 rounded-2xl p-4 border border-slate-200 grid grid-cols-2 gap-4">
+                        <div class="text-center">
+                            <span class="text-xs font-bold text-slate-500 uppercase">Correct Sentences</span>
+                            <p class="text-2xl font-black text-slate-800" id="final-completed">5/5</p>
+                        </div>
+                        <div class="text-center">
+                            <span class="text-xs font-bold text-slate-500 uppercase">Bonus Stars Won</span>
+                            <p class="text-2xl font-black text-yellow-600 flex items-center justify-center gap-1">
+                                <svg class="w-5 h-5 text-yellow-500 fill-current inline" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                                <span id="final-stars">+15</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-2 pt-2">
+                        <button onclick="goToScreen('scoreboard')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3 px-6 rounded-2xl border-b-4 border-indigo-800 shadow-md transition-all active:translate-y-[2px] active:border-b-2">
+                            View Leaderboard 🏆
+                        </button>
+                        <button onclick="goToScreen('home')" class="bg-yellow-400 hover:bg-yellow-500 text-slate-800 font-black py-3 px-6 rounded-2xl border-b-4 border-yellow-600 shadow-md transition-all active:translate-y-[2px] active:border-b-2">
+                            Back to Levels 🎯
+                        </button>
+                        <button id="celebration-replay-btn" onclick="replayCurrentLevel()" class="text-slate-600 hover:text-slate-800 font-bold text-sm py-2">
+                            Replay this level 🔄
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 5: Classroom Scoreboard Screen -->
+        <div id="screen-scoreboard" class="hidden space-y-6 animate-fade-in">
+            <div class="flex items-center justify-between">
+                <button onclick="goToScreen('home')" class="hover:bg-slate-100 text-slate-600 p-2 rounded-xl transition-all font-bold text-sm flex items-center gap-1.5 border border-slate-200 bg-white">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                    Back to Lessons
+                </button>
+                <h3 class="heading-font text-2xl text-slate-800 flex items-center gap-2">
+                    <span>🏆</span> Class Scoreboard
+                </h3>
+            </div>
+
+            <div class="bg-white border-4 border-yellow-400 rounded-3xl p-6 shadow-lg max-w-2xl mx-auto space-y-6">
+                <div class="text-center space-y-1">
+                    <h4 class="heading-font text-2xl text-slate-800">Grammar Champions</h4>
+                    <p class="text-xs text-slate-500 font-bold">See all registered writers and their total stars earned!</p>
+                </div>
+
+                <div class="overflow-hidden border border-slate-200 rounded-2xl">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-yellow-100 text-slate-800 text-xs sm:text-sm font-bold border-b border-slate-200">
+                                <th class="p-4 w-16 text-center">Rank</th>
+                                <th class="p-4">Writer's Name</th>
+                                <th class="p-4 text-center">Last Run</th>
+                                <th class="p-4 text-right">Stars Count</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scoreboard-table-body" class="text-xs sm:text-sm font-semibold text-slate-700">
+                            <!-- Populated with rows dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex items-center justify-between gap-4 pt-2">
+                    <button onclick="triggerScoreboardResetModal()" class="text-red-500 hover:text-red-700 hover:underline text-xs font-bold">
+                        Clear Scoreboard Data
+                    </button>
+                    <button onclick="goToScreen('home')" class="bg-yellow-400 hover:bg-yellow-500 text-slate-800 font-bold px-5 py-2.5 rounded-xl text-xs sm:text-sm border-b-2 border-yellow-600 transition-all">
+                        Keep Practicing! ✍️
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: Teacher Dashboard (Add sentences, view logs) -->
+        <div id="screen-teacher" class="hidden space-y-6 animate-fade-in">
+            <!-- Navigation -->
+            <div class="flex items-center justify-between">
+                <button onclick="goToScreen('home')" class="hover:bg-slate-100 text-slate-600 p-2 rounded-xl transition-all font-bold text-sm flex items-center gap-1.5 border border-slate-200 bg-white">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                    Back to Lessons
+                </button>
+                <h3 class="heading-font text-2xl text-slate-800 flex items-center gap-2">
+                    <span>👩‍🏫</span> Teacher's Dashboard
+                </h3>
+            </div>
+
+            <!-- Dashboard Split Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Creator Panel -->
+                <div class="lg:col-span-5 bg-white border-2 border-indigo-200 rounded-3xl p-5 shadow-sm space-y-4">
+                    <div class="border-b pb-3">
+                        <h4 class="font-black text-indigo-900 flex items-center gap-2">
+                            <span>✏️</span> Create a Sentence
+                        </h4>
+                        <p class="text-xs text-slate-500 font-medium">Add targeted exercises using A1-A2 vocabulary.</p>
+                    </div>
+
+                    <!-- Sentence Creator Form -->
+                    <div class="space-y-4 text-sm font-semibold text-slate-700">
+                        <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-3 text-xs text-indigo-800 font-normal space-y-1">
+                            <span class="font-bold">Instructions:</span>
+                            <p>Type the correct sentence with proper capitalization and a **full stop (`.`)** at the end. Use very basic words for low-to-mid skilled pupils.</p>
+                        </div>
+
+                        <div>
+                            <label class="block mb-1">Select Practice Difficulty</label>
+                            <select id="custom-level" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-3 py-2 outline-none focus:border-indigo-400 font-medium">
+                                <option value="easy">Level 1 - Sentence Starter</option>
+                                <option value="medium">Level 2 - Special Names (Tom, Monday, Paris)</option>
+                                <option value="hard">Level 3 - Full Stop Master (Missing ending dot)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block mb-1">The Correct Sentence (Target Model)</label>
+                            <input id="custom-text" type="text" placeholder="e.g., We play with the dog." class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-indigo-400 font-medium text-slate-800">
+                        </div>
+
+                        <div>
+                            <label class="block mb-1">Correction Hint / Reason (Keep it simple!)</label>
+                            <textarea id="custom-hint" rows="2" placeholder="e.g., Make sure 'We' starts with a capital letter and put a full stop dot at the end." class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-3 py-2 outline-none focus:border-indigo-400 font-medium text-slate-800 text-xs sm:text-sm"></textarea>
+                        </div>
+
+                        <button onclick="addCustomSentence()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Add to Classroom Pool
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sentence List & Activity Panel -->
+                <div class="lg:col-span-7 bg-white border-2 border-slate-200 rounded-3xl p-5 shadow-sm flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="border-b pb-3 flex justify-between items-center">
+                            <div>
+                                <h4 class="font-black text-slate-800 flex items-center gap-2">
+                                    <span>📚</span> Simple Sentence Bank
+                                </h4>
+                                <p class="text-xs text-slate-500 font-medium">Manage sentences currently presented in game.</p>
+                            </div>
+                            <button onclick="triggerRestoreSentencesModal()" class="text-xs bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-600 px-2.5 py-1.5 rounded-lg font-bold transition-all">
+                                Reset Defaults
+                            </button>
+                        </div>
+
+                        <!-- Sentences list scrollarea -->
+                        <div class="max-h-[320px] overflow-y-auto mt-4 pr-1 space-y-3" id="sentence-bank-list">
+                            <!-- Populated via Javascript -->
+                        </div>
+                    </div>
+
+                    <!-- Reset Progress -->
+                    <div class="border-t pt-4 flex flex-col sm:flex-row gap-4 items-center justify-between text-xs font-semibold text-slate-500">
+                        <div>
+                            <span>Need to reset stars, streaks, or student stats?</span>
+                        </div>
+                        <button onclick="triggerResetProgressModal()" class="text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200 px-3 py-1.5 rounded-xl transition-all font-bold">
+                            Reset Score & Stars
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- CLASSROOM CLEAN MODAL OVERLAY -->
+    <div id="classroom-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
+        <div class="bg-white border-4 border-slate-700 rounded-3xl p-6 max-w-sm w-full space-y-4 shadow-2xl transform scale-95 transition-all">
+            <div class="text-center space-y-2">
+                <span id="modal-emoji" class="text-4xl block">💡</span>
+                <h4 id="modal-title" class="heading-font text-xl text-slate-800">Are you sure?</h4>
+                <p id="modal-description" class="text-sm text-slate-500 font-medium">Action desc here</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="closeClassroomModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl border border-slate-300 text-sm">
+                    Go Back
+                </button>
+                <button id="modal-confirm-btn" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 rounded-xl border-b-4 border-red-700 text-sm">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Notification/Toast Overlay -->
+    <div id="custom-toast" class="fixed bottom-6 right-6 z-50 bg-slate-800 text-white font-bold text-sm px-5 py-3 rounded-2xl shadow-lg border border-slate-700 flex items-center gap-3 transition-all transform translate-y-20 opacity-0 pointer-events-none">
+        <span id="toast-icon">✨</span>
+        <span id="toast-text">Success Message here!</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-6 text-center text-slate-400 text-xs">
+        <div class="max-w-4xl mx-auto px-4 space-y-1">
+            <p class="font-bold">Grammar Quest &copy; 2026. Designed with ❤️ for early English learners.</p>
+            <p>Made for the English subject to help low to mid skilled pupils conquer capitalization & basic writing conventions.</p>
+        </div>
+    </footer>
+
+    <!-- Audio Web API & Game Logic Script -->
+    <script>
+        // --- Web Audio Synthesizer ---
+        let audioContext = null;
+        let isAudioMuted = false;
+
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            if (isAudioMuted) return;
+            initAudio();
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+
+            try {
+                const now = audioContext.currentTime;
+                if (type === 'click') {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                } else if (type === 'success') {
+                    [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                        const osc = audioContext.createOscillator();
+                        const gain = audioContext.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + (idx * 0.05));
+                        gain.gain.setValueAtTime(0.12, now + (idx * 0.05));
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3 + (idx * 0.05));
+                        osc.connect(gain);
+                        gain.connect(audioContext.destination);
+                        osc.start(now + (idx * 0.05));
+                        osc.stop(now + 0.4 + (idx * 0.05));
+                    });
+                } else if (type === 'failure') {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.linearRampToValueAtTime(140, now + 0.25);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'victory') {
+                    const notes = [261.63, 329.63, 392.00, 523.25, 392.00, 523.25, 659.25];
+                    const times = [0, 0.1, 0.2, 0.3, 0.45, 0.55, 0.7];
+                    notes.forEach((freq, idx) => {
+                        const osc = audioContext.createOscillator();
+                        const gain = audioContext.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + times[idx]);
+                        gain.gain.setValueAtTime(0.12, now + times[idx]);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + times[idx] + 0.35);
+                        osc.connect(gain);
+                        gain.connect(audioContext.destination);
+                        osc.start(now + times[idx]);
+                        osc.stop(now + times[idx] + 0.4);
+                    });
+                }
+            } catch (e) {
+                console.warn("Web Audio failed or not supported in this environment.", e);
+            }
+        }
+
+        function toggleAudio() {
+            isAudioMuted = !isAudioMuted;
+            const btn = document.getElementById('audio-btn');
+            if (isAudioMuted) {
+                btn.className = "bg-red-50 hover:bg-red-100 text-red-600 p-2 rounded-xl border-2 border-red-200 transition-all";
+                btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>`;
+            } else {
+                btn.className = "bg-slate-100 hover:bg-slate-200 text-slate-700 p-2 rounded-xl border-2 border-slate-200 transition-all";
+                btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>`;
+            }
+            playSound('click');
+        }
+
+        // --- Application State ---
+        let currentScreen = 'welcome';
+        let currentLevel = 'easy'; // easy, medium, hard
+        let sentenceIndex = 0;
+        let totalStars = 0;
+        let currentStreak = 0;
+
+        // Two Player Game Mode Variables
+        let isTwoPlayer = false;
+        let activePlayerName = "";
+        let activePlayerName2 = "";
+        let currentActiveTurn = 1; // 1 or 2
+
+        // Individual player performance metrics (For final celebration matchup screen)
+        let player1CorrectAnswersCount = 0;
+        let player2CorrectAnswersCount = 0;
+        let player1TotalStarsEarned = 0;
+        let player2TotalStarsEarned = 0;
+        
+        // Active challenge structures
+        let targetSentence = ""; // e.g., "The dog is happy."
+        let workingWords = []; // Array of word objects for interactive interface
+        let hasEndingFullStop = false; // Player-selected ending full stop state
+        let levelSentencesPool = [];
+
+        // Preloaded Sentences Database (Simple, A1-A2 vocabulary)
+        const defaultSentences = [
+            // LEVEL 1: Only initial capital letters. Period already placed.
+            { id: "e1", level: "easy", correctText: "The dog is happy.", hint: "Start the sentence with a capital 'T'!" },
+            { id: "e2", level: "easy", correctText: "We like to play.", hint: "Remember to make 'W' capital because it starts the sentence." },
+            { id: "e3", level: "easy", correctText: "She has a red ball.", hint: "Click the 's' in 'she' to make it a capital 'S'!" },
+            { id: "e4", level: "easy", correctText: "He runs to school.", hint: "Always start your sentence with a big capital letter." },
+            { id: "e5", level: "easy", correctText: "Cats like sweet milk.", hint: "Click the 'c' in 'cats' to capitalize it." },
+            { id: "e6", level: "easy", correctText: "The sun is big.", hint: "The word 'The' must start with a capital 'T'." },
+
+            // LEVEL 2: Names, Days, Places, and sentence start
+            { id: "m1", level: "medium", correctText: "My friend is Tom.", hint: "'My' starts the sentence, and 'Tom' is a boy's name, so both need capitals!" },
+            { id: "m2", level: "medium", correctText: "On Monday we play.", hint: "'On' starts the sentence. 'Monday' is a day, so it gets a capital letter!" },
+            { id: "m3", level: "medium", correctText: "I see Ben at school.", hint: "The word 'I' must always be capital. 'Ben' is a name, so capitalize it too!" },
+            { id: "m4", level: "medium", correctText: "We live in Paris.", hint: "Start with a capital 'W'. 'Paris' is a famous city, so it needs a capital 'P'." },
+            { id: "m5", level: "medium", correctText: "Anna has a cute cat.", hint: "Anna is a girl's name and the start of our sentence. Capitalize the 'A'!" },
+            { id: "m6", level: "medium", correctText: "We run on Sunday.", hint: "Start with capital 'W' and capitalize the day 'Sunday'!" },
+
+            // LEVEL 3: Capitalization AND placing the missing full stop
+            { id: "h1", level: "hard", correctText: "The sun is hot.", hint: "Capitalize 'The' and click the empty box at the end to add your full stop dot!" },
+            { id: "h2", level: "hard", correctText: "I like big yellow bananas.", hint: "Remember the capital 'I' at the start, and don't forget the ending full stop dot." },
+            { id: "h3", level: "hard", correctText: "They go to the park.", hint: "Capitalize 'They' at the start and click the final grey box to place a full stop." },
+            { id: "h4", level: "hard", correctText: "Ben is a very good boy.", hint: "'Ben' needs a capital letter. Check the ending of the sentence for a full stop!" },
+            { id: "h5", level: "hard", correctText: "We run on Sunday.", hint: "Capitalize the sentence start 'We', the day 'Sunday', and place your full stop dot." },
+            { id: "h6", level: "hard", correctText: "Anna walks with the dog.", hint: "Capitalize 'Anna', and end with a full stop dot." }
+        ];
+
+        let sentencesBank = [];
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', () => {
+            const storedSentences = localStorage.getItem('grammar_quest_sentences');
+            if (storedSentences) {
+                sentencesBank = JSON.parse(storedSentences);
+            } else {
+                sentencesBank = [...defaultSentences];
+                saveSentencesToStorage();
+            }
+
+            // Check if player name exists
+            const storedPlayer = localStorage.getItem('grammar_quest_player');
+            const storedPlayer2 = localStorage.getItem('grammar_quest_player2');
+            const storedMode = localStorage.getItem('grammar_quest_two_player_mode');
+            
+            if (storedPlayer) {
+                activePlayerName = storedPlayer;
+                activePlayerName2 = storedPlayer2 || "";
+                isTwoPlayer = (storedMode === 'true');
+
+                setupOnboardingUIVisibility();
+                updateStatsUI();
+                goToScreen('home');
+            } else {
+                goToScreen('welcome');
+            }
+        });
+
+        function saveSentencesToStorage() {
+            localStorage.setItem('grammar_quest_sentences', JSON.stringify(sentencesBank));
+        }
+
+        // --- Multi Player Onboarding Control ---
+        function setGameMode(isVersus) {
+            playSound('click');
+            isTwoPlayer = isVersus;
+            
+            const btnSolo = document.getElementById('tab-solo');
+            const btnVersus = document.getElementById('tab-versus');
+            const p2Input = document.getElementById('p2-input-wrapper');
+            const p1Label = document.getElementById('p1-label');
+
+            if (isTwoPlayer) {
+                btnVersus.className = "py-2.5 rounded-xl font-bold text-sm transition-all bg-white text-rose-700 shadow-sm border border-slate-200";
+                btnSolo.className = "py-2.5 rounded-xl font-bold text-sm transition-all text-slate-600 hover:text-slate-800";
+                p2Input.classList.remove('hidden');
+                p1Label.innerText = "Player 1 Name";
+            } else {
+                btnSolo.className = "py-2.5 rounded-xl font-bold text-sm transition-all bg-white text-indigo-700 shadow-sm border border-slate-200";
+                btnVersus.className = "py-2.5 rounded-xl font-bold text-sm transition-all text-slate-600 hover:text-slate-800";
+                p2Input.classList.add('hidden');
+                p1Label.innerText = "Player Name";
+            }
+        }
+
+        function registerPlayers() {
+            const p1Input = document.getElementById('player-name-input').value.trim();
+            const p2Input = document.getElementById('player2-name-input').value.trim();
+
+            if (p1Input.length < 2) {
+                playSound('failure');
+                showToast("Player 1 needs a name with 2+ letters!", "✍️");
+                return;
+            }
+
+            if (isTwoPlayer && p2Input.length < 2) {
+                playSound('failure');
+                showToast("Player 2 needs a name with 2+ letters!", "✍️");
+                return;
+            }
+
+            activePlayerName = p1Input;
+            activePlayerName2 = isTwoPlayer ? p2Input : "";
+
+            localStorage.setItem('grammar_quest_player', activePlayerName);
+            localStorage.setItem('grammar_quest_player2', activePlayerName2);
+            localStorage.setItem('grammar_quest_two_player_mode', isTwoPlayer);
+
+            // Fetch cumulative stats
+            const storedStars = localStorage.getItem('grammar_quest_stars_' + activePlayerName);
+            totalStars = storedStars ? parseInt(storedStars) : 0;
+
+            setupOnboardingUIVisibility();
+            playSound('success');
+            showToast(isTwoPlayer ? "Both players registered successfully!" : `Welcome, ${activePlayerName}!`, "🎉");
+            updateStatsUI();
+            goToScreen('home');
+        }
+
+        function setupOnboardingUIVisibility() {
+            document.getElementById('header-player-name').innerText = isTwoPlayer ? `💙 ${activePlayerName}` : activePlayerName;
+            
+            const p2Header = document.getElementById('header-p2-display');
+            const p2HeaderDivider = document.getElementById('header-p2-stats-divider');
+            const welcomeSub = document.getElementById('welcome-submessage');
+            
+            if (isTwoPlayer) {
+                document.getElementById('header-player2-name').innerText = `❤️ ${activePlayerName2}`;
+                p2Header.classList.remove('hidden');
+                p2Header.classList.add('flex');
+                p2HeaderDivider.classList.remove('hidden');
+
+                document.getElementById('welcome-player-name').innerText = `${activePlayerName} and ${activePlayerName2}`;
+                welcomeSub.innerHTML = `Get ready for an exciting 2-Player Versus challenge! Take turns fixing Penny's sentences. <strong>💙 Player 1</strong> gets odd turns, and <strong>❤️ Player 2</strong> gets even turns. Let's see who is the ultimate Grammar Champion!`;
+            } else {
+                p2Header.classList.add('hidden');
+                p2Header.classList.remove('flex');
+                p2HeaderDivider.classList.add('hidden');
+
+                document.getElementById('welcome-player-name').innerText = activePlayerName;
+                welcomeSub.innerHTML = "Join Penny the Pencil to practice your writing. Find missing capital letters and place full stops to complete the sentences and earn shiny stars!";
+            }
+        }
+
+        function changeActivePlayer() {
+            document.getElementById('player-name-input').value = "";
+            document.getElementById('player2-name-input').value = "";
+            goToScreen('welcome');
+        }
+
+        // --- Screen Navigation Manager ---
+        function goToScreen(screenId) {
+            currentScreen = screenId;
+            playSound('click');
+
+            // Hide all screens
+            ['screen-welcome', 'screen-home', 'screen-play', 'screen-celebration', 'screen-scoreboard', 'screen-teacher'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+
+            // Show current screen
+            document.getElementById(`screen-${screenId}`).classList.remove('hidden');
+
+            // Header elements control
+            const stats = document.getElementById('header-stats');
+            if (screenId !== 'welcome') {
+                stats.classList.remove('hidden');
+                stats.classList.add('flex');
+            } else {
+                stats.classList.add('hidden');
+                stats.classList.remove('flex');
+            }
+
+            if (screenId === 'teacher') {
+                populateTeacherSentenceList();
+            }
+
+            if (screenId === 'scoreboard') {
+                renderScoreboard();
+            }
+        }
+
+        function updateStatsUI() {
+            document.getElementById('stat-stars').innerText = `${totalStars} Stars`;
+            if (activePlayerName && !isTwoPlayer) {
+                localStorage.setItem('grammar_quest_stars_' + activePlayerName, totalStars);
+            }
+            
+            let lvlLabel = "Level 1: Easy";
+            if (currentLevel === 'medium') lvlLabel = "Level 2: Medium";
+            if (currentLevel === 'hard') lvlLabel = "Level 3: Hard";
+            document.getElementById('stat-level').innerText = lvlLabel;
+        }
+
+        function showToast(text, icon = "✨") {
+            const toast = document.getElementById('custom-toast');
+            document.getElementById('toast-icon').innerText = icon;
+            document.getElementById('toast-text').innerText = text;
+            
+            toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+
+        // --- Practice Engine Logic ---
+        function startPractice(level) {
+            currentLevel = level;
+            sentenceIndex = 0;
+            currentStreak = 0;
+            currentActiveTurn = 1; // Player 1 always starts
+
+            // Reset Versus Level Scores
+            player1CorrectAnswersCount = 0;
+            player2CorrectAnswersCount = 0;
+            player1TotalStarsEarned = 0;
+            player2TotalStarsEarned = 0;
+            levelCorrectAnswersCount = 0;
+
+            // Filter appropriate level sentences
+            levelSentencesPool = sentencesBank.filter(s => s.level === level);
+            if (levelSentencesPool.length === 0) {
+                levelSentencesPool = defaultSentences.filter(s => s.level === level);
+            }
+
+            // If Versus mode, let's limit/set the total match size to an even 6 sentences (3 turns each)
+            if (isTwoPlayer) {
+                // Keep the subset to exactly 6 or maximum possible even number of sentences
+                levelSentencesPool = levelSentencesPool.slice(0, 6);
+            }
+
+            updateStatsUI();
+            goToScreen('play');
+            loadActiveChallenge();
+        }
+
+        function loadActiveChallenge() {
+            document.getElementById('feedback-panel').classList.add('hidden');
+            const data = levelSentencesPool[sentenceIndex];
+            targetSentence = data.correctText;
+            hasEndingFullStop = (currentLevel !== 'hard'); 
+
+            // Turn Indicator banner configuration (Versus vs Solo)
+            const turnBanner = document.getElementById('versus-turn-banner');
+            const workspaceCard = document.getElementById('gameplay-workspace-card');
+            const workspaceHeader = document.getElementById('workspace-helper-header');
+
+            if (isTwoPlayer) {
+                turnBanner.classList.remove('hidden');
+                
+                if (currentActiveTurn === 1) {
+                    turnBanner.className = "p-3 rounded-2xl border-4 text-center transform shadow-sm bg-blue-50 border-blue-400 text-blue-900 animate-pulse";
+                    turnBanner.innerHTML = `<span class="heading-font text-lg">💙 Player 1's Turn: <span class="underline">${activePlayerName}</span></span>`;
+                    
+                    // Match workspace border design with turn
+                    workspaceCard.className = "bg-white rounded-3xl border-4 border-blue-500 shadow-xl overflow-hidden transition-all duration-300";
+                    workspaceHeader.className = "bg-blue-100 border-b-2 border-blue-500 p-4 flex items-center justify-between gap-4";
+                } else {
+                    turnBanner.className = "p-3 rounded-2xl border-4 text-center transform shadow-sm bg-rose-50 border-rose-400 text-rose-900 animate-pulse";
+                    turnBanner.innerHTML = `<span class="heading-font text-lg">❤️ Player 2's Turn: <span class="underline">${activePlayerName2}</span></span>`;
+                    
+                    workspaceCard.className = "bg-white rounded-3xl border-4 border-rose-500 shadow-xl overflow-hidden transition-all duration-300";
+                    workspaceHeader.className = "bg-rose-100 border-b-2 border-rose-500 p-4 flex items-center justify-between gap-4";
+                }
+            } else {
+                turnBanner.classList.add('hidden');
+                workspaceCard.className = "bg-white rounded-3xl border-4 border-slate-700 shadow-xl overflow-hidden transition-all duration-300";
+                workspaceHeader.className = "bg-amber-100 border-b-2 border-slate-700 p-4 flex items-center justify-between gap-4";
+            }
+
+            // Build interactive words array
+            let rawCleanText = targetSentence;
+            if (rawCleanText.endsWith('.')) {
+                rawCleanText = rawCleanText.slice(0, -1);
+            }
+
+            const rawWords = rawCleanText.split(' ');
+            workingWords = rawWords.map((word, idx) => {
+                let currentText = word;
+                if (word !== "I") {
+                    currentText = word.charAt(0).toLowerCase() + word.slice(1);
+                } else {
+                    if (Math.random() > 0.3) {
+                        currentText = "i";
+                    }
+                }
+                return {
+                    original: word,
+                    current: currentText
+                };
+            });
+
+            renderPlayProgressDots();
+            renderInteractiveSentence();
+            
+            const badge = document.getElementById('level-indicator-badge');
+            if (currentLevel === 'easy') {
+                badge.innerText = "Level 1: Starters";
+                badge.className = "bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full";
+            } else if (currentLevel === 'medium') {
+                badge.innerText = "Level 2: Names";
+                badge.className = "bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full";
+            } else {
+                badge.innerText = "Level 3: Master";
+                badge.className = "bg-indigo-100 text-indigo-800 text-xs font-bold px-3 py-1 rounded-full";
+            }
+        }
+
+        function renderPlayProgressDots() {
+            const container = document.getElementById('progress-dots');
+            container.innerHTML = "";
+            for (let i = 0; i < levelSentencesPool.length; i++) {
+                const dot = document.createElement('div');
+                
+                // Show whose turn it was for finished dots in Versus
+                let dotColor = "bg-slate-200";
+                if (i < sentenceIndex) {
+                    if (isTwoPlayer) {
+                        dotColor = (i % 2 === 0) ? "bg-blue-400" : "bg-rose-400";
+                    } else {
+                        dotColor = "bg-emerald-500 scale-110";
+                    }
+                } else if (i === sentenceIndex) {
+                    if (isTwoPlayer) {
+                        dotColor = (currentActiveTurn === 1) ? "bg-blue-500 ring-2 ring-blue-300 scale-125" : "bg-rose-500 ring-2 ring-rose-300 scale-125";
+                    } else {
+                        dotColor = "bg-amber-400 ring-2 ring-amber-300 scale-125";
+                    }
+                }
+
+                dot.className = `w-3 h-3 rounded-full transition-all duration-300 ${dotColor}`;
+                container.appendChild(dot);
+            }
+        }
+
+        function renderInteractiveSentence() {
+            const container = document.getElementById('interactive-sentence-container');
+            container.innerHTML = "";
+
+            workingWords.forEach((wordObj, wordIdx) => {
+                const wordWrapper = document.createElement('div');
+                wordWrapper.className = "flex items-center mx-1.5 py-1.5";
+
+                const firstLetter = wordObj.current.charAt(0);
+                const restOfWord = wordObj.current.slice(1);
+
+                const firstLetterBtn = document.createElement('button');
+                firstLetterBtn.innerText = firstLetter;
+                const isCapital = (firstLetter === firstLetter.toUpperCase() && firstLetter !== firstLetter.toLowerCase());
+                
+                let activeLetterClass = "bg-white border-slate-300 text-slate-500 hover:bg-slate-50";
+                if (isCapital) {
+                    if (isTwoPlayer) {
+                        activeLetterClass = currentActiveTurn === 1 
+                            ? "bg-blue-400 border-blue-600 text-white shadow-sm font-extrabold" 
+                            : "bg-rose-400 border-rose-600 text-white shadow-sm font-extrabold";
+                    } else {
+                        activeLetterClass = "bg-yellow-300 border-yellow-500 text-slate-800 shadow-sm font-extrabold";
+                    }
+                }
+
+                firstLetterBtn.className = `text-2xl sm:text-3xl font-bold px-1.5 py-0.5 rounded-lg border-2 transition-all transform hover:scale-115 active:scale-90 ${activeLetterClass}`;
+                firstLetterBtn.onclick = () => {
+                    toggleLetterCase(wordIdx);
+                };
+
+                wordWrapper.appendChild(firstLetterBtn);
+
+                if (restOfWord.length > 0) {
+                    const restText = document.createElement('span');
+                    restText.innerText = restOfWord;
+                    restText.className = "text-2xl sm:text-3xl font-bold text-slate-700 tracking-wide";
+                    wordWrapper.appendChild(restText);
+                }
+
+                container.appendChild(wordWrapper);
+            });
+
+            // Interactive Full Stop Slot at the very end
+            const fullStopWrapper = document.createElement('div');
+            fullStopWrapper.className = "flex items-center ml-1";
+
+            if (currentLevel === 'hard') {
+                const fullStopBtn = document.createElement('button');
+                let fullStopClass = "bg-slate-200 border-dashed border-slate-400 text-slate-400 hover:bg-slate-300";
+                
+                if (hasEndingFullStop) {
+                    if (isTwoPlayer) {
+                        fullStopClass = currentActiveTurn === 1 
+                            ? "bg-blue-500 border-blue-700 text-white animate-pulse" 
+                            : "bg-rose-500 border-rose-700 text-white animate-pulse";
+                    } else {
+                        fullStopClass = "bg-indigo-500 border-indigo-700 text-white animate-pulse";
+                    }
+                }
+
+                fullStopBtn.className = `w-10 h-10 text-3xl font-black rounded-xl border-2 flex items-center justify-center transition-all ${fullStopClass}`;
+                fullStopBtn.innerText = hasEndingFullStop ? "." : "?";
+                fullStopBtn.title = "Click to add a full stop dot!";
+                fullStopBtn.onclick = () => {
+                    hasEndingFullStop = !hasEndingFullStop;
+                    playSound('click');
+                    renderInteractiveSentence();
+                };
+                fullStopWrapper.appendChild(fullStopBtn);
+            } else {
+                const fixedDot = document.createElement('span');
+                fixedDot.className = "text-4xl font-extrabold text-slate-800 animate-fade-in";
+                fixedDot.innerText = ".";
+                fullStopWrapper.appendChild(fixedDot);
+            }
+
+            container.appendChild(fullStopWrapper);
+        }
+
+        function toggleLetterCase(wordIdx) {
+            playSound('click');
+            const word = workingWords[wordIdx].current;
+            const first = word.charAt(0);
+            const rest = word.slice(1);
+
+            if (first === first.toUpperCase()) {
+                workingWords[wordIdx].current = first.toLowerCase() + rest;
+            } else {
+                workingWords[wordIdx].current = first.toUpperCase() + rest;
+            }
+            renderInteractiveSentence();
+        }
+
+        function resetCurrentSentence() {
+            playSound('click');
+            loadActiveChallenge();
+            showToast("Sentence reset to original state!", "🔄");
+        }
+
+        function speakCurrentSentence() {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const cleanTxt = targetSentence.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+                const utterance = new SpeechSynthesisUtterance(cleanTxt);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.8; 
+                window.speechSynthesis.speak(utterance);
+            } else {
+                showToast("Speech support not found on this device.", "🔇");
+            }
+        }
+
+        function checkAnswer() {
+            let userSentence = workingWords.map(w => w.current).join(' ');
+            if (hasEndingFullStop) {
+                userSentence += ".";
+            }
+
+            const cleanUser = userSentence.trim();
+            const cleanTarget = targetSentence.trim();
+            const isCorrect = (cleanUser === cleanTarget);
+
+            const explainersContainer = document.getElementById('feedback-explainers');
+            explainersContainer.innerHTML = "";
+
+            const activeName = (isTwoPlayer) ? (currentActiveTurn === 1 ? activePlayerName : activePlayerName2) : activePlayerName;
+
+            if (isCorrect) {
+                playSound('success');
+                displayMascotMouthState('happy');
+                
+                // Score updates
+                if (isTwoPlayer) {
+                    if (currentActiveTurn === 1) {
+                        player1CorrectAnswersCount++;
+                        player1TotalStarsEarned += 3;
+                    } else {
+                        player2CorrectAnswersCount++;
+                        player2TotalStarsEarned += 3;
+                    }
+                } else {
+                    levelCorrectAnswersCount++;
+                }
+
+                totalStars += 3;
+                currentStreak++;
+
+                document.getElementById('feedback-title').innerHTML = `🌟 Super Job, ${activeName}!`;
+                document.getElementById('feedback-title').className = "heading-font text-xl text-emerald-600";
+                document.getElementById('feedback-message').innerHTML = `Excellent writing! You spelled and capitalized everything perfectly. Here are <strong>+3 stars</strong>!`;
+
+                const bullet = document.createElement('div');
+                bullet.className = "bg-emerald-50 text-emerald-800 p-2.5 rounded-xl border border-emerald-100 flex items-center gap-2 font-semibold";
+                bullet.innerHTML = "<span>✨</span> Correct Sentence Structure!";
+                explainersContainer.appendChild(bullet);
+
+            } else {
+                playSound('failure');
+                displayMascotMouthState('sad');
+                currentStreak = 0;
+
+                document.getElementById('feedback-title').innerHTML = `💡 Let's Look Closer, ${activeName}!`;
+                document.getElementById('feedback-title').className = "heading-font text-xl text-amber-600";
+                document.getElementById('feedback-message').innerHTML = `You are so close! Penny the Pencil found some mistakes. Let's fix them:`;
+
+                const activeData = levelSentencesPool[sentenceIndex];
+
+                if (workingWords[0].current.charAt(0) !== targetSentence.charAt(0)) {
+                    addCorrectionBullet(explainersContainer, "The first word of the sentence must start with a CAPITAL letter!");
+                }
+
+                if (currentLevel !== 'easy') {
+                    workingWords.forEach((wordObj, i) => {
+                        const targetWordFirst = wordObj.original.charAt(0);
+                        const userWordFirst = wordObj.current.charAt(0);
+                        if (targetWordFirst === targetWordFirst.toUpperCase() && userWordFirst !== targetWordFirst && i !== 0) {
+                            addCorrectionBullet(explainersContainer, `"${wordObj.original}" is a special name or day. It needs a CAPITAL letter!`);
+                        }
+                    });
+                }
+
+                if (currentLevel === 'hard' && !hasEndingFullStop) {
+                    addCorrectionBullet(explainersContainer, "Your sentence is missing its ending dot! Click the last grey box to add a full stop.");
+                }
+
+                if (activeData.hint) {
+                    addCorrectionBullet(explainersContainer, activeData.hint, "💡 Tip");
+                }
+            }
+
+            // Modify button text based on turn in versus
+            const nextBtnText = document.getElementById('next-btn-text');
+            if (isTwoPlayer && (sentenceIndex + 1 < levelSentencesPool.length)) {
+                const nextPlayer = (currentActiveTurn === 1) ? activePlayerName2 : activePlayerName;
+                nextBtnText.innerText = `Next (Turn: ${nextPlayer})`;
+            } else {
+                nextBtnText.innerText = (sentenceIndex + 1 < levelSentencesPool.length) ? "Next Sentence" : "Finish Level!";
+            }
+
+            updateStatsUI();
+            document.getElementById('feedback-panel').classList.remove('hidden');
+            document.getElementById('feedback-panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function addCorrectionBullet(container, message, tag = "❌ Notice") {
+            const bullet = document.createElement('div');
+            bullet.className = "bg-amber-50 text-amber-800 p-2.5 rounded-xl border border-amber-200 flex items-start gap-2 font-medium";
+            bullet.innerHTML = `<span class="font-bold text-amber-600 flex-shrink-0">${tag}:</span> <span>${message}</span>`;
+            container.appendChild(bullet);
+        }
+
+        function displayMascotMouthState(state) {
+            const mouth = document.getElementById('mascot-mouth');
+            if (state === 'happy') {
+                mouth.setAttribute('d', "M 35 60 Q 50 75 65 60");
+            } else if (state === 'sad') {
+                mouth.setAttribute('d', "M 35 65 Q 50 50 65 65");
+            } else {
+                mouth.setAttribute('d', "M 45 60 Q 50 60 55 60");
+            }
+        }
+
+        function nextChallenge() {
+            playSound('click');
+            displayMascotMouthState('neutral');
+            
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+
+            if (sentenceIndex + 1 < levelSentencesPool.length) {
+                sentenceIndex++;
+                
+                // Alternate turn in versus mode
+                if (isTwoPlayer) {
+                    currentActiveTurn = (currentActiveTurn === 1) ? 2 : 1;
+                }
+                loadActiveChallenge();
+            } else {
+                finishLevelCelebration();
+            }
+        }
+
+        function finishLevelCelebration() {
+            playSound('victory');
+            
+            const levelTitle = currentLevel === 'easy' ? "Level 1: Sentence Starters" : 
+                               currentLevel === 'medium' ? "Level 2: Special Names" : "Level 3: Full Stop Master";
+            document.getElementById('finished-level-name').innerText = levelTitle;
+
+            const title = document.getElementById('celebration-title');
+            const subtext = document.getElementById('celebration-subtext');
+            const badgeContainer = document.getElementById('celebration-badge-container');
+
+            if (isTwoPlayer) {
+                // Show versus comparison layout
+                document.getElementById('celebration-solo-results').classList.add('hidden');
+                document.getElementById('celebration-duel-results').classList.remove('hidden');
+
+                document.getElementById('duel-p1-name').innerText = activePlayerName;
+                document.getElementById('duel-p2-name').innerText = activePlayerName2;
+
+                document.getElementById('duel-p1-score').innerText = `${player1CorrectAnswersCount}/3`;
+                document.getElementById('duel-p2-score').innerText = `${player2CorrectAnswersCount}/3`;
+
+                document.getElementById('duel-p1-stars').innerText = `+${player1TotalStarsEarned} Stars`;
+                document.getElementById('duel-p2-stars').innerText = `+${player2TotalStarsEarned} Stars`;
+
+                const crown1 = document.getElementById('p1-win-crown');
+                const crown2 = document.getElementById('p2-win-crown');
+
+                crown1.classList.add('hidden');
+                crown2.classList.add('hidden');
+
+                if (player1CorrectAnswersCount > player2CorrectAnswersCount) {
+                    title.innerText = `👑 ${activePlayerName} Wins!`;
+                    subtext.innerText = `Congratulations on winning the ${levelTitle} Duel!`;
+                    crown1.classList.remove('hidden');
+                } else if (player2CorrectAnswersCount > player1CorrectAnswersCount) {
+                    title.innerText = `👑 ${activePlayerName2} Wins!`;
+                    subtext.innerText = `Congratulations on winning the ${levelTitle} Duel!`;
+                    crown2.classList.remove('hidden');
+                } else {
+                    title.innerText = "🤝 It's a Tie Game!";
+                    subtext.innerText = "Fantastic writing skills from both players today!";
+                }
+
+                // Save both players' individual metrics to the leaderboard
+                saveScoreboardEntry(activePlayerName, currentLevel, player1CorrectAnswersCount, 3, player1TotalStarsEarned);
+                saveScoreboardEntry(activePlayerName2, currentLevel, player2CorrectAnswersCount, 3, player2TotalStarsEarned);
+
+            } else {
+                // Show standard solo dashboard
+                document.getElementById('celebration-duel-results').classList.add('hidden');
+                document.getElementById('celebration-solo-results').classList.remove('hidden');
+
+                title.innerText = "Excellent Work!";
+                subtext.innerText = `You completed the ${levelTitle} Challenge!`;
+
+                document.getElementById('final-completed').innerText = `${levelCorrectAnswersCount}/${levelSentencesPool.length}`;
+                const bonusStars = levelCorrectAnswersCount * 3;
+                document.getElementById('final-stars').innerText = `+${bonusStars}`;
+
+                saveScoreboardEntry(activePlayerName, currentLevel, levelCorrectAnswersCount, levelSentencesPool.length, totalStars);
+            }
+
+            goToScreen('celebration');
+        }
+
+        function replayCurrentLevel() {
+            startPractice(currentLevel);
+        }
+
+        // --- Scoreboard Logic ---
+        function saveScoreboardEntry(name, level, correct, total, cumulativeStars) {
+            let records = [];
+            const stored = localStorage.getItem('grammar_quest_scoreboard');
+            if (stored) {
+                try {
+                    records = JSON.parse(stored);
+                } catch(e) {
+                    records = [];
+                }
+            }
+
+            const playerIndex = records.findIndex(r => r.name.toLowerCase() === name.toLowerCase());
+            
+            const attemptInfo = {
+                level: level,
+                score: `${correct}/${total}`,
+                stars: cumulativeStars,
+                date: new Date().toLocaleDateString()
+            };
+
+            if (playerIndex !== -1) {
+                records[playerIndex].stars = Math.max(records[playerIndex].stars, cumulativeStars);
+                records[playerIndex].attempts = records[playerIndex].attempts || [];
+                records[playerIndex].attempts.push(attemptInfo);
+            } else {
+                records.push({
+                    name: name,
+                    stars: cumulativeStars,
+                    attempts: [attemptInfo]
+                });
+            }
+
+            localStorage.setItem('grammar_quest_scoreboard', JSON.stringify(records));
+        }
+
+        function renderScoreboard() {
+            const tbody = document.getElementById('scoreboard-table-body');
+            tbody.innerHTML = "";
+
+            let records = [];
+            const stored = localStorage.getItem('grammar_quest_scoreboard');
+            if (stored) {
+                try {
+                    records = JSON.parse(stored);
+                } catch(e) {
+                    records = [];
+                }
+            }
+
+            if (records.length === 0) {
+                records = [
+                    { name: "Penny (Teacher Pencil)", stars: 18, attempts: [{ level: "hard", score: "6/6" }] },
+                    { name: "Anna", stars: 12, attempts: [{ level: "medium", score: "4/6" }] },
+                    { name: "Tom", stars: 9, attempts: [{ level: "easy", score: "3/6" }] }
+                ];
+            }
+
+            // Sort descending by stars count
+            records.sort((a, b) => b.stars - a.stars);
+
+            records.forEach((player, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-100 hover:bg-slate-50 transition-colors";
+
+                let rankLabel = `${idx + 1}`;
+                if (idx === 0) rankLabel = "🥇 1";
+                else if (idx === 1) rankLabel = "🥈 2";
+                else if (idx === 2) rankLabel = "🥉 3";
+
+                const isSelf = (activePlayerName && player.name.toLowerCase() === activePlayerName.toLowerCase()) || 
+                               (isTwoPlayer && activePlayerName2 && player.name.toLowerCase() === activePlayerName2.toLowerCase());
+                const rowClass = isSelf ? "bg-yellow-50 border-l-4 border-l-yellow-400" : "";
+
+                let lastAttemptScore = "0/6";
+                if (player.attempts && player.attempts.length > 0) {
+                    lastAttemptScore = player.attempts[player.attempts.length - 1].score;
+                }
+
+                tr.innerHTML = `
+                    <td class="p-4 text-center font-bold ${rowClass}">${rankLabel}</td>
+                    <td class="p-4 text-slate-900 font-bold ${rowClass} flex items-center gap-1.5">
+                        ${player.name}
+                        ${isSelf ? '<span class="bg-indigo-100 text-indigo-700 text-[10px] px-1.5 py-0.5 rounded-full uppercase tracking-wider">Active</span>' : ''}
+                    </td>
+                    <td class="p-4 text-center text-slate-500 ${rowClass}">${lastAttemptScore}</td>
+                    <td class="p-4 text-right text-yellow-600 font-extrabold ${rowClass}">
+                        <span class="inline-flex items-center gap-1">
+                            ★ ${player.stars}
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- Custom Dialog Modal Handlers (Replacing native alert/confirm blocks) ---
+        let currentModalAction = null;
+
+        function showClassroomModal(emoji, title, desc, onConfirm) {
+            const modal = document.getElementById('classroom-modal');
+            document.getElementById('modal-emoji').innerText = emoji;
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-description').innerText = desc;
+            
+            currentModalAction = onConfirm;
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            document.getElementById('modal-confirm-btn').onclick = () => {
+                if (currentModalAction) currentModalAction();
+                closeClassroomModal();
+            };
+        }
+
+        function closeClassroomModal() {
+            const modal = document.getElementById('classroom-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+            currentModalAction = null;
+        }
+
+        function triggerScoreboardResetModal() {
+            playSound('click');
+            showClassroomModal(
+                "🗑️",
+                "Clear Scoreboard?",
+                "This will permanently delete all student scoreboard rankings. This action cannot be undone.",
+                () => {
+                    localStorage.removeItem('grammar_quest_scoreboard');
+                    renderScoreboard();
+                    playSound('failure');
+                    showToast("Scoreboard reset!", "🗑️");
+                }
+            );
+        }
+
+        function triggerRestoreSentencesModal() {
+            playSound('click');
+            showClassroomModal(
+                "📚",
+                "Restore Default Sentences?",
+                "This will revert the sentence bank back to the default simple sentences. Your customized sentences will be lost.",
+                () => {
+                    sentencesBank = [...defaultSentences];
+                    saveSentencesToStorage();
+                    populateTeacherSentenceList();
+                    playSound('success');
+                    showToast("Defaults restored!", "📚");
+                }
+            );
+        }
+
+        function triggerResetProgressModal() {
+            playSound('click');
+            showClassroomModal(
+                "🔄",
+                "Reset Current Player Score?",
+                "This will reset stars and active streaks for your currently selected players.",
+                () => {
+                    totalStars = 0;
+                    currentStreak = 0;
+                    if (activePlayerName) {
+                        localStorage.setItem('grammar_quest_stars_' + activePlayerName, 0);
+                    }
+                    if (isTwoPlayer && activePlayerName2) {
+                        localStorage.setItem('grammar_quest_stars_' + activePlayerName2, 0);
+                    }
+                    updateStatsUI();
+                    playSound('click');
+                    showToast("Student progress reset!", "🔄");
+                }
+            );
+        }
+
+        // --- Teacher Zone Management ---
+        function openTeacherDashboard() {
+            goToScreen('teacher');
+        }
+
+        function populateTeacherSentenceList() {
+            const container = document.getElementById('sentence-bank-list');
+            container.innerHTML = "";
+
+            sentencesBank.forEach((sentence, index) => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-50 border border-slate-200 rounded-2xl p-3 flex items-start justify-between gap-3 text-xs sm:text-sm transition-all hover:bg-slate-100";
+                
+                let lvlTagColor = "bg-emerald-100 text-emerald-800";
+                let lvlName = "Level 1 (Starter)";
+                if (sentence.level === 'medium') {
+                    lvlTagColor = "bg-amber-100 text-amber-800";
+                    lvlName = "Level 2 (Names)";
+                } else if (sentence.level === 'hard') {
+                    lvlTagColor = "bg-indigo-100 text-indigo-800";
+                    lvlName = "Level 3 (Master)";
+                }
+
+                card.innerHTML = `
+                    <div class="space-y-1.5 flex-1">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="${lvlTagColor} font-bold px-2 py-0.5 rounded text-[10px] uppercase">${lvlName}</span>
+                            <span class="text-slate-400 font-mono">ID: ${sentence.id}</span>
+                        </div>
+                        <p class="font-bold text-slate-800 text-sm">"${sentence.correctText}"</p>
+                        <p class="text-slate-500 font-medium"><em>Hint:</em> ${sentence.hint || 'None'}</p>
+                    </div>
+                    <button onclick="removeSentence('${sentence.id}')" class="text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded-lg border border-transparent hover:border-red-100 transition-all" title="Remove Sentence">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function addCustomSentence() {
+            const rawText = document.getElementById('custom-text').value.trim();
+            const hint = document.getElementById('custom-hint').value.trim();
+            const level = document.getElementById('custom-level').value;
+
+            if (rawText.length === 0) {
+                showToast("Please enter a sentence first!", "⚠️");
+                return;
+            }
+
+            if (!rawText.endsWith('.')) {
+                showToast("Your sentence must end with a full stop dot ( . )", "⚠️");
+                return;
+            }
+
+            const newSentence = {
+                id: "c_" + Date.now(),
+                level: level,
+                correctText: rawText,
+                hint: hint || "Look closely at capitalization and full stops."
+            };
+
+            sentencesBank.push(newSentence);
+            saveSentencesToStorage();
+            populateTeacherSentenceList();
+
+            document.getElementById('custom-text').value = "";
+            document.getElementById('custom-hint').value = "";
+            
+            playSound('success');
+            showToast("New A1-A2 Sentence added!", "✏️");
+        }
+
+        function removeSentence(id) {
+            sentencesBank = sentencesBank.filter(s => s.id !== id);
+            saveSentencesToStorage();
+            populateTeacherSentenceList();
+            playSound('click');
+            showToast("Sentence removed from pool.", "🗑️");
+        }
+    </script>
+</body>
+</html>
